@@ -102,6 +102,7 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/api-nodes/overview',
+        'sdk/api-nodes/additional-nodes',
       ],
     },
     {
@@ -137,6 +138,7 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/apps/overview',
+        'sdk/apps/additional-apps',
       ],
     },
     {
@@ -148,6 +150,9 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/guides/getting-started',
+        'sdk/guides/testing',
+        'sdk/guides/migration',
+        'sdk/guides/troubleshooting',
       ],
     },
     {
@@ -159,6 +164,7 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/examples/basic',
+        'sdk/examples/advanced',
       ],
     },
   ],
