@@ -1,7 +1,7 @@
 {
-  "buildCommand": "bun run build",
+  "buildCommand": "cd docs && bun install && bun run build",
   "outputDirectory": "docs/build",
-  "installCommand": "bun run install:all",
+  "installCommand": "cd docs && bun install",
   "rewrites": [
     {
       "source": "/docs",
