@@ -37,6 +37,17 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: '🏗️ Architecture',
+      link: {
+        type: 'doc',
+        id: 'sdk/architecture/data-flow',
+      },
+      items: [
+        'sdk/architecture/data-flow',
+      ],
+    },
+    {
+      type: 'category',
       label: '🔧 Core SDK',
       link: {
         type: 'doc',
@@ -90,6 +101,19 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/network/overview',
+        'sdk/network/protocols',
+        'sdk/network/graph-registry',
+      ],
+    },
+    {
+      type: 'category',
+      label: '📱 Applications',
+      link: {
+        type: 'doc',
+        id: 'sdk/apps/overview',
+      },
+      items: [
+        'sdk/apps/overview',
       ],
     },
     {
