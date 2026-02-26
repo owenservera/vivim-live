@@ -1,367 +1,433 @@
+/* Hero Banner */
 .heroBanner {
   padding: 6rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
-  background: radial-gradient(ellipse 100% 80% at 50% 0%, rgba(166, 91, 240, 0.15) 0%, transparent 60%),
-              linear-gradient(180deg, rgba(0, 212, 255, 0.05) 0%, transparent 100%);
-}
-
-.heroBanner::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 50%, rgba(166, 91, 240, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 30%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
-  pointer-events: none;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #0f0f0f 100%);
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
 }
 
 .heroContent {
-  max-width: 800px;
-  margin: 0 auto;
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .heroBadge {
-  display: inline-block;
-  background: rgba(0, 212, 255, 0.1);
-  border: 1px solid rgba(0, 212, 255, 0.3);
-  color: #00d4ff;
-  padding: 0.5rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: rgba(166, 91, 240, 0.15);
+  border: 1px solid rgba(166, 91, 240, 0.3);
   border-radius: 50px;
   font-size: 0.875rem;
   font-weight: 500;
+  color: #a65bf0;
   margin-bottom: 1.5rem;
 }
 
+.badgeDot {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 .heroTitle {
-  font-size: 5rem !important;
-  font-weight: 800 !important;
-  background: linear-gradient(135deg, #fff 0%, #00d4ff 50%, #a65bf0 100%);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 0%, #a65bf0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin-bottom: 1rem !important;
-  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.heroAccent {
+  background: linear-gradient(135deg, #a65bf0 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .heroSubtitle {
-  font-size: 1.75rem !important;
-  color: #00d4ff !important;
-  font-weight: 500;
-  margin-bottom: 1rem !important;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  color: #94a3b8;
+  margin-bottom: 1rem;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .heroTagline {
-  font-size: 1.25rem !important;
-  color: #a0a0a0 !important;
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #64748b;
+  margin-bottom: 2.5rem;
   max-width: 600px;
-  margin: 0 auto 2rem !important;
+  margin-left: auto;
+  margin-right: auto;
   line-height: 1.6;
 }
 
 .heroStats {
   display: flex;
-  justify-content: center;
-  gap: 3rem;
-  margin-bottom: 2.5rem;
   flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .stat {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  min-width: 140px;
 }
 
 .statNumber {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #a65bf0 0%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .statLabel {
   font-size: 0.875rem;
-  color: #a0a0a0;
-  margin-top: 0.25rem;
+  color: #64748b;
+  margin-top: 0.5rem;
 }
 
 .buttons {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
+.heroButton {
+  transition: all 0.3s ease;
+}
+
+.heroButton:hover {
+  transform: translateY(-2px);
+}
+
+/* Hero Background Animation */
+.heroBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.heroParticle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(166, 91, 240, 0.5);
+  border-radius: 50%;
+}
+
+/* Sections */
 .section {
   padding: 5rem 0;
 }
 
-.sectionTitle {
+.sectionHeader {
   text-align: center;
-  margin-bottom: 0.5rem !important;
-  font-size: 2.5rem !important;
-  color: #fff;
-}
-
-.sectionSubtitle {
-  text-align: center;
-  color: #a0a0a0;
-  font-size: 1.125rem;
-  margin-bottom: 3rem !important;
-}
-
-.problemCard, .featureCard {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 2rem;
-  height: 100%;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.problemCard:hover, .featureCard:hover {
-  transform: translateY(-4px);
-  border-color: rgba(166, 91, 240, 0.3);
-  box-shadow: 0 10px 30px rgba(166, 91, 240, 0.1);
-}
-
-.problemCard {
-  background: rgba(255, 0, 110, 0.03);
-  border-color: rgba(255, 0, 110, 0.1);
-}
-
-.problemCard:hover {
-  border-color: rgba(255, 0, 110, 0.3);
-  box-shadow: 0 10px 30px rgba(255, 0, 110, 0.1);
-}
-
-.problemIcon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.featureCardLink {
-  text-decoration: none;
-  color: inherit;
-}
-
-.featureCardLink:hover {
-  color: inherit;
-}
-
-.featureCard {
-  background: rgba(166, 91, 240, 0.03);
-  border-color: rgba(166, 91, 240, 0.1);
-}
-
-.featureIcon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.featureCard h3 {
-  color: #fff;
-  margin-bottom: 0.75rem !important;
-}
-
-.featureCard p {
-  color: #a0a0a0;
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-/* How It Works Section */
-.howItWorksSection {
-  padding: 5rem 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.03) 50%, transparent 100%);
-}
-
-.flowDiagram {
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
   margin-bottom: 3rem;
 }
 
-.flowStep {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 150px;
+.sectionTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.flowIcon {
-  font-size: 2.5rem;
-  margin-bottom: 0.75rem;
-  background: rgba(166, 91, 240, 0.1);
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+.sectionSubtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #64748b;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Vision Section */
+.visionSection {
+  padding: 5rem 0;
+  background: linear-gradient(180deg, #0f0f0f 0%, #1a1a2e 100%);
+}
+
+.visionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.visionCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.visionIcon {
+  width: 60px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.flowStep h4 {
-  color: #fff;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.flowStep p {
-  color: #a0a0a0;
-  font-size: 0.8rem;
-}
-
-.flowArrow {
   font-size: 2rem;
-  color: rgba(166, 91, 240, 0.5);
-  margin-top: 1.5rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.flowDetails {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+.visionTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 0.75rem;
 }
 
-.flowDetailCard {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.flowDetailCard code {
-  color: #00d4ff;
-  font-size: 0.9rem;
-  margin-bottom: 0.25rem;
-}
-
-.flowDetailCard span {
-  color: #a0a0a0;
-  font-size: 0.8rem;
+.visionDescription {
+  color: #94a3b8;
+  line-height: 1.6;
 }
 
 /* Architecture Section */
 .architectureSection {
   padding: 5rem 0;
+  background: #0f0f0f;
 }
 
-.archGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  max-width: 1000px;
-  margin: 0 auto;
+.archStack {
+  max-width: 900px;
+  margin: 0 auto 2rem;
 }
 
-.archCard {
+.archLayer {
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 2rem;
-  text-align: center;
+  border-left: 4px solid;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1rem;
+  border-radius: 0 1rem 1rem 0;
   transition: all 0.3s ease;
 }
 
-.archCard:hover {
-  transform: translateY(-4px);
-  border-color: rgba(0, 212, 255, 0.3);
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+.archLayer:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateX(5px);
 }
 
-.archIcon {
-  font-size: 2.5rem;
+.archLayerName {
+  font-size: 1.25rem;
+  font-weight: 600;
   margin-bottom: 1rem;
 }
 
-.archCard h4 {
-  color: #fff;
-  margin-bottom: 0.5rem !important;
+.archItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.archCard p {
-  color: #a0a0a0;
-  font-size: 0.9rem;
-  margin-bottom: 1rem !important;
-}
-
-.archCard a {
-  color: #00d4ff;
+.archItem {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
   font-size: 0.875rem;
-  font-weight: 500;
+  color: #e2e8f0;
+  transition: all 0.3s ease;
 }
 
+.archItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.archLink {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.archLink a {
+  color: #a65bf0;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.archLink a:hover {
+  color: #c084fc;
+}
+
+/* Quick Links Section */
+.quickLinksSection {
+  padding: 5rem 0;
+  background: linear-gradient(180deg, #0f0f0f 0%, #1a1a2e 100%);
+}
+
+.linksGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.linkCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.linkCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.linkCardIcon {
+  font-size: 2rem;
+}
+
+.linkCardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.linkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.linkList li {
+  margin-bottom: 0.75rem;
+}
+
+.linkList a {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: block;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.linkList a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* CTA Section */
 .ctaSection {
   padding: 5rem 0;
+  background: linear-gradient(135deg, #a65bf0 0%, #0ea5e9 100%);
+}
+
+.ctaContent {
   text-align: center;
-  background: linear-gradient(180deg, transparent 0%, rgba(166, 91, 240, 0.1) 100%);
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.ctaSection h2 {
-  font-size: 2.5rem !important;
+.ctaTitle {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
   color: #fff;
-  margin-bottom: 1rem !important;
+  margin-bottom: 1rem;
 }
 
-.ctaSection p {
-  font-size: 1.25rem;
-  color: #a0a0a0;
+.ctaDescription {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.9);
   margin-bottom: 2rem;
 }
 
-@media screen and (max-width: 966px) {
+.ctaButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.ctaButton {
+  background: #fff;
+  color: #a65bf0;
+  border: 2px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.ctaButton:hover {
+  background: transparent;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
   .heroBanner {
-    padding: 3rem 1rem;
-  }
-  
-  .heroTitle {
-    font-size: 3rem !important;
-  }
-  
-  .heroSubtitle {
-    font-size: 1.25rem !important;
+    padding: 4rem 0;
+    min-height: 70vh;
   }
   
   .heroStats {
-    gap: 1.5rem;
+    gap: 1rem;
+  }
+  
+  .stat {
+    min-width: 100px;
+    padding: 1rem 1.5rem;
+  }
+  
+  .statNumber {
+    font-size: 2rem;
   }
   
   .buttons {
     flex-direction: column;
-  }
-  
-  .section {
-    padding: 3rem 0;
-  }
-  
-  .flowDiagram {
-    flex-direction: column;
     align-items: center;
   }
   
-  .flowArrow {
-    transform: rotate(90deg);
-    margin: 0;
+  .heroButton {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
   }
   
-  .flowStep {
-    max-width: 100%;
+  .visionGrid,
+  .linksGrid {
+    grid-template-columns: 1fr;
   }
 }

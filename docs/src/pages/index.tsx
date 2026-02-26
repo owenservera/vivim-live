@@ -1,181 +1,211 @@
+import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import Heading from '@theme/Heading';
+import {motion} from 'framer-motion';
 import styles from './index.module.css';
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
+  
   return (
     <header className={clsx('hero', styles.heroBanner)}>
       <div className="container">
-        <div className={styles.heroContent}>
-          <div className={styles.heroBadge}>🚀 Open Source</div>
-          <Heading as="h1" className={styles.heroTitle}>
-            VIVIM
-          </Heading>
-          <p className={styles.heroSubtitle}>
-            Your Personal AI Memory Platform
-          </p>
-          <p className={styles.heroTagline}>
-            Capture. Remember. Connect. Own your AI conversations forever.
-          </p>
-          <div className={styles.heroStats}>
-            <div className={styles.stat}>
-              <span className={styles.statNumber}>10K+</span>
-              <span className={styles.statLabel}>Conversations Captured</span>
-            </div>
-            <div className={styles.stat}>
+        <motion.div
+          initial={{opacity: 0, y: 30}}
+          animate={{opacity: 1, y: 0}}
+          transition={{duration: 0.8}}
+          className={styles.heroContent}>
+          
+          <motion.div
+            initial={{scale: 0.9, opacity: 0}}
+            animate={{scale: 1, opacity: 1}}
+            transition={{delay: 0.2, duration: 0.5}}
+            className={styles.heroBadge}>
+            <span className={styles.badgeDot}></span>
+            Open Source SDK
+          </motion.div>
+          
+          <motion.h1
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{delay: 0.3, duration: 0.8}}
+            className={styles.heroTitle}>
+            VIVIM <span className={styles.heroAccent}>SDK</span>
+          </motion.h1>
+          
+          <motion.p
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{delay: 0.4, duration: 0.8}}
+            className={styles.heroSubtitle}>
+            Open-Source E2E Self-Contained Toolkit for Decentralized Applications
+          </motion.p>
+          
+          <motion.p
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{delay: 0.5, duration: 0.8}}
+            className={styles.heroTagline}>
+            Build decentralized, AI-native, local-first applications with powerful P2P networking, 
+            distributed storage, and identity management.
+          </motion.p>
+          
+          <motion.div
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{delay: 0.6, duration: 0.8}}
+            className={styles.heroStats}>
+            <motion.div 
+              className={styles.stat}
+              whileHover={{scale: 1.05}}
+              transition={{type: 'spring', stiffness: 300}}>
+              <span className={styles.statNumber}>13+</span>
+              <span className={styles.statLabel}>Core Modules</span>
+            </motion.div>
+            <motion.div 
+              className={styles.stat}
+              whileHover={{scale: 1.05}}
+              transition={{type: 'spring', stiffness: 300}}>
               <span className={styles.statNumber}>8+</span>
-              <span className={styles.statLabel}>AI Providers</span>
-            </div>
-            <div className={styles.stat}>
+              <span className={styles.statLabel}>API Nodes</span>
+            </motion.div>
+            <motion.div 
+              className={styles.stat}
+              whileHover={{scale: 1.05}}
+              transition={{type: 'spring', stiffness: 300}}>
+              <span className={styles.statNumber}>10+</span>
+              <span className={styles.statLabel}>Applications</span>
+            </motion.div>
+            <motion.div 
+              className={styles.stat}
+              whileHover={{scale: 1.05}}
+              transition={{type: 'spring', stiffness: 300}}>
               <span className={styles.statNumber}>100%</span>
-              <span className={styles.statLabel}>E2E Encrypted</span>
-            </div>
-          </div>
-          <div className={styles.buttons}>
+              <span className={styles.statLabel}>Open Source</span>
+            </motion.div>
+          </motion.div>
+          
+          <motion.div
+            initial={{opacity: 0, y: 20}}
+            animate={{opacity: 1, y: 0}}
+            transition={{delay: 0.7, duration: 0.8}}
+            className={styles.buttons}>
             <Link
-              className="button button--primary button--lg"
-              to="/docs/getting-started/introduction"
-              style={{marginRight: '1rem'}}>
-              ⚡ Get Started
+              className={clsx('button', 'button--primary', 'button--lg', styles.heroButton)}
+              to="/docs/sdk/overview">
+              📦 Explore SDK
             </Link>
             <Link
-              className="button button--secondary button--lg"
-              to="/docs/architecture/overview">
-              🏗️ Architecture
+              className={clsx('button', 'button--secondary', 'button--lg', styles.heroButton)}
+              to="/docs/getting-started/introduction">
+              ⚡ Quick Start
             </Link>
-          </div>
-        </div>
+            <Link
+              className={clsx('button', 'button--outline', 'button--lg', styles.heroButton)}
+              to="https://github.com/vivim/vivim-sdk"
+              target="_blank">
+              🐙 GitHub
+            </Link>
+          </motion.div>
+        </motion.div>
+      </div>
+      
+      {/* Animated background elements */}
+      <div className={styles.heroBackground}>
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className={styles.heroParticle}
+            initial={{
+              x: Math.random() * 100 + '%',
+              y: Math.random() * 100 + '%',
+              opacity: 0,
+            }}
+            animate={{
+              y: [null, -100],
+              opacity: [0, 0.5, 0],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 10,
+              repeat: Infinity,
+              ease: 'linear',
+              delay: Math.random() * 5,
+            }}
+            style={{
+              left: Math.random() * 100 + '%',
+              animationDelay: Math.random() * 5 + 's',
+            }}
+          />
+        ))}
       </div>
     </header>
   );
 }
 
-function Feature({title, description, icon, link}: {title: string; description: string; icon: string; link: string}) {
-  return (
-    <div className={clsx('col col--4')}>
-      <Link to={link} className={styles.featureCardLink}>
-        <div className={styles.featureCard}>
-          <div className={styles.featureIcon}>{icon}</div>
-          <Heading as="h3">{title}</Heading>
-          <p>{description}</p>
-        </div>
-      </Link>
-    </div>
-  );
-}
-
-function ProblemSection() {
-  return (
-    <section className={styles.section}>
-      <div className="container">
-        <Heading as="h2" className={styles.sectionTitle}>The Problem with AI</Heading>
-        <p className={styles.sectionSubtitle}>Why we built VIVIM</p>
-        <div className="row">
-          <div className="col col--4">
-            <div className={styles.problemCard}>
-              <div className={styles.problemIcon}>🔒</div>
-              <Heading as="h4">Locked Away</Heading>
-              <p>AI providers store your conversations. You can't access, search, or use them outside their platforms.</p>
-            </div>
-          </div>
-          <div className="col col--4">
-            <div className={styles.problemCard}>
-              <div className={styles.problemIcon}>⏰</div>
-              <Heading as="h4">Ephemeral</Heading>
-              <p>Chat histories disappear. Context windows are limited. Your knowledge vanishes.</p>
-            </div>
-          </div>
-          <div className="col col--4">
-            <div className={styles.problemCard}>
-              <div className={styles.problemIcon}>🏝️</div>
-              <Heading as="h4">Siloed</Heading>
-              <p>Your AI interactions exist in isolated silos. No connection between sessions.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HowItWorksSection() {
-  return (
-    <section className={styles.howItWorksSection}>
-      <div className="container">
-        <Heading as="h2" className={styles.sectionTitle}>How It Works</Heading>
-        <p className={styles.sectionSubtitle}>From capture to intelligent context</p>
-        
-        <div className={styles.flowDiagram}>
-          <div className={styles.flowStep}>
-            <div className={styles.flowIcon}>📥</div>
-            <h4>Capture</h4>
-            <p>Import from ChatGPT, Claude, Gemini & more</p>
-          </div>
-          <div className={styles.flowArrow}>→</div>
-          <div className={styles.flowStep}>
-            <div className={styles.flowIcon}>🔐</div>
-            <h4>Encrypt</h4>
-            <p>E2E encryption, your keys, your data</p>
-          </div>
-          <div className={styles.flowArrow}>→</div>
-          <div className={styles.flowStep}>
-            <div className={styles.flowIcon}>🧠</div>
-            <h4>Understand</h4>
-            <p>Extract ACUs, entities, memories</p>
-          </div>
-          <div className={styles.flowArrow}>→</div>
-          <div className={styles.flowStep}>
-            <div className={styles.flowIcon}>⚡</div>
-            <h4>Context</h4>
-            <p>Build intelligent context for AI</p>
-          </div>
-        </div>
-        
-        <div className={styles.flowDetails}>
-          <div className={styles.flowDetailCard}>
-            <code>POST /api/v1/capture</code>
-            <span>Import conversation</span>
-          </div>
-          <div className={styles.flowDetailCard}>
-            <code>Yjs + CRDT</code>
-            <span>Conflict-free sync</span>
-          </div>
-          <div className={styles.flowDetailCard}>
-            <code>libp2p</code>
-            <span>P2P networking</span>
-          </div>
-          <div className={styles.flowDetailCard}>
-            <code>8 layers</code>
-            <span>Context pipeline</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FeaturesSection() {
-  const features = [
-    {title: 'End-to-End Encrypted', description: 'Your memories are encrypted. Only you can decrypt them with your keys.', icon: '🔐', link: '/docs/security/overview'},
-    {title: 'P2P Decentralized', description: 'No central server stores your data. Sync directly between devices.', icon: '🌐', link: '/docs/network/overview'},
-    {title: 'Offline-First', description: 'Works without internet. Sync when you are back online.', icon: '📴', link: '/docs/pwa/overview'},
-    {title: 'Storage V2', description: 'Content-addressed DAG storage with cryptographic verification.', icon: '💾', link: '/docs/pwa/storage-v2'},
-    {title: 'BYOK Support', description: 'Bring Your Own Key. Use your own API keys for privacy.', icon: '🔑', link: '/docs/pwa/byok'},
-    {title: 'Context Pipeline', description: 'Hyper-optimized streaming context pipelines with 8 layers.', icon: '🧠', link: '/docs/architecture/context'},
+function VisionSection() {
+  const visionItems = [
+    {
+      icon: '🌐',
+      title: 'Decentralized by Design',
+      description: 'No central servers. No single point of control. Your data lives on your devices, synchronized peer-to-peer.',
+      color: '#a65bf0',
+    },
+    {
+      icon: '🔐',
+      title: 'Sovereign Privacy',
+      description: 'End-to-end encryption with your keys. Zero-knowledge architecture. You own everything.',
+      color: '#0ea5e9',
+    },
+    {
+      icon: '🧠',
+      title: 'AI-Native Architecture',
+      description: 'Built from the ground up for AI applications. Memory, context, and agent loops as first-class primitives.',
+      color: '#f59e0b',
+    },
+    {
+      icon: '⚡',
+      title: 'Local-First Performance',
+      description: 'Works offline. Syncs when online. Optimized for edge execution with Bun runtime.',
+      color: '#10b981',
+    },
   ];
 
   return (
-    <section className={styles.section}>
+    <section className={styles.visionSection}>
       <div className="container">
-        <Heading as="h2" className={styles.sectionTitle}>Core Features</Heading>
-        <p className={styles.sectionSubtitle}>What makes VIVIM different</p>
-        <div className="row">
-          {features.map((props, idx) => (
-            <Feature key={idx} {...props} />
+        <motion.div
+          initial={{opacity: 0, y: 30}}
+          whileInView={{opacity: 1, y: 0}}
+          transition={{duration: 0.6}}
+          viewport={{once: true}}
+          className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Our Vision</h2>
+          <p className={styles.sectionSubtitle}>
+            A new paradigm for decentralized AI applications
+          </p>
+        </motion.div>
+        
+        <div className={styles.visionGrid}>
+          {visionItems.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{opacity: 0, y: 30}}
+              whileInView={{opacity: 1, y: 0}}
+              transition={{duration: 0.5, delay: index * 0.1}}
+              viewport={{once: true}}
+              whileHover={{y: -5, scale: 1.02}}
+              className={styles.visionCard}
+              style={{borderColor: item.color}}>
+              <div 
+                className={styles.visionIcon}
+                style={{background: `linear-gradient(135deg, ${item.color}22, ${item.color}11)`}}>
+                {item.icon}
+              </div>
+              <h3 className={styles.visionTitle}>{item.title}</h3>
+              <p className={styles.visionDescription}>{item.description}</p>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -183,38 +213,167 @@ function FeaturesSection() {
   );
 }
 
-function ArchitecturePreview() {
+function ArchitectureSection() {
+  const layers = [
+    {
+      name: 'Applications',
+      items: ['ACU Processor', 'OmniFeed', 'Circle Engine', 'Assistant', 'AI Documentation'],
+      color: '#a65bf0',
+    },
+    {
+      name: 'API Nodes',
+      items: ['Identity', 'Storage', 'Memory', 'AI Chat', 'Content', 'Social'],
+      color: '#0ea5e9',
+    },
+    {
+      name: 'SDK Core',
+      items: ['VivimSDK', 'RecordKeeper', 'Anchor Protocol', 'Self-Design', 'Assistant Runtime'],
+      color: '#f59e0b',
+    },
+    {
+      name: 'Network',
+      items: ['P2P Engine', 'Sync Protocol', 'Exit Node', 'DHT', 'GossipSub'],
+      color: '#10b981',
+    },
+    {
+      name: 'Infrastructure',
+      items: ['IPFS', 'Filecoin', 'SQLite', 'Chain of Trust'],
+      color: '#ef4444',
+    },
+  ];
+
   return (
     <section className={styles.architectureSection}>
       <div className="container">
-        <Heading as="h2" className={styles.sectionTitle}>System Architecture</Heading>
-        <p className={styles.sectionSubtitle}>Built for scale, designed for privacy</p>
+        <motion.div
+          initial={{opacity: 0, y: 30}}
+          whileInView={{opacity: 1, y: 0}}
+          transition={{duration: 0.6}}
+          viewport={{once: true}}
+          className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Architecture Overview</h2>
+          <p className={styles.sectionSubtitle}>
+            Modular layers working in harmony
+          </p>
+        </motion.div>
         
-        <div className={styles.archGrid}>
-          <div className={styles.archCard}>
-            <div className={styles.archIcon}>📱</div>
-            <h4>PWA Client</h4>
-            <p>React, offline-first, IndexedDB</p>
-            <Link to="/docs/pwa/overview">Learn more →</Link>
-          </div>
-          <div className={styles.archCard}>
-            <div className={styles.archIcon}>🌐</div>
-            <h4>P2P Network</h4>
-            <p>libp2p, CRDT, DHT</p>
-            <Link to="/docs/network/overview">Learn more →</Link>
-          </div>
-          <div className={styles.archCard}>
-            <div className={styles.archIcon}>🧠</div>
-            <h4>Context Engine</h4>
-            <p>8-layer pipeline, ACUs</p>
-            <Link to="/docs/architecture/context">Learn more →</Link>
-          </div>
-          <div className={styles.archCard}>
-            <div className={styles.archIcon}>💿</div>
-            <h4>Storage</h4>
-            <p>DAG storage, content-addressed</p>
-            <Link to="/docs/database/schema">Learn more →</Link>
-          </div>
+        <div className={styles.archStack}>
+          {layers.map((layer, index) => (
+            <motion.div
+              key={index}
+              initial={{opacity: 0, x: -50}}
+              whileInView={{opacity: 1, x: 0}}
+              transition={{duration: 0.5, delay: index * 0.1}}
+              viewport={{once: true}}
+              className={styles.archLayer}
+              style={{borderLeftColor: layer.color}}>
+              <h3 
+                className={styles.archLayerName}
+                style={{color: layer.color}}>
+                {layer.name}
+              </h3>
+              <div className={styles.archItems}>
+                {layer.items.map((item, i) => (
+                  <span key={i} className={styles.archItem}>{item}</span>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        
+        <motion.div
+          initial={{opacity: 0, y: 20}}
+          whileInView={{opacity: 1, y: 0}}
+          transition={{duration: 0.6, delay: 0.5}}
+          viewport={{once: true}}
+          className={styles.archLink}>
+          <Link to="/docs/sdk/architecture/data-flow">
+            View detailed architecture diagrams →
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function QuickLinksSection() {
+  const links = [
+    {
+      category: 'Getting Started',
+      icon: '🚀',
+      items: [
+        {label: 'Introduction', href: '/docs/sdk/overview'},
+        {label: 'Quick Start', href: '/docs/getting-started/introduction'},
+        {label: 'Installation', href: '/docs/getting-started/introduction#installation'},
+      ],
+    },
+    {
+      category: 'Core SDK',
+      icon: '🔧',
+      items: [
+        {label: 'SDK Overview', href: '/docs/sdk/core/overview'},
+        {label: 'Communication Protocol', href: '/docs/sdk/core/communication'},
+        {label: 'Self-Design Module', href: '/docs/sdk/core/self-design'},
+      ],
+    },
+    {
+      category: 'API Nodes',
+      icon: '🔌',
+      items: [
+        {label: 'Identity Node', href: '/docs/sdk/api-nodes/overview#identity-node'},
+        {label: 'Storage Node', href: '/docs/sdk/api-nodes/overview#storage-node'},
+        {label: 'Memory Node', href: '/docs/sdk/api-nodes/overview#memory-node'},
+      ],
+    },
+    {
+      category: 'Development',
+      icon: '💻',
+      items: [
+        {label: 'CLI Reference', href: '/docs/sdk/cli/overview'},
+        {label: 'Extension System', href: '/docs/sdk/extension/overview'},
+        {label: 'Testing Guide', href: '/docs/sdk/guides/testing'},
+      ],
+    },
+  ];
+
+  return (
+    <section className={styles.quickLinksSection}>
+      <div className="container">
+        <motion.div
+          initial={{opacity: 0, y: 30}}
+          whileInView={{opacity: 1, y: 0}}
+          transition={{duration: 0.6}}
+          viewport={{once: true}}
+          className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Quick Links</h2>
+          <p className={styles.sectionSubtitle}>
+            Jump to what you need
+          </p>
+        </motion.div>
+        
+        <div className={styles.linksGrid}>
+          {links.map((section, index) => (
+            <motion.div
+              key={index}
+              initial={{opacity: 0, y: 30}}
+              whileInView={{opacity: 1, y: 0}}
+              transition={{duration: 0.5, delay: index * 0.1}}
+              viewport={{once: true}}
+              whileHover={{y: -3}}
+              className={styles.linkCard}>
+              <div className={styles.linkCardHeader}>
+                <span className={styles.linkCardIcon}>{section.icon}</span>
+                <h3 className={styles.linkCardTitle}>{section.category}</h3>
+              </div>
+              <ul className={styles.linkList}>
+                {section.items.map((item, i) => (
+                  <li key={i}>
+                    <Link to={item.href}>{item.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
@@ -225,20 +384,30 @@ function CTASection() {
   return (
     <section className={styles.ctaSection}>
       <div className="container">
-        <Heading as="h2">Ready to own your AI?</Heading>
-        <p>Start capturing your AI conversations today.</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--primary button--lg"
-            to="/docs/getting-started/introduction">
-            ⚡ Get Started
-          </Link>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/architecture/pipeline">
-            🏗️ Context Pipeline
-          </Link>
-        </div>
+        <motion.div
+          initial={{opacity: 0, scale: 0.95}}
+          whileInView={{opacity: 1, scale: 1}}
+          transition={{duration: 0.6}}
+          viewport={{once: true}}
+          className={styles.ctaContent}>
+          <h2 className={styles.ctaTitle}>Ready to build the future?</h2>
+          <p className={styles.ctaDescription}>
+            Start building decentralized, AI-native applications with VIVIM SDK.
+          </p>
+          <div className={styles.ctaButtons}>
+            <Link
+              className={clsx('button', 'button--primary', 'button--lg', styles.ctaButton)}
+              to="/docs/getting-started/introduction">
+              ⚡ Get Started
+            </Link>
+            <Link
+              className={clsx('button', 'button--outline', 'button--lg', styles.ctaButton)}
+              to="https://github.com/vivim/vivim-sdk"
+              target="_blank">
+              🐙 View on GitHub
+            </Link>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -247,14 +416,13 @@ function CTASection() {
 export default function Home() {
   return (
     <Layout
-      title="VIVIM - Your Personal AI Memory Platform"
-      description="Capture, store, and interact with your AI conversations across multiple providers.">
+      title="VIVIM SDK - Decentralized AI Toolkit"
+      description="Open-source E2E self-contained toolkit for building decentralized, AI-native applications.">
       <HomepageHeader />
       <main>
-        <ProblemSection />
-        <HowItWorksSection />
-        <FeaturesSection />
-        <ArchitecturePreview />
+        <VisionSection />
+        <ArchitectureSection />
+        <QuickLinksSection />
         <CTASection />
       </main>
     </Layout>

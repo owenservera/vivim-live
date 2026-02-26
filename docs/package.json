@@ -1,9 +1,13 @@
 {
-  "name": "vivim-docs",
-  "version": "1.0.0",
+  "name": "temp-docs",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "docusaurus start --port 3001",
+    "dev": "docusaurus start",
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
@@ -44,5 +48,10 @@
   },
   "engines": {
     "node": ">=20.0"
-  }
+  },
+  "trustedDependencies": [
+    "@swc/core",
+    "core-js",
+    "core-js-pure"
+  ]
 }
