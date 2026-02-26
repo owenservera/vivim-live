@@ -152,6 +152,7 @@ const sidebars: SidebarsConfig = {
         'sdk/guides/getting-started',
         'sdk/guides/testing',
         'sdk/guides/migration',
+        'sdk/guides/performance',
         'sdk/guides/troubleshooting',
       ],
     },
@@ -164,6 +165,7 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/examples/basic',
+        'sdk/examples/intermediate',
         'sdk/examples/advanced',
       ],
     },
