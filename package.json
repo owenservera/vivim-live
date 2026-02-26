@@ -11,14 +11,44 @@
     "build": "bun run build:web && bun run build:docs",
     "build:web": "cd github-frontend && bun run build",
     "build:docs": "cd docs && bun run build",
-    "install:all": "bun install && cd github-frontend && bun install && cd ../docs && bun install"
+    "install:all": "bun install && cd github-frontend && bun install && cd ../docs && bun install",
+    "lint": "echo 'No root-level linting configured'",
+    "lint:docs": "cd docs && bun run lint",
+    "lint:frontend": "cd github-frontend && bun run lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "bun run typecheck:docs && bun run typecheck:frontend",
+    "typecheck:docs": "cd docs && bun run typecheck",
+    "typecheck:frontend": "cd github-frontend && bun run build",
+    "test": "echo 'No tests configured yet'",
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@commitlint/cli": "^19.0.0",
+    "@commitlint/config-conventional": "^19.0.0",
+    "concurrently": "^9.2.1",
+    "husky": "^9.0.0",
+    "prettier": "^3.2.0",
+    "semantic-release": "^24.0.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/github": "^9.0.0",
+    "@semantic-release/npm": "^12.0.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/owenservera/vivim-app.git",
     "directory": "vivim-live"
+  },
+  "release": {
+    "branches": ["main"],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git",
+      "@semantic-release/github"
+    ]
   }
 }

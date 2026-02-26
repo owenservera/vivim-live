@@ -1,0 +1,24 @@
+name: Auto Label Issues
+
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request:
+    types: [opened, labeled, synchronize]
+
+jobs:
+  label:
+    name: Label
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label bug issues
+        if: github.event_name == 'issues' && github.event.issue.labels.any(|label| label.name == 'bug')
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Label enhancement issues
+        if: github.event_name == 'issues' && github.event.issue.labels.any(|label| label.name == 'enhancement')
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

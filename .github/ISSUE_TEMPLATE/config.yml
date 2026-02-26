@@ -1,0 +1,19 @@
+name: Custom Issue Config
+blank_issues_enabled: true
+
+contact_links:
+  - name: 📚 Documentation
+    url: https://vivim.live/docs
+    about: Please check the documentation first
+
+  - name: 💬 Discord Community
+    url: https://discord.gg/vivim
+    about: Join our community for questions and discussions
+
+  - name: 🐦 Twitter
+    url: https://twitter.com/vivim
+    about: Follow us for updates
+
+  - name: ❓ General Questions
+    url: https://github.com/owenservera/vivim-live/discussions
+    about: Use GitHub Discussions for general questions

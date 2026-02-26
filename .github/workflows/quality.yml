@@ -1,0 +1,87 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
+      - '**.jsx'
+      - '**.json'
+      - '**.css'
+      - '**.yml'
+      - '**.yaml'
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
+      - '**.jsx'
+      - '**.json'
+      - '**.css'
+      - '**.yml'
+      - '**.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prettier:
+    name: Prettier Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Prettier
+        run: bun add -D prettier
+
+      - name: Check formatting
+        run: |
+          npx prettier --check .
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun run install:all
+
+      - name: Run security audit
+        run: |
+          bun audit || true
+
+  complexity:
+    name: Complexity Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun run install:all
+
+      - name: Check for TODO comments
+        run: |
+          echo "Checking for TODO/FIXME comments..."
+          grep -r "TODO\|FIXME\|XXX\|HACK" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" . || echo "No TODO/FIXME comments found"
