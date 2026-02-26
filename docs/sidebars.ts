@@ -57,6 +57,29 @@ const sidebars: SidebarsConfig = {
         'sdk/core/overview',
         'sdk/core/communication',
         'sdk/core/utilities',
+        'sdk/core/self-design',
+      ],
+    },
+    {
+      type: 'category',
+      label: '💻 CLI',
+      link: {
+        type: 'doc',
+        id: 'sdk/cli/overview',
+      },
+      items: [
+        'sdk/cli/overview',
+      ],
+    },
+    {
+      type: 'category',
+      label: '🔌 Extension System',
+      link: {
+        type: 'doc',
+        id: 'sdk/extension/overview',
+      },
+      items: [
+        'sdk/extension/overview',
       ],
     },
     {
