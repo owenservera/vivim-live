@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
-import { Github, Book, Users, Package, CircleIssue, GitPullRequest, Star, GitFork, Menu, X } from "lucide-react"
+import { Github, Book, Users, Package, CircleDot, GitPullRequest, Star, GitFork, Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 const navItems = [
   { href: "/", label: "Overview", icon: null },
   { href: "/repository", label: "Repository", icon: null },
-  { href: "/issues", label: "Issues", icon: CircleIssue },
+  { href: "/issues", label: "Issues", icon: CircleDot },
   { href: "/pull-requests", label: "Pull Requests", icon: GitPullRequest },
   { href: "/contributors", label: "Contributors", icon: Users },
   { href: "/releases", label: "Releases", icon: Package },

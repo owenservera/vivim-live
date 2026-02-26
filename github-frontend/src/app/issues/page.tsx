@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { 
-  CircleIssue, 
+  CircleDot, 
   Search, 
   Filter,
   MessageSquare,
@@ -117,7 +117,7 @@ export default function IssuesPage() {
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <CircleIssue className="h-8 w-8" />
+                <CircleDot className="h-8 w-8" />
                 <div>
                   <h1 className="text-3xl font-bold">Issues</h1>
                   <p className="text-muted-foreground">Track bugs, enhancements, and feature requests</p>
@@ -200,7 +200,7 @@ export default function IssuesPage() {
                           className="p-4 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors"
                         >
                           <div className="flex items-start gap-3">
-                            <CircleIssue className="h-5 w-5 text-green-600 mt-0.5" />
+                            <CircleDot className="h-5 w-5 text-green-600 mt-0.5" />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
                                 <h3 className="font-semibold truncate">{issue.title}</h3>
