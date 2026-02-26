@@ -1,17 +1,7 @@
 {
-  "buildCommand": "cd docs && bun run build",
-  "outputDirectory": "docs/build",
-  "installCommand": "bun install && cd docs && bun install",
-  "rewrites": [
-    {
-      "source": "/docs",
-      "destination": "/docs/index.html"
-    },
-    {
-      "source": "/docs/:path*",
-      "destination": "/docs/:path*"
-    }
-  ],
+  "buildCommand": "node build.js",
+  "outputDirectory": "dist",
+  "installCommand": "bun install",
   "headers": [
     {
       "source": "/docs/(.*)",
