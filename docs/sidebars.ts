@@ -44,6 +44,19 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'sdk/core/overview',
+        'sdk/core/communication',
+        'sdk/core/utilities',
+      ],
+    },
+    {
+      type: 'category',
+      label: '🥟 Bun Integration',
+      link: {
+        type: 'doc',
+        id: 'sdk/bun/integration',
+      },
+      items: [
+        'sdk/bun/integration',
       ],
     },
     {
