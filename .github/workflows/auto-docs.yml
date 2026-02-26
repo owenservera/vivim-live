@@ -1,0 +1,422 @@
+name: AI Documentation Pipeline
+
+# This workflow automatically generates documentation when vivi-app source code changes
+
+on:
+  # Trigger from vivi-app repository via repository dispatch
+  repository_dispatch:
+    types: [vivi-app-changed]
+  
+  # Also allow manual/scheduled runs
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: 'Source branch to check for changes'
+        required: false
+        default: 'main'
+
+# Cancel in-progress runs when a new run is triggered
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ZAI_MODEL: glm-4.7
+
+jobs:
+  detect-changes:
+    name: Detect Source Changes
+    runs-on: ubuntu-latest
+    outputs:
+      has_changes: ${{ steps.check_changes.outputs.has_changes }}
+      changed_files: ${{ steps.check_changes.outputs.changed_files }}
+      commit_sha: ${{ steps.check_changes.outputs.commit_sha }}
+    steps:
+      - name: Checkout vivim-live
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Fetch vivi-app changes
+        uses: actions/checkout@v4
+        with:
+          repository: owenservera/vivi-app
+          path: vivi-app
+          fetch-depth: 50
+          token: ${{ secrets.GH_TOKEN }}
+      
+      - name: Detect changed files
+        id: check_changes
+        shell: bash
+        run: |
+          cd vivi-app
+          
+          # Get the commit SHA from the event or use latest
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            CURRENT_COMMIT="${{ github.event.client_payload.commit }}"
+          else
+            CURRENT_COMMIT=$(git rev-parse origin/main 2>/dev/null || git rev-parse HEAD)
+          fi
+          
+          echo "Current commit: $CURRENT_COMMIT"
+          echo "commit_sha=$CURRENT_COMMIT" >> $GITHUB_OUTPUT
+          
+          # Get last processed commit from marker file
+          if [ -f ../.github/workflows/docs-marker.txt ]; then
+            LAST_COMMIT=$(cat ../.github/workflows/docs-marker.txt | tr -d '\n\r')
+          else
+            # First run - get recent changes
+            LAST_COMMIT=""
+          fi
+          
+          echo "Last processed commit: $LAST_COMMIT"
+          
+          if [ -z "$LAST_COMMIT" ] || [ "$LAST_COMMIT" = "NONE" ]; then
+            # First run - get recent changes from last 20 commits
+            CHANGED_FILES=$(git diff --name-only HEAD~20 HEAD -- 'src/**' 'packages/**' 'lib/**' '*.ts' '*.tsx' '*.js' '*.jsx' 2>/dev/null | grep -v '\.test\.' | grep -v '\.spec\.' | grep -v 'node_modules' || true)
+          else
+            # Get changes since last run
+            CHANGED_FILES=$(git diff --name-only $LAST_COMMIT $CURRENT_COMMIT -- 'src/**' 'packages/**' 'lib/**' '*.ts' '*.tsx' '*.js' '*.jsx' 2>/dev/null | grep -v '\.test\.' | grep -v '\.spec\.' | grep -v 'node_modules' || true)
+          fi
+          
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "changed_files=" >> $GITHUB_OUTPUT
+            echo "No source files changed"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            # Escape for multiline output
+            echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "Changed files: $CHANGED_FILES"
+          fi
+
+  generate-docs:
+    name: Generate Documentation
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout vivim-live
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+      
+      - name: Fetch vivi-app source
+        uses: actions/checkout@v4
+        with:
+          repository: owenservera/vivi-app
+          path: vivi-app
+          token: ${{ secrets.GH_TOKEN }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        run: npm install axios
+      
+      - name: Generate documentation
+        id: generate
+        env:
+          CHANGED_FILES: ${{ needs.detect-changes.outputs.changed_files }}
+          COMMIT_SHA: ${{ needs.detect-changes.outputs.commit_sha }}
+        shell: bash
+        run: |
+          cat > generate-docs.mjs << 'EOFJS'
+          import axios from 'axios';
+          import fs from 'fs';
+          import path from 'path';
+          import { fileURLToPath } from 'url';
+          
+          const __filename = fileURLToPath(import.meta.url);
+          const __dirname = path.dirname(__filename);
+          
+          const ZAI_API_KEY = process.env.ZAI_API_KEY;
+          const ZAI_BASE_URL = process.env.ZAI_BASE_URL || 'https://api.z.ai/api/coding/paas/v4';
+          const ZAI_MODEL = process.env.ZAI_MODEL || 'glm-4.7';
+          const changedFiles = (process.env.CHANGED_FILES || '').split('\n').filter(f => f.trim());
+          const commitSha = process.env.COMMIT_SHA || '';
+          
+          async function generateDocs() {
+            console.log(`Processing ${changedFiles.length} changed files...`);
+            
+            if (changedFiles.length === 0) {
+              console.log('No files to process');
+              return null;
+            }
+            
+            // Read changed files content
+            const fileContents = [];
+            const maxFiles = 8;  // Limit to 8 files to manage tokens
+            const maxContent = 4000;  // Limit content per file
+            
+            for (const file of changedFiles.slice(0, maxFiles)) {
+              try {
+                const fullPath = path.join(process.cwd(), 'vivi-app', file);
+                if (fs.existsSync(fullPath)) {
+                  let content = fs.readFileSync(fullPath, 'utf-8');
+                  // Truncate long files
+                  if (content.length > maxContent) {
+                    content = content.substring(0, maxContent) + '\n\n// ... (truncated)';
+                  }
+                  fileContents.push({ file, content });
+                }
+              } catch (e) {
+                console.log(`Could not read ${file}: ${e.message}`);
+              }
+            }
+            
+            if (fileContents.length === 0) {
+              console.log('No readable files to document');
+              return null;
+            }
+            
+            // Build prompt for Z.AI
+            const systemPrompt = `You are an expert technical documentation generator specializing in TypeScript/JavaScript APIs. 
+            
+Analyze the provided code and generate comprehensive, production-ready documentation in Markdown format suitable for Docusaurus.
+
+Generate documentation with these exact sections:
+1. \`## Overview\` - Brief description of what this code provides
+2. \`## API Reference\` - Functions, classes, interfaces with:
+   - Parameter names, types, and descriptions
+   - Return types and descriptions
+   - Optional vs required parameters
+3. \`## Type Definitions\` - TypeScript interfaces/types used
+4. \`## Usage Example\` - Working code example
+5. \`## Notes\` - Any important caveats or considerations
+
+Use Docusaurus frontmatter:
+---
+id: auto-{module-name}
+title: {Descriptive Title}
+sidebar_label: {Short Label}
+---
+
+Style: Clear, concise, developer-focused. Include real code examples.`;
+            
+            const userPrompt = `Generate documentation for these changed files from vivi-app (commit: ${commitSha.slice(0, 7)}):\n\n${fileContents.map(f => `### File: ${f.file}\n\n\`\`\`typescript\n${f.content}\n\`\`\``).join('\n\n\n')}\n\nFocus on the public API surface - exports, public methods, and interfaces. Ignore internal implementation details.`;
+            
+            console.log('Calling Z.AI API...');
+            console.log(`Model: ${ZAI_MODEL}`);
+            console.log(`Endpoint: ${ZAI_BASE_URL}`);
+            
+            try {
+              const response = await axios.post(
+                `${ZAI_BASE_URL}/chat/completions`,
+                {
+                  model: ZAI_MODEL,
+                  messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: userPrompt }
+                  ],
+                  temperature: 0.2,
+                  max_tokens: 4096
+                },
+                {
+                  headers: {
+                    'Authorization': `Bearer ${ZAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                  },
+                  timeout: 120000  // 2 minute timeout
+                }
+              );
+              
+              const generatedDocs = response.data.choices[0].message.content;
+              console.log(`Tokens used: ${response.data.usage?.total_tokens || 'unknown'}`);
+             ;
+              console.log console.log(`Tokens used: ${response.data.usage?.total_tokens || 'unknown'}`);
+              
+              return generatedDocs;
+            } catch (error) {
+              console.error('Z.AI API Error:', error.message);
+              if (error.response) {
+                console.error('Response:', error.response.data);
+              }
+              throw error;
+            }
+          }
+          
+          async function main() {
+            const docs = await generateDocs();
+            
+            if (!docs) {
+              console.log('No documentation generated');
+              process.exit(0);
+            }
+            
+            // Save to docs directory
+            const docsDir = path.join(process.cwd(), 'docs', 'docs', 'auto-generated');
+            if (!fs.existsSync(docsDir)) {
+              fs.mkdirSync(docsDir, { recursive: true });
+            }
+            
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const outputFile = path.join(docsDir, `api-changes-${timestamp}.md`);
+            fs.writeFileSync(outputFile, docs);
+            
+            console.log(`Documentation saved to ${outputFile}`);
+            
+            // Also update main index file
+            const indexFile = path.join(docsDir, 'index.md');
+            const indexContent = `---
+id: auto-generated
+title: Auto-Generated API Documentation
+sidebar_label: API Changes
+---
+
+# Auto-Generated Documentation
+
+This documentation is automatically generated from vivi-app source code changes using Z.AI GLM-4.7.
+
+## Recent Updates
+
+| Date | Description |
+|------|-------------|
+| ${timestamp} | Auto-generated from latest changes |
+
+## Generated Documents
+
+See individual files in this directory for detailed documentation.
+
+---
+*Generated by AI Documentation Pipeline*
+`;
+            fs.writeFileSync(indexFile, indexContent);
+            console.log('Index updated');
+          }
+          
+          main().then(() => {
+            console.log('Done!');
+            process.exit(0);
+          }).catch(err => {
+            console.error('Fatal error:', err.message);
+            process.exit(1);
+          });
+          EOFJS
+          
+          # Run the script
+          CHANGED_FILES="$CHANGED_FILES" \
+          COMMIT_SHA="$COMMIT_SHA" \
+          ZAI_API_KEY="$ZAI_API_KEY" \
+          ZAI_BASE_URL="https://api.z.ai/api/coding/paas/v4" \
+          ZAI_MODEL="glm-4.7" \
+          node generate-docs.mjs
+      
+      - name: Check generated docs
+        id: check_docs
+        run: |
+          DOCS_DIR="docs/docs/auto-generated"
+          if [ -d "$DOCS_DIR" ] && [ "$(ls -A $DOCS_DIR)" ]; then
+            echo "docs_generated=true" >> $GITHUB_OUTPUT
+            echo "Documentation files created:"
+            ls -la $DOCS_DIR
+          else
+            echo "docs_generated=false" >> $GITHUB_OUTPUT
+            echo "No documentation was generated"
+          fi
+
+  commit-and-deploy:
+    name: Commit and Deploy
+    needs: generate-docs
+    if: needs.generate-docs.outputs.docs_generated == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_TOKEN }}
+      
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      
+      - name: Commit documentation changes
+        run: |
+          # Stage all docs changes
+          git add docs/
+          
+          # Check if there are changes
+          if ! git diff --cached --quiet; then
+            echo "Committing documentation changes..."
+            git commit -m "docs: Auto-generate API documentation from vivi-app [skip ci]"
+            
+            echo "Pushing to origin..."
+            git push origin main
+          else
+            echo "No changes to commit"
+          fi
+      
+      - name: Update marker file
+        run: |
+          echo "${{ needs.detect-changes.outputs.commit_sha }}" > .github/workflows/docs-marker.txt
+          git add .github/workflows/docs-marker.txt
+          git commit -m "chore: Update docs generation marker"
+          git push origin main
+      
+      - name: Trigger Vercel Deployment
+        if: success()
+        run: |
+          echo "Checking for Vercel deploy hook..."
+          if [ -n "${{ secrets.VERCEL_DEPLOY_HOOK }}" ]; then
+            echo "Triggering Vercel deployment..."
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}" \
+              -H "Content-Type: application/json" \
+              -d '{"ref": "main", "message": "Auto-generated documentation update"}')
+            
+            if [ "$RESPONSE" = "200" ] || [ "$RESPONSE" = "201" ]; then
+              echo "Vercel deployment triggered successfully!"
+            else
+              echo "Vercel trigger returned: $RESPONSE"
+              # Note: Vercel also auto-deploys on git push, so this is backup
+            fi
+          else
+            echo "No VERCEL_DEPLOY_HOOK configured - Vercel will auto-deploy on git push"
+          fi
+
+  notify-failure:
+    name: Notify on Failure
+    needs: [detect-changes, generate-docs, commit-and-deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue on failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueBody = `
+            ## Documentation Pipeline Failed
+            
+            **Workflow:** ${{ github.workflow }}
+            **Run:** ${{ github.run_id }}
+            **Commit:** ${{ github.sha }}
+            
+            ### Steps Failed:
+            - Detect Changes: ${{ needs.detect-changes.result }}
+            - Generate Docs: ${{ needs.generate-docs.result }}
+            - Commit & Deploy: ${{ needs.commit-and-deploy.result }}
+            
+            ### Action Required:
+            Please check the workflow logs and fix the issue.
+            
+            [View Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '[Auto] Documentation Pipeline Failed',
+              body: issueBody,
+              labels: ['documentation', 'bug', 'automated']
+            });
