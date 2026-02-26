@@ -2,9 +2,11 @@
 
 **Sovereign AI Interface with Documentation**
 
-This repository contains the VIVIM Live deployment with:
-- **Landing Page**: Stealth-style interface at root
-- **Documentation**: Docusaurus-powered docs at `/docs`
+🌐 **Live Site**: [vivim.live](https://vivim.live) | 📚 **Docs**: [vivim.live/docs](https://vivim.live/docs)
+
+This repository contains the complete VIVIM Live platform:
+- **Landing Page**: Stealth-style interface at root (`/`)
+- **Documentation**: Docusaurus-powered SDK docs at `/docs`
 
 ## Quick Start
 
@@ -23,78 +25,46 @@ bun run build
 
 ```
 vivim-live/
-├── github-frontend/    # Next.js 15 GitHub-style frontend
+├── github-frontend/    # Next.js 15 GitHub-style frontend (optional)
 ├── docs/               # Docusaurus documentation
 │   ├── build/          # Production build output
 │   ├── docs/           # Documentation source
 │   │   └── sdk/        # SDK documentation
 │   └── docusaurus.config.ts
 ├── index.html          # Landing page
+├── vercel.json         # Vercel deployment config
 └── package.json        # Root package.json
 ```
 
-## Deployment
+## Deployment (Vercel)
 
-### For vivim.live
+This repository is configured for **automatic deployments** from GitHub to Vercel.
 
-The documentation is configured to be served at `https://www.vivim.live/docs`.
+### Auto-Deploy Workflow
 
-1. **Build the documentation**:
-   ```bash
-   cd docs
-   bun run build
-   ```
+| Action | Result |
+|--------|--------|
+| Push to `main` | Auto-deploy to production |
+| Push to feature branch | Auto-deploy to preview URL |
+| Create Pull Request | Create preview deployment |
 
-2. **Deploy the `docs/build` directory** to your hosting provider.
+### Vercel Configuration
 
-3. **Configure your web server** to serve:
-   - Root (`/`) → Landing page (`index.html`)
-   - `/docs/*` → Documentation (`docs/build/*`)
+The `vercel.json` handles:
+- **Build Command**: `cd docs && bun run build`
+- **Output Directory**: `docs/build`
+- **Rewrites**: `/docs/*` → Documentation
+- **Root**: Landing page (`index.html`)
 
-### Using Vercel
+### Manual Deploy
 
 ```bash
-# Install Vercel CLI
-npm i -g vercel
+# Build documentation
+cd docs
+bun run build
 
-# Deploy
+# Deploy to Vercel
 vercel --prod
-```
-
-### Using Netlify
-
-1. Connect your repository to Netlify
-2. Set build command: `bun run build`
-3. Set publish directory: `docs/build`
-4. Configure redirects in `netlify.toml`:
-   ```toml
-   [[redirects]]
-     from = "/docs/*"
-     to = "/docs/:splat"
-     status = 200
-   ```
-
-### Using nginx
-
-```nginx
-server {
-    listen 80;
-    server_name vivim.live www.vivim.live;
-
-    root /var/www/vivim-live;
-    index index.html;
-
-    # Landing page
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Documentation
-    location /docs {
-        alias /var/www/vivim-live/docs/build;
-        try_files $uri $uri/ /docs/index.html;
-    }
-}
 ```
 
 ## Development
@@ -103,14 +73,13 @@ server {
 
 ```bash
 cd docs
+bun install
 bun run dev
 ```
 
-The docs will be available at `http://localhost:3000/docs`.
+Available at `http://localhost:3000/docs`
 
 ### Run Landing Page Only
-
-The landing page is a static HTML file. Open `index.html` in a browser or serve it:
 
 ```bash
 # Using Python
@@ -120,23 +89,71 @@ python -m http.server 8000
 npx serve .
 ```
 
+### Run Both (Development)
+
+```bash
+# Root terminal - landing page
+python -m http.server 3000
+
+# Docs terminal - documentation
+cd docs
+bun run dev
+```
+
 ## Documentation Structure
 
-The SDK documentation is organized into:
+### SDK Documentation (NEW!)
 
-- **Overview** (`/docs/sdk/overview`) - Introduction to VIVIM SDK
-- **Core SDK** (`/docs/sdk/core/overview`) - Core types and utilities
-- **API Nodes** (`/docs/sdk/api-nodes/overview`) - Identity, Storage, AI Chat, etc.
-- **SDK Nodes** (`/docs/sdk/sdk-nodes/overview`) - React, Vue, Svelte, Flutter adapters
-- **Network** (`/docs/sdk/network/overview`) - P2P networking
-- **Guides** (`/docs/sdk/guides/getting-started`) - Step-by-step tutorials
-- **Examples** (`/docs/sdk/examples/basic`) - Code examples
+| Document | Path |
+|----------|------|
+| **SDK Overview** | `/docs/sdk/overview` |
+| **Core SDK** | `/docs/sdk/core/overview` |
+| **API Nodes** | `/docs/sdk/api-nodes/overview` |
+| **SDK Nodes** | `/docs/sdk/sdk-nodes/overview` |
+| **Network** | `/docs/sdk/network/overview` |
+| **Getting Started** | `/docs/sdk/guides/getting-started` |
+| **Examples** | `/docs/sdk/examples/basic` |
+
+### Other Documentation
+
+- Architecture
+- API Reference
+- PWA Guide
+- Network Security
+- User Guides
 
 ## GitHub Repositories
 
-- **Main Application**: [github.com/owenservera/vivim-app](https://github.com/owenservera/vivim-app)
-- **SDK**: [github.com/vivim/vivim-sdk](https://github.com/vivim/vivim-sdk)
+| Repository | Description |
+|------------|-------------|
+| **[vivim-live](https://github.com/owenservera/vivim-live)** | 🏠 Main landing site + docs |
+| **[vivim-app](https://github.com/owenservera/vivim-app)** | 💻 Full application (PWA, Server, P2P) |
+| **[vivim-sdk](https://github.com/vivim/vivim-sdk)** | 📦 SDK package |
+
+## Commands
+
+```bash
+# Install all dependencies
+bun run install:all
+
+# Development
+bun run dev              # Run all dev servers
+bun run dev:docs         # Run docs only
+bun run dev:web          # Run web frontend only
+
+# Build
+bun run build            # Build everything
+bun run build:docs       # Build docs only
+bun run build:web        # Build web frontend only
+
+# Preview
+bun run serve            # Serve production build
+```
 
 ## License
 
 MIT License - See LICENSE file for details.
+
+---
+
+**Built with** Docusaurus **| Deployed on** Vercel

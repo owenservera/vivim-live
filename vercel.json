@@ -1,12 +1,15 @@
 {
-  "framework": "docusaurus",
   "buildCommand": "cd docs && bun run build",
   "outputDirectory": "docs/build",
-  "installCommand": "cd docs && bun install",
+  "installCommand": "bun install && cd docs && bun install",
   "rewrites": [
     {
-      "source": "/docs/(.*)",
-      "destination": "/docs/$1"
+      "source": "/docs",
+      "destination": "/docs/index.html"
+    },
+    {
+      "source": "/docs/:path*",
+      "destination": "/docs/:path*"
     }
   ],
   "headers": [
