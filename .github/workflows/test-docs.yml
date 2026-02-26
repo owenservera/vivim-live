@@ -1,0 +1,25 @@
+name: Test Documentation Pipeline
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [test-event]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Test environment
+        run: |
+          echo "Testing workflow..."
+          echo "ZAI_API_KEY exists: ${{ secrets.ZAI_API_KEY != '' }}"
+          echo "GH_TOKEN exists: ${{ secrets.GH_TOKEN != '' }}"
+      
+      - name: Test Z.AI API
+        run: |
+          curl -s -X POST "https://api.z.ai/api/coding/paas/v4/models" \
+            -H "Authorization: Bearer ${{ secrets.ZAI_API_KEY }}" \
+            -H "Content-Type: application/json" | head -100
