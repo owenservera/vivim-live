@@ -7,7 +7,7 @@
     { "source": "/style.css", "destination": "/style.css" },
     { "source": "/script.js", "destination": "/script.js" },
     { "source": "/assets/:path*", "destination": "/assets/:path*" },
-    { "source": "/docs", "destination": "/docs/index.html" },
+    { "source": "/docs/", "destination": "/docs/index.html" },
     { "source": "/docs/:path*", "destination": "/docs/:path*" }
   ],
   "headers": [
