@@ -6,8 +6,10 @@
     { "source": "/", "destination": "/index.html" },
     { "source": "/style.css", "destination": "/style.css" },
     { "source": "/script.js", "destination": "/script.js" },
-    { "source": "/assets/:path*", "destination": "/assets/:path*" },
-    { "source": "/docs/", "destination": "/docs/index.html" },
+    { "source": "/assets/:path*", "destination": "/assets/:path*" }
+  ],
+  "redirects": [
+    { "source": "/docs", "destination": "/docs/", "permanent": false },
     { "source": "/docs/:path*", "destination": "/docs/:path*" }
   ],
   "headers": [
