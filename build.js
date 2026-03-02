@@ -1,12 +1,14 @@
 // Build script for Vercel deployment
-// Combines landing page with Docusaurus docs
+// Combines landing page with Docusaurus docs from vivim-app-og
 
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = __dirname;
 const DIST = path.join(ROOT, 'dist');
-const DOCS_BUILD = path.join(ROOT, 'docs', 'build');
+
+// Docs source: always use external vivim-app-og
+const DOCS_BUILD = path.join(ROOT, '..', 'vivim-app-og', 'vivim-app', 'vivim.docs.context', 'build');
 
 // Create dist directory
 if (!fs.existsSync(DIST)) {
@@ -35,9 +37,9 @@ if (fs.existsSync(assetsSrc)) {
 // Copy docs build to dist/docs
 if (fs.existsSync(DOCS_BUILD)) {
   fs.cpSync(DOCS_BUILD, path.join(DIST, 'docs'), { recursive: true });
-  console.log('Copied docs/build to dist/docs/');
+  console.log(`Copied docs to dist/docs/ (from vivim-app-og)`);
 } else {
-  console.log('Warning: docs/build not found. Run "cd docs && bun run build" first.');
+  console.log(`Warning: External docs not found at ${DOCS_BUILD}`);
 }
 
 console.log('Build complete! Output in dist/');
