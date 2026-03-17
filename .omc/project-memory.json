@@ -207,8 +207,8 @@
   "hotPaths": [
     {
       "path": "index.html",
-      "accessCount": 11,
-      "lastAccessed": 1773770511491,
+      "accessCount": 15,
+      "lastAccessed": 1773772151451,
       "type": "file"
     },
     {
@@ -269,6 +269,12 @@
       "path": "bunfig.toml",
       "accessCount": 1,
       "lastAccessed": 1773766865287,
+      "type": "file"
+    },
+    {
+      "path": ".deployment-summary.md",
+      "accessCount": 1,
+      "lastAccessed": 1773771631882,
       "type": "file"
     }
   ],
