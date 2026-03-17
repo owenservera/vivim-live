@@ -3,11 +3,8 @@
   "version": "1.0.0",
   "description": "VIVIM Live - Sovereign AI Interface with Documentation",
   "private": true,
-  "workspaces": ["github-frontend", "docs"],
   "scripts": {
     "dev": "concurrently \"bun run dev:web\" \"bun run dev:docs\"",
-    "dev:web": "cd github-frontend && bun run dev",
-    "dev:docs": "cd docs && bun run dev",
     "build": "node build.js",
     "build:web": "cd github-frontend && bun run build",
     "build:docs": "cd docs && bun run build",

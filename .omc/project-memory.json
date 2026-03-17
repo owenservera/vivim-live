@@ -1,0 +1,222 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1773761112579,
+  "projectRoot": "C:\\0-BlackBoxProject-0\\vivim-live",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      }
+    ],
+    "frameworks": [],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": "npm run lint",
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "concurrently \"bun run dev:web\" \"bun run dev:docs\"",
+      "dev:web": "cd github-frontend && bun run dev",
+      "dev:docs": "cd docs && bun run dev",
+      "build": "node build.js",
+      "build:web": "cd github-frontend && bun run build",
+      "build:docs": "cd docs && bun run build",
+      "install:all": "bun install && cd github-frontend && bun install && cd ../docs && bun install",
+      "lint": "echo 'No root-level linting configured'",
+      "lint:docs": "cd docs && bun run lint",
+      "lint:frontend": "cd github-frontend && bun run lint",
+      "format": "prettier --write .",
+      "format:check": "prettier --check .",
+      "typecheck": "bun run typecheck:docs && bun run typecheck:frontend",
+      "typecheck:docs": "cd docs && bun run typecheck",
+      "typecheck:frontend": "cd github-frontend && bun run build",
+      "test": "echo 'No tests configured yet'",
+      "prepare": "husky install"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": true,
+    "workspaces": [
+      "github-frontend",
+      "docs"
+    ],
+    "mainDirectories": [
+      "assets",
+      "docs"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "assets": {
+      "path": "assets",
+      "purpose": "Static assets",
+      "fileCount": 3,
+      "lastAccessed": 1773761112356,
+      "keyFiles": [
+        "Screenshot 2026-02-24 020020.png",
+        "unnamed.jpg",
+        "v.jpg"
+      ]
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 3,
+      "lastAccessed": 1773761112360,
+      "keyFiles": [
+        "index.html",
+        "script.js",
+        "style.css"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 14,
+      "lastAccessed": 1773761112390,
+      "keyFiles": [
+        "build-final.log",
+        "build-output.log",
+        "bun.lock",
+        "DOCUMENTATION_GUIDE.md",
+        "docusaurus.config.ts"
+      ]
+    },
+    "github-frontend": {
+      "path": "github-frontend",
+      "purpose": null,
+      "fileCount": 11,
+      "lastAccessed": 1773761112391,
+      "keyFiles": [
+        "next-env.d.ts",
+        "next.config.js",
+        "package-lock.json",
+        "package.json",
+        "postcss.config.js"
+      ]
+    },
+    "vivim-stealth": {
+      "path": "vivim-stealth",
+      "purpose": null,
+      "fileCount": 10,
+      "lastAccessed": 1773761112393,
+      "keyFiles": [
+        "bun.lock",
+        "eslint.config.js",
+        "index.html",
+        "package.json",
+        "README.md"
+      ]
+    },
+    "dist\\assets": {
+      "path": "dist\\assets",
+      "purpose": "Static assets",
+      "fileCount": 3,
+      "lastAccessed": 1773761112396,
+      "keyFiles": [
+        "Screenshot 2026-02-24 020020.png",
+        "unnamed.jpg",
+        "v.jpg"
+      ]
+    },
+    "dist\\docs": {
+      "path": "dist\\docs",
+      "purpose": "Documentation",
+      "fileCount": 10,
+      "lastAccessed": 1773761112397,
+      "keyFiles": [
+        "404.html",
+        "docs.json",
+        "index.html"
+      ]
+    },
+    "docs\\build": {
+      "path": "docs\\build",
+      "purpose": "Build output",
+      "fileCount": 4,
+      "lastAccessed": 1773761112398,
+      "keyFiles": [
+        "404.html",
+        "index.html",
+        "sitemap.xml"
+      ]
+    },
+    "docs\\docs": {
+      "path": "docs\\docs",
+      "purpose": "Documentation",
+      "fileCount": 1,
+      "lastAccessed": 1773761112399,
+      "keyFiles": [
+        "ai-chat-widget.md"
+      ]
+    },
+    "github-frontend\\node_modules": {
+      "path": "github-frontend\\node_modules",
+      "purpose": "Dependencies",
+      "fileCount": 1,
+      "lastAccessed": 1773761112410,
+      "keyFiles": []
+    },
+    "vivim-stealth\\dist": {
+      "path": "vivim-stealth\\dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 3,
+      "lastAccessed": 1773761112412,
+      "keyFiles": [
+        "index.html",
+        "v.jpg",
+        "vite.svg"
+      ]
+    },
+    "vivim-stealth\\node_modules": {
+      "path": "vivim-stealth\\node_modules",
+      "purpose": "Dependencies",
+      "fileCount": 0,
+      "lastAccessed": 1773761112415,
+      "keyFiles": []
+    },
+    "vivim-stealth\\public": {
+      "path": "vivim-stealth\\public",
+      "purpose": "Public files",
+      "fileCount": 2,
+      "lastAccessed": 1773761112416,
+      "keyFiles": [
+        "v.jpg",
+        "vite.svg"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "vercel.json",
+      "accessCount": 1,
+      "lastAccessed": 1773761534474,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 1,
+      "lastAccessed": 1773761551760,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
