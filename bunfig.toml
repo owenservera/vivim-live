@@ -1,0 +1,19 @@
+[install.scopes]
+vivim-live = "https://registry.npmjs.org"
+
+[install]
+# Use exact versions to avoid conflicts
+exact = true
+
+# Lockfile configuration
+lockfile = true
+lockfile-save = true
+
+# Cache configuration
+cache = true
+cache-dir = ".bun-cache"
+
+[dev]
+# Development server configuration
+port = 3000
+host = "localhost"

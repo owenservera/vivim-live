@@ -206,15 +206,69 @@
   },
   "hotPaths": [
     {
-      "path": "vercel.json",
-      "accessCount": 1,
-      "lastAccessed": 1773761534474,
+      "path": "index.html",
+      "accessCount": 11,
+      "lastAccessed": 1773770511491,
       "type": "file"
     },
     {
       "path": "package.json",
+      "accessCount": 5,
+      "lastAccessed": 1773771274869,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 4,
+      "lastAccessed": 1773769307910,
+      "type": "file"
+    },
+    {
+      "path": "style.css",
+      "accessCount": 4,
+      "lastAccessed": 1773770399776,
+      "type": "file"
+    },
+    {
+      "path": "script.js",
+      "accessCount": 4,
+      "lastAccessed": 1773770433042,
+      "type": "file"
+    },
+    {
+      "path": "vercel.json",
+      "accessCount": 2,
+      "lastAccessed": 1773763212352,
+      "type": "file"
+    },
+    {
+      "path": "vivim-live-marketing-upgrade-plan.md",
+      "accessCount": 2,
+      "lastAccessed": 1773769788962,
+      "type": "file"
+    },
+    {
+      "path": "demo-interactive.html",
       "accessCount": 1,
-      "lastAccessed": 1773761551760,
+      "lastAccessed": 1773763793009,
+      "type": "file"
+    },
+    {
+      "path": "script-updated.js",
+      "accessCount": 1,
+      "lastAccessed": 1773764842039,
+      "type": "file"
+    },
+    {
+      "path": "server.js",
+      "accessCount": 1,
+      "lastAccessed": 1773766828579,
+      "type": "file"
+    },
+    {
+      "path": "bunfig.toml",
+      "accessCount": 1,
+      "lastAccessed": 1773766865287,
       "type": "file"
     }
   ],

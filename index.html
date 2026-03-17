@@ -21,13 +21,58 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="./style.css">
+    <!-- Three.js for 3D elements -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <!-- Abstract ambient background -->
     <div id="ambient-canvas"></div>
-    
+
+    <!-- 3D Hero Background -->
+    <canvas id="hero-3d-canvas"></canvas>
+
     <!-- Custom glowing cursor -->
     <div class="cursor-glow"></div>
+
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-progress" id="scroll-progress">
+        <div class="progress-track">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-sections">
+            <div class="progress-section active" data-section="hero"></div>
+            <div class="progress-section" data-section="features"></div>
+            <div class="progress-section" data-section="demo"></div>
+            <div class="progress-section" data-section="community"></div>
+        </div>
+    </div>
+
+    <!-- TL;DR Quick Summary -->
+    <div class="tldr-summary" id="tldr-summary">
+        <button class="tldr-toggle" id="tldr-toggle">
+            <i class="fas fa-bolt"></i>
+            <span>TL;DR</span>
+        </button>
+        <div class="tldr-content">
+            <div class="tldr-item">
+                <i class="fas fa-brain"></i>
+                <span>Personal AI Memory Layer</span>
+            </div>
+            <div class="tldr-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>100% Private, Your Data</span>
+            </div>
+            <div class="tldr-item">
+                <i class="fas fa-share-nodes"></i>
+                <span>Share & Earn Dividends</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
     
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
@@ -68,14 +113,14 @@
                 <div class="logo-glow"></div>
             </div>
             
-            <h1 class="motto">
-                <span class="word" style="--delay: 0.2s">OWN</span> 
-                <span class="divider" style="--delay: 0.3s">|</span> 
-                <span class="word" style="--delay: 0.4s">SHARE</span> 
-                <span class="divider" style="--delay: 0.5s">|</span> 
-                <span class="word" style="--delay: 0.6s">EVOLVE</span>
+            <h1 class="motto kinetic-text" id="kinetic-headline">
+                <span class="word" style="--delay: 0.2s" data-text="OWN">OWN</span>
+                <span class="divider" style="--delay: 0.3s">|</span>
+                <span class="word" style="--delay: 0.4s" data-text="SHARE">SHARE</span>
+                <span class="divider" style="--delay: 0.5s">|</span>
+                <span class="word" style="--delay: 0.6s" data-text="EVOLVE">EVOLVE</span>
                 <br>
-                <span class="highlight" style="--delay: 0.8s">YOUR AI</span>
+                <span class="highlight" style="--delay: 0.8s" data-text="YOUR AI">YOUR AI</span>
             </h1>
             
             <p class="subtitle" style="--delay: 1.0s">
@@ -182,29 +227,131 @@
         <!-- Demo Section -->
         <section class="demo" id="demo">
             <div class="section-header">
-                <h2 class="section-title">See It In Action</h2>
-                <p class="section-subtitle">Your personal AI cockpit</p>
+                <h2 class="section-title kinetic-section">See It In Action</h2>
+                <p class="section-subtitle">Your personal AI cockpit - try it yourself</p>
             </div>
-            
-            <div class="demo-container">
-                <div class="demo-browser-bar">
-                    <div class="browser-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                    <div class="browser-url">vivim.live</div>
-                </div>
-                <div class="demo-screenshot">
-                    <img src="./assets/Screenshot 2026-02-24 020020.png" alt="VIVIM Interface" class="screenshot-img">
-                    <div class="screenshot-overlay">
-                        <div class="play-button">
-                            <i class="fas fa-play"></i>
+
+            <!-- Interactive Demo Container -->
+            <div class="demo-interactive-wrapper">
+                <div class="demo-interactive-container" id="demo-container">
+                    <!-- Knowledge graph overlay -->
+                    <div class="demo-graph-overlay" id="demo-graph"></div>
+
+                    <div class="demo-interface">
+                        <!-- Sidebar: Memory cards -->
+                        <div class="demo-sidebar">
+                            <div class="demo-sidebar-title">Memory Bank</div>
+                            <div class="demo-memory-item" draggable="true" data-memory="1">
+                                <div class="demo-memory-title">Project Setup</div>
+                                <div class="demo-memory-meta">3 conversations • 2 days ago</div>
+                            </div>
+                            <div class="demo-memory-item" draggable="true" data-memory="2">
+                                <div class="demo-memory-title">API Integration</div>
+                                <div class="demo-memory-meta">5 conversations • 1 week ago</div>
+                            </div>
+                            <div class="demo-memory-item" draggable="true" data-memory="3">
+                                <div class="demo-memory-title">Design System</div>
+                                <div class="demo-memory-meta">8 conversations • 3 days ago</div>
+                            </div>
+                            <div class="demo-memory-item" draggable="true" data-memory="4">
+                                <div class="demo-memory-title">Database Schema</div>
+                                <div class="demo-memory-meta">4 conversations • 5 days ago</div>
+                            </div>
+                        </div>
+
+                        <!-- Main: Chat interface -->
+                        <div class="demo-main">
+                            <div class="demo-chat-container" id="demo-chat">
+                                <div class="demo-message">
+                                    <div class="demo-message-avatar">V</div>
+                                    <div class="demo-message-content">
+                                        <div class="demo-message-text">
+                                            Welcome to your VIVIM cockpit! This is where you interact with your personal AI memory layer. Try typing a message or drag memory cards from the sidebar to provide context.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="demo-message user">
+                                    <div class="demo-message-avatar">U</div>
+                                    <div class="demo-message-content">
+                                        <div class="demo-message-text">
+                                            What was the last thing we discussed about the project setup?
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="demo-message">
+                                    <div class="demo-message-avatar">V</div>
+                                    <div class="demo-message-content">
+                                        <div class="demo-message-text">
+                                            Based on your memory bank, we discussed initializing the project with Next.js 14, setting up Tailwind CSS, and configuring the database schema. You also decided to use Prisma as the ORM. Would you like me to pull up the specific implementation details?
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="demo-input-container">
+                                <input type="text" class="demo-input" id="demo-input" placeholder="Type a message or drag memory cards...">
+                                <button class="demo-send-btn" id="demo-send">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right panel: Context recipes -->
+                        <div class="demo-right-panel">
+                            <div class="demo-sidebar-title">Context Recipes</div>
+                            <div class="demo-recipe-card">
+                                <div class="demo-recipe-header">
+                                    <div class="demo-recipe-icon">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="demo-recipe-title">Dev Sprint</div>
+                                </div>
+                                <div class="demo-recipe-tags">
+                                    <span class="demo-recipe-tag">code</span>
+                                    <span class="demo-recipe-tag">setup</span>
+                                    <span class="demo-recipe-tag">api</span>
+                                </div>
+                            </div>
+                            <div class="demo-recipe-card">
+                                <div class="demo-recipe-header">
+                                    <div class="demo-recipe-icon">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="demo-recipe-title">Design Review</div>
+                                </div>
+                                <div class="demo-recipe-tags">
+                                    <span class="demo-recipe-tag">ui</span>
+                                    <span class="demo-recipe-tag">ux</span>
+                                </div>
+                            </div>
+                            <div class="demo-recipe-card">
+                                <div class="demo-recipe-header">
+                                    <div class="demo-recipe-icon">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="demo-recipe-title">Project Archive</div>
+                                </div>
+                                <div class="demo-recipe-tags">
+                                    <span class="demo-recipe-tag">docs</span>
+                                    <span class="demo-recipe-tag">history</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="demo-features">
                 <div class="demo-feature">
                     <i class="fas fa-search"></i>
@@ -270,7 +417,7 @@
             <div class="footer-note">
                 Opt-in contribution &middot; Your Memory Layer &middot; Profit-share dividend
             </div>
-            
+
             <div class="footer-links">
                 <a href="https://github.com/owenservera/vivim-app" target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-github"></i> GitHub
@@ -283,6 +430,187 @@
                 </a>
                 <a href="https://twitter.com/vivim" target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-twitter"></i> Twitter
+                </a>
+            </div>
+        </section>
+
+        <!-- Integrated Documentation Section -->
+        <section class="docs-section" id="docs">
+            <div class="section-header">
+                <h2 class="section-title kinetic-section">Quick Start Guide</h2>
+                <p class="section-subtitle">Get up and running in minutes</p>
+            </div>
+
+            <div class="docs-search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="docs-search" placeholder="Search documentation...">
+            </div>
+
+            <div class="docs-accordion">
+                <div class="docs-item" data-category="setup">
+                    <button class="docs-toggle" aria-expanded="false">
+                        <div class="docs-toggle-header">
+                            <i class="fas fa-rocket"></i>
+                            <span>Installation</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="docs-content">
+                        <p>Install VIVIM SDK using npm or yarn:</p>
+                        <div class="code-block">
+                            <button class="code-copy" aria-label="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <pre><code>npm install @vivim/sdk</code></pre>
+                        </div>
+                        <div class="code-block">
+                            <button class="code-copy" aria-label="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <pre><code>yarn add @vivim/sdk</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="docs-item" data-category="setup">
+                    <button class="docs-toggle" aria-expanded="false">
+                        <div class="docs-toggle-header">
+                            <i class="fas fa-cog"></i>
+                            <span>Configuration</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="docs-content">
+                        <p>Initialize VIVIM with your API key:</p>
+                        <div class="code-block">
+                            <button class="code-copy" aria-label="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <pre><code>import { VivimClient } from '@vivim/sdk';
+
+const vivim = new VivimClient({
+  apiKey: process.env.VIVIM_API_KEY,
+  encryption: true
+});</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="docs-item" data-category="api">
+                    <button class="docs-toggle" aria-expanded="false">
+                        <div class="docs-toggle-header">
+                            <i class="fas fa-code"></i>
+                            <span>Memory Operations</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="docs-content">
+                        <p>Store and retrieve memories:</p>
+                        <div class="code-block">
+                            <button class="code-copy" aria-label="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <pre><code>// Store a memory
+await vivim.memory.store({
+  type: 'conversation',
+  content: 'Discussion about project architecture',
+  tags: ['architecture', 'project']
+});
+
+// Retrieve memories
+const memories = await vivim.memory.search({
+  query: 'architecture',
+  limit: 10
+});</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="docs-item" data-category="api">
+                    <button class="docs-toggle" aria-expanded="false">
+                        <div class="docs-toggle-header">
+                            <i class="fas fa-share-alt"></i>
+                            <span>Sharing Context</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="docs-content">
+                        <p>Create and share context recipes:</p>
+                        <div class="code-block">
+                            <button class="code-copy" aria-label="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <pre><code>// Create a context recipe
+const recipe = await vivim.context.createRecipe({
+  name: 'Dev Sprint',
+  memories: ['mem_123', 'mem_456'],
+  shareWith: 'community'
+});
+
+// Share the recipe
+await vivim.context.share(recipe.id);</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="docs-item" data-category="advanced">
+                    <button class="docs-toggle" aria-expanded="false">
+                        <div class="docs-toggle-header">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Privacy Controls</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="docs-content">
+                        <p>Manage your privacy settings:</p>
+                        <div class="code-block">
+                            <button class="code-copy" aria-label="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <pre><code>// Set privacy level
+await vivim.privacy.setLevel('private');
+
+// Configure encryption
+await vivim.privacy.configureEncryption({
+  algorithm: 'AES-256-GCM',
+  keyRotation: 'monthly'
+});</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="docs-item" data-category="advanced">
+                    <button class="docs-toggle" aria-expanded="false">
+                        <div class="docs-toggle-header">
+                            <i class="fas fa-network-wired"></i>
+                            <span>P2P Sync</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="docs-content">
+                        <p>Sync your knowledge graph across devices:</p>
+                        <div class="code-block">
+                            <button class="code-copy" aria-label="Copy code">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <pre><code>// Enable P2P sync
+await vivim.sync.enable({
+  peerDiscovery: true,
+  autoSync: true,
+  bandwidth: 'high'
+});
+
+// Manual sync
+await vivim.sync.syncNow();</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="docs-footer">
+                <a href="/docs" class="docs-link-all">
+                    View Full Documentation
+                    <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </section>
@@ -340,5 +668,6 @@
             });
         });
     </script>
-</body>
+    <script src="./demo-interactive.js"></script>
+    </body>
 </html>
