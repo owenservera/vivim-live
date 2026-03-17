@@ -37,8 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/owenservera/vivim-app.git",
-    "directory": "vivim-live"
+    "url": "https://github.com/owenservera/vivim-live.git",
   },
   "release": {
     "branches": ["main"],
