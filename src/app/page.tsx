@@ -64,12 +64,12 @@ const PRINCIPLES = [
 ];
 
 const PROVIDERS = [
-  { name: "OpenAI", logo: "🤖" },
-  { name: "Anthropic", logo: "🧠" },
-  { name: "Google", logo: "🔴" },
-  { name: "Mistral", logo: "❄️" },
-  { name: "Groq", logo: "⚡" },
-  { name: "Ollama", logo: "🦙" },
+  { name: "OpenAI", color: "#10A37F" },
+  { name: "Anthropic", color: "#D4A574" },
+  { name: "Google", color: "#4285F4" },
+  { name: "Mistral", color: "#FF5000" },
+  { name: "Groq", color: "#7B3FE4" },
+  { name: "Ollama", color: "#800080" },
 ];
 
 const SOLUTION_FEATURES = [
@@ -208,9 +208,14 @@ export default function Home() {
               {PROVIDERS.map((provider) => (
                 <div
                   key={provider.name}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl glass-card hover:border-violet-500/30 transition-colors"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl glass-card hover:border-violet-500/30 transition-colors min-w-[120px]"
                 >
-                  <span className="text-4xl">{provider.logo}</span>
+                  <div 
+                    className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-lg"
+                    style={{ backgroundColor: provider.color }}
+                  >
+                    {provider.name.slice(0, 2).toUpperCase()}
+                  </div>
                   <span className="text-sm text-slate-400">{provider.name}</span>
                 </div>
               ))}

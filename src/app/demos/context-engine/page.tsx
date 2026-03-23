@@ -47,10 +47,9 @@ interface JitAcu {
 interface Scenario {
   id: "A" | "B";
   person: string;
-  personEmoji: string;
+  initials: string;
   role: string;
   topic: string;
-  topicEmoji: string;
   message: string;
   color: string;
   acuCount: number;
@@ -61,10 +60,9 @@ const SCENARIOS: Record<"A" | "B", Scenario> = {
   A: {
     id: "A",
     person: "Marcus",
-    personEmoji: "💼",
+    initials: "MC",
     role: "CEO · Direct Report",
     topic: "Project Alpha",
-    topicEmoji: "📊",
     message: '"What\'s our Q2 timeline risk?"',
     color: "#8B5CF6",
     acuCount: 6,
@@ -73,10 +71,9 @@ const SCENARIOS: Record<"A" | "B", Scenario> = {
   B: {
     id: "B",
     person: "Lena",
-    personEmoji: "📣",
+    initials: "LP",
     role: "Marketing Lead",
     topic: "Feature B Launch",
-    topicEmoji: "🚀",
     message: '"Help me write positioning copy"',
     color: "#06B6D4",
     acuCount: 8,
@@ -429,7 +426,12 @@ export default function ContextEngineDemoPage() {
                       style={isActive ? { borderColor: s.color + "50" } : {}}
                     >
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xl">{s.personEmoji}</span>
+                        <div 
+                          className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white text-xs"
+                          style={{ backgroundColor: s.color }}
+                        >
+                          {s.initials}
+                        </div>
                         <div>
                           <p className="text-white text-sm font-semibold leading-none">{s.person}</p>
                           <p className="text-slate-500 text-[10px] mt-0.5">{s.role}</p>
@@ -442,13 +444,20 @@ export default function ContextEngineDemoPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 mb-2">
-                        <span className="text-sm">{s.topicEmoji}</span>
+                        <div 
+                          className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white"
+                          style={{ backgroundColor: s.color + "40" }}
+                        >
+                          {s.topic.charAt(0)}
+                        </div>
                         <span className="text-slate-400 text-xs">{s.topic}</span>
                       </div>
                       <p className="text-slate-500 text-[10px] italic leading-relaxed">{s.message}</p>
                       <div className="flex items-center gap-3 mt-2 pt-2 border-t border-white/5">
-                        <span className="text-[10px] text-slate-600">🧠 {s.acuCount} ACUs</span>
-                        <span className="text-[10px] text-slate-600">📦 {s.bundleCount} bundles</span>
+                        <Brain className="w-3 h-3 text-slate-500" />
+                        <span className="text-[10px] text-slate-600">{s.acuCount} ACUs</span>
+                        <Layers className="w-3 h-3 text-slate-500" />
+                        <span className="text-[10px] text-slate-600">{s.bundleCount} bundles</span>
                       </div>
                     </motion.div>
                   );
