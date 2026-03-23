@@ -1,0 +1,52 @@
+# VIVIM - Sovereign, Portable, Personal AI Memory
+
+## Overview
+
+VIVIM is a revolutionary AI memory layer that provides intelligent context management, persistent memory, and semantic storage. It works with all AI providers to give your AI a brain that never forgets.
+
+## Core Features
+
+- **Sovereign**: You own your memory data completely
+- **Portable**: Export your memory anytime in standard formats  
+- **Personal**: Your memory is yours alone
+- **Context Management**: Intelligent management of AI context windows
+- **Semantic Storage**: Advanced memory storage with semantic understanding
+- **ACU (Atomic Chat Units)**: Revolutionary unit for measuring context usage
+
+## Technical Details
+
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4 + CSS Variables
+- **Animations**: Framer Motion
+- **Components**: shadcn/ui (Radix UI)
+- **Runtime**: Bun
+
+## Use Cases
+
+1. **Live Memory Demo**: Watch memory extraction in action
+2. **Context Engine Demo**: See context assembly in real-time
+3. **Developer Integration**: Add memory to any AI application
+4. **Personal AI Assistant**: Give your AI persistent memory
+
+## API / Integration
+
+VIVIM provides APIs for:
+- Memory storage and retrieval
+- Context window optimization
+- Semantic search across memories
+- Export in standard formats (JSON, markdown)
+
+## Links
+
+- Website: https://vivim.live
+- GitHub: https://github.com/owenservera/vivim-live
+- Discord: https://discord.gg/vivim
+
+## License
+
+AGPL-3.0
+
+---
+
+Your memory. Your rules. Everywhere.

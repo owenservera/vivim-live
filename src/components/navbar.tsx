@@ -149,7 +149,7 @@ function MobileMenu({
             aria-label="Navigation menu"
           >
             <div className="flex items-center justify-between p-6 border-b border-white/5">
-              <img src="/logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
+              <img src="/nav-logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
               <button
                 type="button"
                 ref={closeButtonRef}
@@ -319,7 +319,7 @@ export function Navbar() {
           }`}
         >
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <img src="/logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
+            <img src="/nav-logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
           </Link>
 
           <div className="hidden md:flex items-center gap-0.5 flex-shrink-0">

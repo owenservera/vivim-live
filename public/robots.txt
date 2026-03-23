@@ -10,5 +10,24 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+# AI/ML Bot access (Allow for training data visibility)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
 User-agent: *
 Allow: /
