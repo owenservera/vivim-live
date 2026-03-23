@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Github, Menu, X, BookOpen } from "lucide-react";
+import { Play, Github, Menu, X, BookOpen, Cpu, Brain } from "lucide-react";
 
 const sectionToId = (section: string): string =>
   section.toLowerCase().split(" ").join("-");
@@ -139,9 +139,8 @@ function MobileMenu({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-72 flex flex-col md:hidden"
+            className="fixed right-0 top-0 bottom-0 z-50 w-72 flex flex-col md:hidden bg-slate-950"
             style={{
-              background: "rgba(9, 14, 26, 0.97)",
               backdropFilter: "blur(24px)",
               borderLeft: "1px solid rgba(255,255,255,0.08)",
             }}
@@ -247,8 +246,6 @@ function DemosDropdown() {
   );
 }
 
-import { Cpu, Brain } from "lucide-react";
-
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
@@ -310,12 +307,12 @@ export function Navbar() {
       />
 
       <nav
-        className={`fixed z-50 px-4 w-full max-w-6xl left-1/2 -translate-x-1/2 transition-all duration-500 ${
+        className={`fixed z-50 px-4 w-full max-w-[1400px] left-1/2 -translate-x-1/2 transition-all duration-500 ${
           scrolled ? "top-2" : "top-6"
         }`}
       >
         <div
-          className={`rounded-full px-4 sm:px-5 py-2.5 flex items-center justify-between gap-2 sm:gap-3 transition-all duration-500 ${
+          className={`rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between gap-4 transition-all duration-500 ${
             scrolled
               ? "glass-strong shadow-[0_4px_30px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.08)]"
               : "glass"
@@ -325,13 +322,13 @@ export function Navbar() {
             <img src="/logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
           </Link>
 
-          <div className="hidden lg:flex items-center gap-0.5 flex-shrink-0">
+          <div className="hidden md:flex items-center gap-0.5 flex-shrink-0">
             {sections.map((section, i) => (
               <button
                 type="button"
                 key={section.id}
                 onClick={() => scrollToSection(section.id)}
-                className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium relative transition-colors whitespace-nowrap ${
+                className={`px-2.5 py-1.5 rounded-full text-xs sm:text-sm font-medium relative transition-colors whitespace-nowrap ${
                   activeSection === i ? "text-white" : "text-slate-400 hover:text-white"
                 }`}
                 aria-current={activeSection === i ? "true" : undefined}
@@ -348,7 +345,7 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center gap-1.5 flex-shrink-0">
+          <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
             <DemosDropdown />
 
             <a
@@ -374,7 +371,7 @@ export function Navbar() {
 
           <button
             type="button"
-            className="lg:hidden text-slate-300 hover:text-white p-1"
+            className="md:hidden text-slate-300 hover:text-white p-1"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-menu"
