@@ -34,6 +34,7 @@ interface Layer {
   maxTokens: number;
   state: LayerState;
   content: string;
+  priority?: "HIGH" | "LOW";
 }
 
 interface JitAcu {
