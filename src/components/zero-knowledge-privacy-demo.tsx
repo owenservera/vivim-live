@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Lock, Key, Server, Wifi, WifiOff, CheckCircle, AlertCircle, Activity, Eye, EyeOff } from 'lucide-react';
+import { Shield, Lock, Key, Server, Wifi, WifiOff, CheckCircle, AlertCircle, Activity, Eye, EyeOff, Smartphone } from 'lucide-react';
 
 type SecurityLayer = {
   id: number;
@@ -217,14 +217,5 @@ export function ZeroKnowledgePrivacyDemo() {
         )}
       </div>
     </div>
-  );
-}
-
-function Smartphone({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <rect x="5" y="2" width="14" height="20" rx="2" />
-      <line x1="12" y1="18" x2="12.01" y2="18" />
-    </svg>
   );
 }
