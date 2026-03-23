@@ -25,7 +25,19 @@ import {
   Key,
   ChevronRight,
   CheckCircle2,
+  BarChart3,
 } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Navbar } from "@/components/navbar";
 import { NeuralBackground } from "@/components/neural-bg";
 import { HeroVisual } from "@/components/hero-visual";
@@ -80,9 +92,156 @@ const SOLUTION_FEATURES = [
   { icon: Globe, title: "Works with Any AI", desc: "Model-agnostic design means you can switch providers without losing your memory." },
 ];
 
+interface Problem {
+  rank: number;
+  title: string;
+  hook: string;
+  category: "memory" | "portability" | "trust" | "developer";
+  scores: { P: number; T: number; E: number; M: number };
+  vivimAnswer: string;
+  vivimScore: number;
+  vivimGap: string;
+}
+
+const PROBLEMS: Problem[] = [
+  {
+    rank: 1,
+    title: "The Context Wipe",
+    hook: "AI forgets everything, every session",
+    category: "memory",
+    scores: { P: 9.5, T: 9, E: 8.5, M: 10 },
+    vivimAnswer: "The 8-layer context assembly engine + ACU persistent memory store. Every conversation is segmented into addressable memory units, classified across 9 types, and JIT-retrieved for every future interaction.",
+    vivimScore: 9.5,
+    vivimGap: "Requires onboarding friction — users must import history or begin building memory.",
+  },
+  {
+    rank: 2,
+    title: "The Provider Lock-in Trap",
+    hook: "Your memory belongs to ChatGPT, not you",
+    category: "portability",
+    scores: { P: 9, T: 7, E: 9.5, M: 9.5 },
+    vivimAnswer: "Provider-agnostic ACU store + import parsers for every major platform. ChatGPT history → VIVIM in one command. The same memory works across GPT-4, Claude, Gemini, Ollama.",
+    vivimScore: 9,
+    vivimGap: "Parser completeness is still growing. Full coverage requires community contributions.",
+  },
+  {
+    rank: 3,
+    title: "The Copy-Paste Tax",
+    hook: "Hours lost rebuilding context weekly",
+    category: "memory",
+    scores: { P: 8.5, T: 10, E: 7, M: 9 },
+    vivimAnswer: "L0–L3 layers (Identity Core, Preferences, Topic, Entity) pre-load permanent context before every interaction.",
+    vivimScore: 8.5,
+    vivimGap: "Efficiency gain is only realized post-memory-accumulation. Takes 2–4 weeks of use.",
+  },
+  {
+    rank: 4,
+    title: "The Middle Black Hole",
+    hook: "AI ignores context you explicitly provided",
+    category: "memory",
+    scores: { P: 8, T: 7, E: 9, M: 9 },
+    vivimAnswer: "JIT retrieval (L5) surgically selects only the most relevant ACUs for each message — not a monolithic dump.",
+    vivimScore: 9,
+    vivimGap: "Requires strong embedding quality. Model-dependent retrieval accuracy at the edges.",
+  },
+  {
+    rank: 5,
+    title: "The Data Hostage",
+    hook: "You can't export what you built",
+    category: "portability",
+    scores: { P: 8, T: 6, E: 10, M: 8.5 },
+    vivimAnswer: "Full ACU export to JSON, SQLite, or IPFS in documented open formats — readable without VIVIM.",
+    vivimScore: 9.5,
+    vivimGap: "Awareness gap — users don't feel this pain until they try to leave a platform.",
+  },
+  {
+    rank: 6,
+    title: "The Enterprise Compliance Wall",
+    hook: "AI memory with no audit trail",
+    category: "trust",
+    scores: { P: 9, T: 5, E: 10, M: 8 },
+    vivimAnswer: "Audit logging service + RBAC on memory collections + access grant manager. Enterprise tier adds compliance-grade audit log delivery.",
+    vivimScore: 8,
+    vivimGap: "SOC 2 Type II audit in progress. HIPAA BAA and FedRAMP are 12–18 months out.",
+  },
+  {
+    rank: 7,
+    title: "The AI Memory Surveillance Problem",
+    hook: "Org memory vs individual privacy",
+    category: "trust",
+    scores: { P: 7.5, T: 3, E: 10, M: 7.5 },
+    vivimAnswer: "VIVIM Teams preserves individual sovereignty by design — per-seat memory, selective opt-in sharing only.",
+    vivimScore: 9,
+    vivimGap: "Hard to sell a sovereignty argument to the buyer when sovereignty protects the seller's employees.",
+  },
+  {
+    rank: 8,
+    title: "The Local Model Gap",
+    hook: "Self-hosted AI has no persistent memory layer",
+    category: "developer",
+    scores: { P: 8.5, T: 8, E: 6, M: 7 },
+    vivimAnswer: "Provider-agnostic SDK with local SQLite + IPFS adapters. Self-hostable full stack in docker-compose.",
+    vivimScore: 9,
+    vivimGap: "Niche audience today. But this is the highest-conviction community for a sovereign tool.",
+  },
+  {
+    rank: 9,
+    title: "The Identity Collapse",
+    hook: "AI has no persistent model of who you are",
+    category: "memory",
+    scores: { P: 7, T: 7.5, E: 7, M: 9 },
+    vivimAnswer: "L0 Identity Core + DID-anchored user profile. Who you are is always loaded first.",
+    vivimScore: 8.5,
+    vivimGap: "Identity richness is proportional to usage depth. New users experience this minimally until enough ACUs accumulate.",
+  },
+  {
+    rank: 10,
+    title: "The Developer Infrastructure Gap",
+    hook: "No open standard for AI memory",
+    category: "developer",
+    scores: { P: 7, T: 8, E: 5, M: 8 },
+    vivimAnswer: "ACU specification is an open standard anyone can implement. @vivim/sdk drops into LangChain/LlamaIndex as a memory backend.",
+    vivimScore: 8,
+    vivimGap: "Standards adoption is slow. Requires the ACU spec to gain third-party adoption.",
+  },
+  {
+    rank: 11,
+    title: "The Multi-AI Fragmentation Problem",
+    hook: "Memory siloed per tool",
+    category: "portability",
+    scores: { P: 7, T: 6, E: 7, M: 8 },
+    vivimAnswer: "Single portable ACU database spans all providers. Import from every major platform.",
+    vivimScore: 7.5,
+    vivimGap: "Real-time bidirectional sync across live tool usage isn't shipped yet.",
+  },
+  {
+    rank: 12,
+    title: "The Conversation Context Decay",
+    hook: "Accuracy drops as threads grow",
+    category: "memory",
+    scores: { P: 7.5, T: 6, E: 8, M: 8.5 },
+    vivimAnswer: "Context thermodynamics + memory compression in the Cortex system. ACU decay model promotes reinforced memories.",
+    vivimScore: 8,
+    vivimGap: "The thermodynamics and Cortex system are implemented but underdocumented.",
+  },
+];
+
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [showFullScorecard, setShowFullScorecard] = useState(false);
+  const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   useScrollAnimation();
+
+  const filteredProblems = useMemo(() => {
+    if (activeFilter === "all") return PROBLEMS;
+    return PROBLEMS.filter((p) => p.category === activeFilter);
+  }, [activeFilter]);
+
+  const openScorecardModal = (problem: Problem) => {
+    setSelectedProblem(problem);
+    setShowFullScorecard(true);
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -258,28 +417,44 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-6">
               {[
                 {
-                  title: "The Memory Wipe",
+                  title: "The Context Wipe",
+                  hook: "AI forgets everything, every session",
                   stat: "Conversations degrade after 15–20 messages, even with 1M token windows.",
-                  desc: "AI doesn&apos;t forget gradually — it forgets all at once. When the context window fills, everything before it vanishes. Every. Single. Time.",
+                  desc: "Users rebuild context from scratch on every conversation. 3 years of domain knowledge, preferences, and decisions vanish the moment a tab closes.",
                   color: "border-red-500/30",
+                  category: "memory",
+                  categoryColor: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+                  solutionLink: "#the-solution",
                 },
                 {
-                  title: "The Middle Black Hole",
-                  stat: "20+ percentage points worse accuracy for information in the middle of context.",
-                  desc: "You provided the context. The AI still missed it. Position matters — information buried in the middle gets actively ignored.",
+                  title: "The Provider Lock-in Trap",
+                  hook: "Your memory belongs to ChatGPT, not you",
+                  stat: "Switching AI providers means losing all accumulated context.",
+                  desc: "Switching AI providers means losing all accumulated context. Users are held hostage by memory moats that providers built intentionally.",
                   color: "border-orange-500/30",
+                  category: "portability",
+                  categoryColor: "bg-green-500/10 text-green-400 border-green-500/30",
+                  solutionLink: "#the-solution",
                 },
                 {
                   title: "The Copy-Paste Tax",
+                  hook: "Hours lost rebuilding context weekly",
                   stat: "Hours every week rebuilding context from scratch.",
-                  desc: "Every session: rebuild context manually. Every project: re-explain your stack, preferences, decisions. Every week: hours of repetitive setup — gone when you close the tab.",
+                  desc: "Knowledge workers spend 5–10 hours/week re-explaining their stack, preferences, team structure, and project history to AI tools that forgot everything overnight.",
                   color: "border-amber-500/30",
+                  category: "memory",
+                  categoryColor: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+                  solutionLink: "#the-solution",
                 },
                 {
-                  title: "The Vendor Cuffs",
-                  stat: "$2.1B→$13B vector DB market proves enterprises are spending billions on this.",
-                  desc: "Provider-specific memory means lock-in. Switch models, lose everything. Your context belongs to the platform — not to you.",
+                  title: "The Middle Black Hole",
+                  hook: "AI ignores context you explicitly provided",
+                  stat: "20+ percentage points worse accuracy for information in the middle of context.",
+                  desc: "Stanford/Google/Anthropic research confirms 20+ percentage point accuracy drop for information in the middle of long context windows. Users unknowingly provide context the model never reads.",
                   color: "border-purple-500/30",
+                  category: "memory",
+                  categoryColor: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+                  solutionLink: "#the-solution",
                 },
               ].map((card, i) => (
                 <motion.div
@@ -288,13 +463,131 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   viewport={{ once: true }}
-                  className={`p-6 rounded-2xl bg-slate-900/60 border ${card.color}`}
+                  className={`p-6 rounded-2xl bg-slate-900/60 border ${card.color} group hover:border-slate-600/60 transition-colors`}
                 >
-                  <h3 className="text-xl font-bold text-white mb-2">{card.title}</h3>
+                  <div className="flex items-start justify-between mb-3">
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs px-2 py-0.5 border ${card.categoryColor} bg-transparent`}
+                    >
+                      {card.category === 'memory' && '🧠 Memory'}
+                      {card.category === 'portability' && '🔄 Portability'}
+                      {card.category === 'trust' && '🛡️ Trust'}
+                      {card.category === 'developer' && '⚙️ Developer'}
+                    </Badge>
+                    <span className="text-xs text-slate-500">Rank #{i + 1}</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-1">{card.title}</h3>
+                  <p className="text-xs text-slate-400 mb-3 italic">{card.hook}</p>
                   <p className="text-sm text-red-400 mb-3 font-medium">{card.stat}</p>
-                  <p className="text-sm text-slate-400">{card.desc}</p>
+                  <p className="text-sm text-slate-400 mb-4">{card.desc}</p>
+                  <a 
+                    href={card.solutionLink}
+                    className="inline-flex items-center text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+                  >
+                    <span>How VIVIM solves this</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </a>
                 </motion.div>
               ))}
+            </div>
+
+            {/* Phase 2: Explore Problems Expandable Section */}
+            <div className="mt-8">
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <button className="flex items-center justify-center w-full py-3 text-sm text-slate-400 hover:text-slate-300 transition-colors">
+                    <span>Explore all 12 problems</span>
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="pt-4 pb-2">
+                    {/* Category Filter Pills */}
+                    <div className="flex flex-wrap gap-2 justify-center mb-6">
+                      {[
+                        { id: 'all', label: 'All problems', color: 'border-slate-600 text-slate-400' },
+                        { id: 'memory', label: '🧠 Memory', color: 'border-blue-500/50 text-blue-400' },
+                        { id: 'portability', label: '🔄 Portability', color: 'border-green-500/50 text-green-400' },
+                        { id: 'trust', label: '🛡️ Trust & Sovereignty', color: 'border-amber-500/50 text-amber-400' },
+                        { id: 'developer', label: '⚙️ Developer', color: 'border-purple-500/50 text-purple-400' },
+                      ].map((filter) => (
+                        <button
+                          key={filter.id}
+                          onClick={() => setActiveFilter(filter.id)}
+                          className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                            activeFilter === filter.id 
+                              ? 'bg-slate-700 border-slate-500 text-white' 
+                              : `${filter.color} hover:bg-slate-800/50`
+                          }`}
+                        >
+                          {filter.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Filtered Problems Grid */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {filteredProblems.map((problem) => (
+                        <motion.div
+                          key={problem.rank}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/50 hover:border-slate-700/50 transition-colors"
+                        >
+                          <div className="flex items-start gap-3 mb-2">
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                              problem.rank <= 3 ? 'bg-amber-500/20 text-amber-400' :
+                              problem.rank <= 6 ? 'bg-blue-500/20 text-blue-400' :
+                              'bg-slate-700 text-slate-400'
+                            }`}>
+                              #{problem.rank}
+                            </span>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-[10px] px-1.5 py-0 ${
+                                problem.category === 'memory' ? 'border-blue-500/30 text-blue-400' :
+                                problem.category === 'portability' ? 'border-green-500/30 text-green-400' :
+                                problem.category === 'trust' ? 'border-amber-500/30 text-amber-400' :
+                                'border-purple-500/30 text-purple-400'
+                              } bg-transparent`}
+                            >
+                              {problem.category === 'memory' && '🧠 Memory'}
+                              {problem.category === 'portability' && '🔄 Portability'}
+                              {problem.category === 'trust' && '🛡️ Trust'}
+                              {problem.category === 'developer' && '⚙️ Developer'}
+                            </Badge>
+                          </div>
+                          <h4 className="text-sm font-semibold text-white mb-1">{problem.title}</h4>
+                          <p className="text-xs text-slate-400 line-clamp-2">{problem.hook}</p>
+                          <button 
+                            onClick={() => openScorecardModal(problem)}
+                            className="mt-2 text-xs text-slate-500 hover:text-slate-300 flex items-center"
+                          >
+                            View scores →
+                          </button>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Deep Dive Button */}
+                    <div className="mt-6 text-center">
+                      <Button 
+                        variant="outline" 
+                        className="border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800"
+                        onClick={() => setShowFullScorecard(true)}
+                      >
+                        <BarChart3 className="w-4 h-4 mr-2" />
+                        Open Full Scorecard
+                      </Button>
+                    </div>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           </div>
         </section>
@@ -612,6 +905,98 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      <Dialog open={showFullScorecard} onOpenChange={setShowFullScorecard}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto bg-slate-900 border-slate-800">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-white">
+              {selectedProblem ? `${selectedProblem.title}` : "Problem Scorecard"}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedProblem && (
+            <div className="space-y-4">
+              <p className="text-sm text-slate-400">{selectedProblem.hook}</p>
+              
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { label: "Pain", value: selectedProblem.scores.P, color: selectedProblem.scores.P >= 8 ? "bg-red-500" : "bg-amber-500" },
+                  { label: "Time Lost", value: selectedProblem.scores.T, color: selectedProblem.scores.T >= 8 ? "bg-red-500" : "bg-amber-500" },
+                  { label: "Trust Erosion", value: selectedProblem.scores.E, color: selectedProblem.scores.E >= 8 ? "bg-red-500" : "bg-amber-500" },
+                  { label: "Market Size", value: selectedProblem.scores.M, color: selectedProblem.scores.M >= 8 ? "bg-red-500" : "bg-amber-500" },
+                ].map((dim) => (
+                  <div key={dim.label} className="text-center p-3 rounded-lg bg-slate-800/50">
+                    <div className="text-xs text-slate-500 mb-2">{dim.label}</div>
+                    <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden mb-2">
+                      <div className={`h-full ${dim.color}`} style={{ width: `${dim.value * 10}%` }} />
+                    </div>
+                    <div className="text-lg font-bold text-white">{dim.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 rounded-lg bg-slate-800/50 border-l-4 border-emerald-500">
+                <div className="text-xs text-slate-500 mb-2">VIVIM Solution</div>
+                <p className="text-sm text-slate-300">{selectedProblem.vivimAnswer}</p>
+                <div className="mt-3 inline-flex items-center px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-sm font-medium">
+                  Solution Fit: {selectedProblem.vivimScore}/10
+                </div>
+              </div>
+
+              <div className="p-4 rounded-lg bg-slate-800/30 border-l-4 border-amber-500/50">
+                <div className="text-xs text-slate-500 mb-1">Gap Analysis</div>
+                <p className="text-sm text-slate-400">{selectedProblem.vivimGap}</p>
+              </div>
+            </div>
+          )}
+
+          {!selectedProblem && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {[
+                  { label: "P", desc: "Pain severity", color: "text-red-400" },
+                  { label: "T", desc: "Time lost", color: "text-orange-400" },
+                  { label: "E", desc: "Trust erosion", color: "text-amber-400" },
+                  { label: "M", desc: "Market size", color: "text-blue-400" },
+                ].map((dim) => (
+                  <div key={dim.label} className="p-3 rounded-lg bg-slate-800/50 text-center">
+                    <div className={`text-lg font-bold ${dim.color}`}>{dim.label}</div>
+                    <div className="text-xs text-slate-500">{dim.desc}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid gap-3 max-h-[50vh] overflow-y-auto">
+                {PROBLEMS.map((problem) => {
+                  const avg = (problem.scores.P + problem.scores.T + problem.scores.E + problem.scores.M) / 4;
+                  return (
+                    <button
+                      key={problem.rank}
+                      type="button"
+                      onClick={() => openScorecardModal(problem)}
+                      className="p-4 rounded-xl bg-slate-800/50 border border-slate-700 hover:border-slate-600 text-left transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded ${
+                          problem.rank <= 3 ? 'bg-amber-500/20 text-amber-400' :
+                          problem.rank <= 6 ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-slate-700 text-slate-400'
+                        }`}>
+                          #{problem.rank}
+                        </span>
+                        <div className="flex-1">
+                          <div className="text-sm font-medium text-white">{problem.title}</div>
+                          <div className="text-xs text-slate-500 mt-1">Score: {avg.toFixed(1)}/10</div>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
