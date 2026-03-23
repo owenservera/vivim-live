@@ -66,11 +66,12 @@ const PRINCIPLES = [
 
 const PROVIDERS = [
   { name: "OpenAI" },
-  { name: "Anthropic" },
-  { name: "Google" },
-  { name: "Mistral" },
-  { name: "Groq" },
-  { name: "Ollama" },
+  { name: "Google Gemini" },
+  { name: "Claude" },
+  { name: "Grok" },
+  { name: "Z.ai" },
+  { name: "Qwen" },
+  { name: "Kimi" },
 ];
 
 const SOLUTION_FEATURES = [
