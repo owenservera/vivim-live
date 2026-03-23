@@ -209,10 +209,10 @@ export function NeuralBackground() {
 
     return () => {
       cancelAnimationFrame(rafRef.current);
-      window.removeEventListener("resize",    resize,            { passive: true });
-      window.removeEventListener("mousemove", handleMouse,       { passive: true });
-      window.removeEventListener("mousemove", handleMouseForCSS, { passive: true });
-      window.removeEventListener("scroll",    handleScroll,      { passive: true });
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", handleMouse);
+      window.removeEventListener("mousemove", handleMouseForCSS);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [animate, initNodes]);
 
