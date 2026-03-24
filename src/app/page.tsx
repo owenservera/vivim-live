@@ -26,6 +26,10 @@ import {
   ChevronRight,
   CheckCircle2,
   BarChart3,
+  Lock,
+  History,
+  Network,
+  Zap as BrainZap,
 } from "lucide-react";
 import {
   Collapsible,
@@ -90,6 +94,58 @@ const SOLUTION_FEATURES = [
   { icon: Brain, title: "Remembers Everything", desc: "Every conversation, preference, and detail is stored and organized intelligently." },
   { icon: Target, title: "Intelligent Retrieval", desc: "Finds exactly what's relevant using semantic search — no more repeating yourself." },
   { icon: Globe, title: "Works with Any AI", desc: "Model-agnostic design means you can switch providers without losing your memory." },
+];
+
+const DEMOS = [
+  {
+    slug: "live-memory",
+    title: "Live Memory",
+    desc: "Watch your memory get extracted from real conversations in real-time",
+    icon: Brain,
+    color: "from-violet-500 to-purple-600",
+  },
+  {
+    slug: "context-engine",
+    title: "Context Engine",
+    desc: "See the 8-layer context assembly system build context from scratch",
+    icon: Layers,
+    color: "from-cyan-500 to-blue-600",
+  },
+  {
+    slug: "zero-knowledge-privacy",
+    title: "Zero-Knowledge Privacy",
+    desc: "Your encryption keys never leave your device — even we can't see your data",
+    icon: Lock,
+    color: "from-emerald-500 to-teal-600",
+  },
+  {
+    slug: "sovereign-history",
+    title: "Sovereign History",
+    desc: "Complete ownership of your conversation history with portable exports",
+    icon: History,
+    color: "from-amber-500 to-orange-600",
+  },
+  {
+    slug: "decentralized-network",
+    title: "Decentralized Network",
+    desc: "Peer-to-peer memory sync without central servers or lock-in",
+    icon: Network,
+    color: "from-blue-500 to-indigo-600",
+  },
+  {
+    slug: "secure-collaboration",
+    title: "Secure Collaboration",
+    desc: "Share memory context with your team while preserving individual sovereignty",
+    icon: Users,
+    color: "from-rose-500 to-pink-600",
+  },
+  {
+    slug: "dynamic-intelligence",
+    title: "Dynamic Intelligence",
+    desc: "Adaptive context that evolves based on your usage patterns",
+    icon: BrainZap,
+    color: "from-lime-500 to-green-600",
+  },
 ];
 
 interface Problem {
@@ -637,6 +693,45 @@ export default function Home() {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
               </Link>
+            </div>
+
+            {/* Interactive Demos Section */}
+            <div className="mt-20">
+              <div className="text-center mb-12">
+                <Badge variant="outline" className="border-violet-500/50 text-violet-400 mb-4 text-base px-4 py-1">
+                  Try It Now
+                </Badge>
+                <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                  Interactive Demos
+                </h2>
+                <p className="text-slate-400 max-w-2xl mx-auto">
+                  Explore VIVIM's capabilities through these live, interactive demonstrations
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {DEMOS.map((demo) => {
+                  const Icon = demo.icon;
+                  return (
+                    <Link key={demo.slug} href={`/demos/${demo.slug}`}>
+                      <motion.div
+                        whileHover={{ y: -4 }}
+                        className="p-6 rounded-2xl glass-card border border-white/5 hover:border-violet-500/30 transition-all group"
+                      >
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${demo.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
+                          {demo.title}
+                        </h3>
+                        <p className="text-sm text-slate-400">
+                          {demo.desc}
+                        </p>
+                      </motion.div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>
