@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Github, Menu, X, BookOpen, Cpu, Brain } from "lucide-react";
+import { Play, Github, Menu, X, BookOpen, Cpu, Brain, Lock, History, Network, Users, Zap } from "lucide-react";
 
 const sectionToId = (section: string): string =>
   section.toLowerCase().split(" ").join("-");
@@ -207,6 +207,16 @@ function MobileMenu({
 }
 
 function DemosDropdown() {
+  const demos = [
+    { href: "/demos/live-memory", label: "Live Memory", desc: "See extraction in action", icon: Brain, iconColor: "text-cyan-400" },
+    { href: "/demos/context-engine", label: "Context Engine", desc: "Watch memory assembly live", icon: Cpu, iconColor: "text-violet-400" },
+    { href: "/demos/zero-knowledge-privacy", label: "Zero-Knowledge Privacy", desc: "Your keys never leave your device", icon: Lock, iconColor: "text-emerald-400" },
+    { href: "/demos/sovereign-history", label: "Sovereign History", desc: "Complete ownership of your data", icon: History, iconColor: "text-amber-400" },
+    { href: "/demos/decentralized-network", label: "Decentralized Network", desc: "Peer-to-peer sync without servers", icon: Network, iconColor: "text-blue-400" },
+    { href: "/demos/secure-collaboration", label: "Secure Collaboration", desc: "Team sharing with sovereignty", icon: Users, iconColor: "text-rose-400" },
+    { href: "/demos/dynamic-intelligence", label: "Dynamic Intelligence", desc: "Adaptive context evolution", icon: Zap, iconColor: "text-lime-400" },
+  ];
+
   return (
     <div className="relative group/demos">
       <button
@@ -218,28 +228,23 @@ function DemosDropdown() {
       </button>
 
       <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover/demos:opacity-100 group-hover/demos:visible transition-all duration-200">
-        <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[200px] shadow-xl">
-          <Link
-            href="/demos/context-engine"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-          >
-            <Cpu className="w-4 h-4 text-violet-400" />
-            <div>
-              <p className="text-sm text-white">Context Engine</p>
-              <p className="text-xs text-slate-500">Watch memory assembly live</p>
-            </div>
-          </Link>
-
-          <Link
-            href="/demos/live-memory"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-          >
-            <Brain className="w-4 h-4 text-cyan-400" />
-            <div>
-              <p className="text-sm text-white">Live Memory</p>
-              <p className="text-xs text-slate-500">See extraction in action</p>
-            </div>
-          </Link>
+        <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[240px] shadow-xl">
+          {demos.map((demo) => {
+            const Icon = demo.icon;
+            return (
+              <Link
+                key={demo.href}
+                href={demo.href}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              >
+                <Icon className={`w-4 h-4 ${demo.iconColor}`} />
+                <div>
+                  <p className="text-sm text-white">{demo.label}</p>
+                  <p className="text-xs text-slate-500">{demo.desc}</p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>
