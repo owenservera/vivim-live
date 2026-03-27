@@ -1,0 +1,455 @@
+# Context Engine Deep Dive Visualization
+
+## Context Pipeline Class Diagram
+
+```mermaid
+classDiagram
+    class ParallelContextPipeline {
+        -prisma: PrismaClient
+        -embeddingService: IEmbeddingService
+        -tokenEstimator: ITokenEstimator
+        -llmService: ILLMService
+        -cache: ContextCache
+        -eventBus: ContextEventBus
+        -maxConcurrency: number
+        +assembleParallel(params): Promise~AssembledContext + Metrics~
+        +assembleStreaming(params): AsyncGenerator~StreamingContextChunk~
+        -timedStage(name, fn): PipelineStageResult~T~
+        -fetchSettings(userId): any
+        -embedMessage(message): number[]
+        -fetchConversation(conversationId): any
+        -detectContext(userId, message, embedding, convId): DetectedContext
+        -fetchOrCompileBundle(userId, bundleType, refId): CompiledBundle | null
+        -jitRetrieve(userId, message, embedding, context): JITKnowledge
+        -compilePromptFromBundles(bundles, jit, maxTokens): string
+        -formatJITContent(jit): string
+    }
+
+    class ConcurrencyLimiter {
+        -running: number
+        -queue: Array~{fn, resolve, reject}~
+        -maxConcurrent: number
+        +run(fn): Promise~T~
+        -execute(fn): Promise~T~
+        -processQueue(): void
+        +pendingCount: number
+        +activeCount: number
+    }
+
+    class ContextCache {
+        -settingsCache: Map~string, any~
+        -embeddingsCache: Map~string, number[]~
+        -bundleCache: Map~string, CompiledBundle~
+        -graphCache: Map~string, ContextGraph~
+        +getSettings(userId): any
+        +setSettings(userId, settings): void
+        +getCachedEmbedding(message): number[] | null
+        +setCachedEmbedding(message, embedding): void
+        +getBundle(userId, type, refId): CompiledBundle | null
+        +setBundle(userId, type, bundle, refId): void
+        +getGraph(userId): ContextGraph | null
+    }
+
+    class ContextEventBus {
+        -listeners: Map~string, Array~Function~~
+        +on(event, handler): void
+        +off(event, handler): void
+        +emit(event, ...args): void
+    }
+
+    ParallelContextPipeline --> ContextCache
+    ParallelContextPipeline --> ContextEventBus
+    ParallelContextPipeline --> ConcurrencyLimiter
+```
+
+## Context Assembly Stages
+
+```mermaid
+flowchart TB
+    subgraph "Stage 0: Parallel Fetch (Promise.allSettled)"
+        S0[Start]
+        S0_1[fetchSettings]
+        S0_2[embedMessage]
+        S0_3[fetchConversation]
+        
+        S0 --> S0_1
+        S0 --> S0_2
+        S0 --> S0_3
+    end
+
+    subgraph "Stage 1: Detection + Core Bundles"
+        S1[Results from Stage 0]
+        S1_1[detectContext]
+        S1_2[fetchOrCompileBundle<br/>identity_core]
+        S1_3[fetchOrCompileBundle<br/>global_prefs]
+        
+        S1 --> S1_1
+        S1 --> S1_2
+        S1 --> S1_3
+    end
+
+    subgraph "Stage 2: Dynamic Retrieval"
+        S2[Results from Stage 1]
+        S2_1[jitRetrieve]
+        S2_2[fetchOrCompileBundle<br/>conversation]
+        S2_3[fetchOrCompileBundle<br/>topic (x3)]
+        S2_4[fetchOrCompileBundle<br/>entity (x3)]
+        
+        S2 --> S2_1
+        S2 --> S2_2
+        S2 --> S2_3
+        S2 --> S2_4
+    end
+
+    subgraph "Stage 3: Assembly & Compilation"
+        S3[All bundles + JIT knowledge]
+        S3_1[Budget Calculation]
+        S3_2[Sort by Priority]
+        S3_3[Truncate to fit budget]
+        S3_4[Compile System Prompt]
+        
+        S3 --> S3_1
+        S3_1 --> S3_2
+        S3_2 --> S3_3
+        S3_3 --> S3_4
+    end
+
+    subgraph "Output"
+        OUT[AssembledContext + PipelineMetrics]
+    end
+    
+    S3_4 --> OUT
+
+    style S0 fill:#1a1a2e,stroke:#4a4a6a
+    style S1 fill:#1a1a2e,stroke:#4a4a6a
+    style S2 fill:#1a1a2e,stroke:#4a4a6a
+    style S3 fill:#2d2d44,stroke:#5a5a7a
+    style OUT fill:#16213e,stroke:#0f3460
+```
+
+## Streaming Context Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Pipeline as ParallelContextPipeline
+    participant Cache as ContextCache
+    participant DB as Prisma
+    participant Embed as EmbeddingService
+
+    Client->>Pipeline: assembleStreaming(params)
+    
+    Note over Pipeline: Yield 1: Identity Core (Priority 100)
+    Pipeline->>Cache: getBundle(userId, 'identity_core')
+    alt Cache Hit
+        Cache-->>Pipeline: cached bundle
+    else Cache Miss
+        Pipeline->>DB: find contextBundle
+        DB-->>Pipeline: bundle
+        Pipeline->>Cache: setBundle
+    end
+    Pipeline-->>Client: {layer: 'identity_core', priority: 100}
+    
+    Note over Pipeline: Yield 2: Global Preferences (Priority 90)
+    Pipeline->>Cache: getBundle(userId, 'global_prefs')
+    alt Cache Hit
+        Cache-->>Pipeline: cached bundle
+    else Cache Miss
+        Pipeline->>DB: find contextBundle
+        DB-->>Pipeline: bundle
+    end
+    Pipeline-->>Client: {layer: 'global_prefs', priority: 90}
+    
+    Note over Pipeline: Yield 3-5: Topics (Priority 70)
+    Pipeline->>Embed: embedMessage(userMessage)
+    Embed-->>Pipeline: embedding
+    Pipeline->>DB: semantic search topic_profiles
+    DB-->>Pipeline: topic matches
+    loop for each topic
+        Pipeline->>Cache: getBundle(userId, 'topic', profileId)
+        Pipeline-->>Client: {layer: 'topic:slug', priority: 70}
+    end
+    
+    Note over Pipeline: Yield 6-8: Entities (Priority 60)
+    Pipeline->>DB: semantic search entity_profiles
+    DB-->>Pipeline: entity matches
+    loop for each entity
+        Pipeline->>Cache: getBundle(userId, 'entity', entityId)
+        Pipeline-->>Client: {layer: 'entity:name', priority: 60}
+    end
+    
+    Note over Pipeline: Yield 9: Conversation (Priority 80)
+    alt conversationId provided
+        Pipeline->>Cache: getBundle(userId, 'conversation', convId)
+        Pipeline-->>Client: {layer: 'conversation', priority: 80}
+    end
+    
+    Note over Pipeline: Yield 10: JIT Knowledge (Priority 50)
+    Pipeline->>DB: semantic search atomic_chat_units
+    Pipeline->>DB: semantic search memories
+    Pipeline->>Pipeline: formatJITContent
+    Pipeline-->>Client: {layer: 'jit_knowledge', priority: 50, isFinal: true}
+```
+
+## Bundle Types & Priority
+
+```mermaid
+flowchart LR
+    subgraph "Bundle Priority Order"
+        P100["Priority 100<br/>identity_core"]
+        P90["Priority 90<br/>global_prefs"]
+        P80["Priority 80<br/>conversation"]
+        P70["Priority 70<br/>topic"]
+        P60["Priority 60<br/>entity"]
+        P50["Priority 50<br/>composite"]
+    end
+
+    subgraph "Composition Sources"
+        ID["User Profile<br/>Topic Profiles<br/>Entity Profiles"]
+        PREFS["System Preferences<br/>UI Preferences<br/>Model Preferences"]
+        CONV["Messages<br/>ACUs<br/>Compactions"]
+        TOP["Topic ACUs<br/>Topic Memories<br/>Topic Relationships"]
+        ENT["Entity ACUs<br/>Entity Profiles<br/>Entity Memories"]
+        COMP["Cross-topic<br/>Cross-entity"]
+    end
+
+    P100 --> ID
+    P90 --> PREFS
+    P80 --> CONV
+    P70 --> TOP
+    P60 --> ENT
+    P50 --> COMP
+
+    style P100 fill:#4a1942,stroke:#d4145a
+    style P90 fill:#4a1942,stroke:#d4145a
+    style P80 fill:#1a1a2e,stroke:#4a4a6a
+    style P70 fill:#1a1a2e,stroke:#4a4a6a
+    style P60 fill:#1a1a2e,stroke:#4a4a6a
+    style P50 fill:#0f3460,stroke:#16213e
+```
+
+## Metrics Collection
+
+```mermaid
+flowchart TB
+    subgraph "Pipeline Metrics"
+        start["Start: Date.now()"]
+        
+        subgraph "Stage Timing"
+            stage1["Stage 0: Settings + Embed + Conv"]
+            stage2["Stage 1: Detection + Identity + Prefs"]
+            stage3["Stage 2: JIT + Conv + Topics + Entities"]
+            stage4["Stage 3: Compilation"]
+        end
+        
+        calc["Calculate Metrics"]
+        
+        subgraph "Metrics Output"
+            total["totalDurationMs"]
+            factor["parallelFactor"]
+            cache["cacheHitRate"]
+            budget["tokensBudgeted"]
+            used["tokensUsed"]
+        end
+        
+        emit["Emit Telemetry Event"]
+    end
+    
+    start --> stage1
+    stage1 --> stage2
+    stage2 --> stage3
+    stage3 --> stage4
+    stage4 --> calc
+    calc --> total
+    calc --> factor
+    calc --> cache
+    calc --> budget
+    calc --> used
+    calc --> emit
+
+    note["parallelFactor = totalSerialMs / totalDurationMs<br/>cacheHitRate = cacheHits / totalStages"]
+```
+
+## Context Detection Flow
+
+```mermaid
+flowchart TB
+    subgraph "Input"
+        msg["User Message"]
+        emb["Embedding"]
+        userId["User ID"]
+    end
+
+    subgraph "Topic Matching"
+        db_topics["SELECT * FROM topic_profiles<br/>WHERE userId = ?<br/>ORDER BY embedding <=> ?<br/>LIMIT 5"]
+        filter_t["Filter: similarity > 0.35"]
+        topics["topics: [{slug, profileId, confidence}]"]
+    end
+
+    subgraph "Entity Matching"
+        db_entities["SELECT * FROM entity_profiles<br/>WHERE userId = ?<br/>ORDER BY embedding <=> ?<br/>LIMIT 5"]
+        filter_e["Filter: similarity > 0.4"]
+        entities["entities: [{id, name, type, confidence}]"]
+    end
+
+    subgraph "Output"
+        result["DetectedContext"]
+        isNew["isNewTopic: topics.length === 0"]
+        isCont["isContinuation: !!conversationId"]
+    end
+
+    msg --> emb
+    emb --> db_topics
+    emb --> db_entities
+    db_topics --> filter_t
+    db_entities --> filter_e
+    filter_t --> topics
+    filter_e --> entities
+    topics --> result
+    entities --> result
+    result --> isNew
+    result --> isCont
+```
+
+## JIT Retrieval Process
+
+```mermaid
+flowchart LR
+    subgraph "Query"
+        userId["userId"]
+        message["message"]
+        embedding["embedding"]
+        context["detectedContext"]
+    end
+
+    subgraph "ACU Search"
+        acu_query["SELECT * FROM atomic_chat_units<br/>WHERE authorDid IN (SELECT did FROM users WHERE id = ?)<br/>AND state = 'ACTIVE'<br/>ORDER BY embedding <=> ?<br/>LIMIT 10"]
+        acu_filter["Filter: similarity > 0.3"]
+        acus["acus: [{id, content, type, category, createdAt}]"]
+    end
+
+    subgraph "Memory Search"
+        mem_query["SELECT * FROM memories<br/>WHERE userId = ?<br/>AND isActive = true<br/>ORDER BY embedding <=> ?<br/>LIMIT 10"]
+        mem_filter["Filter: similarity > 0.35"]
+        memories["memories: [{id, content, category, importance}]"]
+    end
+
+    subgraph "Formatting"
+        format["formatJITContent()"]
+        output["JITKnowledge<br/>{acus, memories}"]
+    end
+
+    userId --> acu_query
+    userId --> mem_query
+    embedding --> acu_query
+    embedding --> mem_query
+    acu_query --> acu_filter
+    mem_query --> mem_filter
+    acu_filter --> format
+    mem_filter --> format
+    format --> output
+
+    style acu_query fill:#1a1a2e,stroke:#4a4a6a
+    style mem_query fill:#1a1a2e,stroke:#4a4a6a
+    style format fill:#16213e,stroke:#0f3460
+```
+
+## Budget Algorithm
+
+```mermaid
+flowchart TB
+    subgraph "Input"
+        settings["settings.maxContextTokens (default: 12000)"]
+        userMsg["userMessage"]
+    end
+
+    calc["userTokens = tokenEstimator.estimate(userMessage)"]
+    avail["availableTokens = totalBudget - userTokens"]
+
+    subgraph "Bundle Sorting"
+        priority["priorityOrder = {<br/>identity_core: 100,<br/>global_prefs: 90,<br/>conversation: 80,<br/>topic: 70,<br/>entity: 60,<br/>composite: 50<br/>}"]
+        sort["Sort bundles by priority (descending)"]
+    end
+
+    subgraph "Budget Allocation"
+        loop["For each bundle:"]
+        check["tokensUsed + bundle.tokenCount > maxTokens?"]
+        fit["Add full bundle"]
+        truncate["Truncate to fit remaining"]
+        break["Break if no space left"]
+    end
+
+    subgraph "JIT Addition"
+        jit_check["tokensUsed < maxTokens * 0.9?"]
+        jit_format["Format JIT content"]
+        jit_tokens["Estimate JIT tokens"]
+        jit_fit["tokensUsed + jitTokens <= maxTokens?"]
+        jit_add["Add JIT content"]
+    end
+
+    output["systemPrompt: string"]
+
+    settings --> calc
+    userMsg --> calc
+    calc --> avail
+    avail --> priority
+    priority --> sort
+    sort --> loop
+    loop --> check
+    check -->|No| fit
+    check -->|Yes| truncate
+    truncate --> break
+    fit --> loop
+    loop --> jit_check
+    jit_check -->|Yes| jit_format
+    jit_check -->|No| output
+    jit_format --> jit_tokens
+    jit_tokens --> jit_fit
+    jit_fit -->|Yes| jit_add
+    jit_fit -->|No| output
+    jit_add --> output
+
+    style calc fill:#1a1a2e,stroke:#4a4a6a
+    style loop fill:#2d2d44,stroke:#5a5a7a
+    style output fill:#16213e,stroke:#0f3460
+```
+
+## Key Interfaces
+
+```typescript
+interface AssemblyParams {
+  userId: string;
+  conversationId?: string;
+  userMessage: string;
+}
+
+interface AssembledContext {
+  systemPrompt: string;
+  budget: TokenBudget;
+  bundlesUsed: string[];
+  metadata: {
+    assemblyTimeMs: number;
+    detectedTopics: number;
+    detectedEntities: number;
+    cacheHitRate: number;
+  };
+  metrics: PipelineMetrics;
+}
+
+interface PipelineMetrics {
+  totalDurationMs: number;
+  stages: Record<string, { durationMs: number; source: 'cache' | 'computed'; error?: string }>;
+  parallelFactor: number;
+  cacheHitRate: number;
+  tokensBudgeted: number;
+  tokensUsed: number;
+}
+
+interface StreamingContextChunk {
+  layer: string;
+  content: string;
+  tokenCount: number;
+  priority: number;
+  isFinal: boolean;
+}
+```

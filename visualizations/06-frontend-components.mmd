@@ -1,0 +1,452 @@
+# Frontend Components Architecture Visualization
+
+## Component Hierarchy
+
+```mermaid
+graph TB
+    subgraph "App Shell"
+        app["app/layout.tsx"]
+        page["app/page.tsx (Home)"]
+    end
+
+    subgraph "Demo Pages (app/demos/*)"
+        dm1["live-memory/page.tsx"]
+        dm2["context-engine/page.tsx"]
+        dm3["zero-knowledge-privacy/page.tsx"]
+        dm4["sovereign-history/page.tsx"]
+        dm5["decentralized-network/page.tsx"]
+        dm6["secure-collaboration/page.tsx"]
+        dm7["dynamic-intelligence/page.tsx"]
+        dm8["rights-layer/page.tsx"]
+        dm9["sentinel-detection/page.tsx"]
+        dm10["marketplace/page.tsx"]
+    end
+
+    subgraph "Chat Feature"
+        chat["app/chat/page.tsx"]
+        chat_provider["components/chat/chat-provider.tsx"]
+    end
+
+    subgraph "API Routes"
+        api_chat["app/api/chat/route.ts"]
+        api_geo["app/api/geolocation/route.ts"]
+        api_trans["app/api/translate/route.ts"]
+    end
+
+    app --> page
+    app --> chat
+    app --> dm1
+    app --> dm2
+    app --> dm3
+    app --> dm4
+    app --> dm5
+    app --> dm6
+    app --> dm7
+    app --> dm8
+    app --> dm9
+    app --> dm10
+
+    chat --> chat_provider
+    chat_provider --> api_chat
+
+    dm1 --> api_chat
+    dm2 --> api_geo
+    dm2 --> api_trans
+```
+
+## UI Components Library (Radix-based)
+
+```mermaid
+graph TB
+    subgraph "Base UI Components (components/ui/)"
+        
+        action["Action"]
+        button["button.tsx"]
+        toggle["toggle.tsx"]
+        switch["switch.tsx"]
+        
+        layout["Layout"]
+        dialog["dialog.tsx"]
+        sheet["sheet.tsx"]
+        popover["popover.tsx"]
+        card["card.tsx"]
+        
+        nav["Navigation"]
+        navigation["navigation-menu.tsx"]
+        tabs["tabs.tsx"]
+        menubar["menubar.tsx"]
+        breadcrumb["breadcrumb.tsx"]
+        
+        data["Data Display"]
+        avatar["avatar.tsx"]
+        badge["badge.tsx"]
+        tooltip["tooltip.tsx"]
+        hover["hover-card.tsx"]
+        
+        input["Input"]
+        input["input.tsx"]
+        textarea["textarea.tsx"]
+        select["select.tsx"]
+        slider["slider.tsx"]
+        
+        feedback["Feedback"]
+        toast["toast.tsx"]
+        alert["alert.tsx"]
+        progress["progress.tsx"]
+        skeleton["skeleton.tsx"]
+        
+        container["Container"]
+        scroll["scroll-area.tsx"]
+        accordion["accordion.tsx"]
+        collapsible["collapsible.tsx"]
+        
+        utility["Utility"]
+        separator["separator.tsx"]
+        label["label.tsx"]
+        checkbox["checkbox.tsx"]
+        radio["radio-group.tsx"]
+        table["table.tsx"]
+        pagination["pagination.tsx"]
+        aspect["aspect-ratio.tsx"]
+        command["command.tsx"]
+    end
+```
+
+## Core Components
+
+```mermaid
+flowchart TB
+    subgraph "Navbar"
+        nb["navbar.tsx"]
+        nb_logo["Logo & Brand"]
+        nb_links["Navigation Links"]
+        nb_mobile["Mobile Menu"]
+        nb_theme["Theme Toggle"]
+    end
+
+    subgraph "Hero Section"
+        hero["hero-visual.tsx"]
+        hero_anim["Animated visualization"]
+        hero_demo["Demo button"]
+    end
+
+    subgraph "Background"
+        neural["neural-bg.tsx"]
+        neural_anim["Neural network animation"]
+    end
+
+    subgraph "Providers"
+        logos["provider-logos.tsx"]
+        logos_grid["Logos grid (OpenAI, Claude, Gemini, etc.)"]
+    end
+
+    subgraph "Counters"
+        counter["animated-counter.tsx"]
+        scroll_anim["useScrollAnimation hook"]
+    end
+
+    subgraph "Progress"
+        progress["reading-progress.tsx"]
+    end
+```
+
+## Demo Components
+
+```mermaid
+graph TB
+    subgraph "Live Memory Demo"
+        lm_demo["live-memory-demo.tsx"]
+        lm_timeline["MemoryTimeline component"]
+        lm_pipeline["ExtractionPipeline component"]
+    end
+
+    subgraph "Context Engine Demo"
+        ce_demo["dynamic-intelligence-demo.tsx"]
+        ce_budget["context-budget-viz.tsx"]
+    end
+
+    subgraph "Zero-Knowledge Demo"
+        zk_demo["zero-knowledge-privacy-demo.tsx"]
+        zk_diagram["ZK diagram"]
+    end
+
+    subgraph "Sovereign History Demo"
+        sh_demo["sovereign-history-demo.tsx"]
+        sh_export["Export options"]
+    end
+
+    subgraph "Decentralized Network Demo"
+        dn_demo["decentralized-network-demo.tsx"]
+        dn_graph["InteractiveKnowledgeGraph"]
+    end
+
+    subgraph "Secure Collaboration Demo"
+        sc_demo["secure-collaboration-demo.tsx"]
+    end
+```
+
+## Interactive Components
+
+```mermaid
+flowchart TB
+    subgraph "Knowledge Graph"
+        kg["InteractiveKnowledgeGraph.tsx"]
+        kg_node["GraphNodeDetail.tsx"]
+        kg_zoom["Zoom/Pan controls"]
+        kg_filter["Filter by type"]
+    end
+
+    subgraph "Memory Timeline"
+        mt["MemoryTimeline.tsx"]
+        mt_timeline["Timeline view"]
+        mt_filter["Filter by category"]
+    end
+
+    subgraph "Extraction Pipeline"
+        ep["ExtractionPipeline.tsx"]
+        ep_stages["Visual stages"]
+        ep_anim["Animation"]
+    end
+
+    subgraph "Budget Visualization"
+        bv["context-budget-viz.tsx"]
+        bv_layers["8 layers display"]
+        bv_slider["Budget slider"]
+    end
+```
+
+## Hooks Architecture
+
+```mermaid
+flowchart LR
+    subgraph "Custom Hooks"
+        
+        use_demo["useDemoState.ts"]
+        use_demo_state["State management for demos"]
+        use_demo_data["Demo data loading"]
+        
+        use_mobile["use-mobile.ts"]
+        use_mobile_check["isMobile check"]
+        use_mobile_size["window size tracking"]
+        
+        use_reduced["useReducedMotion.ts"]
+        use_reduced_check["prefers-reduced-motion check"]
+        
+        use_toast["use-toast.ts"]
+        use_toast_state["Toast state management"]
+        use_toast_fns["toast, success, error functions"]
+    end
+
+    subgraph "React Hooks Used"
+        use_state["useState"]
+        use_effect["useEffect"]
+        use_context["useContext"]
+        use_ref["useRef"]
+        use_memo["useMemo"]
+        use_callback["useCallback"]
+        use_transition["useTransition"]
+    end
+
+    subgraph "External Hooks"
+        framer["framer-motion<br/>(useAnimation, useMotionValue, etc.)"]
+        radix["@radix-ui hooks"]
+    end
+
+    use_demo --> use_state
+    use_demo --> use_effect
+    use_mobile --> use_effect
+    use_mobile --> use_state
+    use_reduced --> use_state
+    use_reduced --> use_effect
+    use_toast --> use_state
+    use_toast --> use_context
+```
+
+## Library Architecture
+
+```mermaid
+graph TB
+    subgraph "lib/chat/"
+        chat_ctx["context.ts"]
+        chat_state["Chat state provider"]
+        chat_msgs["Message management"]
+    end
+
+    subgraph "lib/translation/"
+        trans_client["client.ts"]
+        trans_geo["geolocation.ts"]
+        trans_detect["langDetect.ts"]
+        trans_cache["cache.ts"]
+        trans_priority["priority.ts"]
+        
+        subgraph "Features"
+            detect["Language detection"]
+            cache["Translation cache"]
+            fallback["Fallback to user locale"]
+            priority["User > URL > Browser > Default"]
+        end
+    end
+
+    subgraph "utils/"
+        perf["performance.ts"]
+        demo_eb["demoEventBus.ts"]
+        anim["animations.ts"]
+    end
+```
+
+## Demo Engine
+
+```mermaid
+flowchart TB
+    subgraph "Demo Engine"
+        
+        demo_engine["demo-engine/"]
+        
+        cbc["contextBudgetCalculator.ts"]
+        calc_budget["Calculate token budgets"]
+        calc_layers["Layer calculations"]
+        calc_viz["Budget visualization data"]
+        
+        mock_ext["mockExtractionEngine.ts"]
+        mock_acu["Mock ACU extraction"]
+        mock_timeline["Mock timeline generation"]
+        mock_anim["Demo animations"]
+    end
+
+    subgraph "Demo Data Types"
+        demo_types["src/types/demo.ts"]
+        demo_state["Demo state types"]
+        demo_events["Demo event types"]
+    end
+```
+
+## Demo Page Structure Example
+
+```mermaid
+flowchart TB
+    subgraph "Live Memory Demo Page"
+        
+        page["page.tsx"]
+        header["Page header"]
+        content["Main content"]
+        
+        subgraph "Interactive Components"
+            input["User input field"]
+            timeline["MemoryTimeline component"]
+            pipeline["ExtractionPipeline component"]
+            details["Memory detail view"]
+        end
+
+        subgraph "State Management"
+            state["useDemoState hook"]
+            messages["Messages state"]
+            memories["Memories state"]
+            stage["Extraction stage"]
+        end
+
+        subgraph "Event Handlers"
+            send["Handle send message"]
+            extract["Trigger extraction"]
+            display["Display ACUs"]
+        end
+    end
+```
+
+## Framer Motion Animations
+
+```mermaid
+flowchart TB
+    subgraph "Animation Components"
+        
+        motion["framer-motion"]
+        
+        anim_page["Page transitions"]
+        anim_stagger["Stagger children"]
+        anim_enter["Enter animations"]
+        anim_exit["Exit animations"]
+        anim_scroll["Scroll-triggered"]
+        anim_hover["Hover effects"]
+    end
+
+    subgraph "Custom Animation States"
+        reveal["reveal animation"]
+        slide["slide in from bottom"]
+        fade["fade in"]
+        scale["scale up"]
+        stagger["stagger delay"]
+    end
+
+    subgraph "Animation Hooks"
+        reduced["ReducedMotionWrapper"]
+        scroll_anim["useScrollAnimation custom hook"]
+        reduced_check["Check prefers-reduced-motion"]
+    end
+```
+
+## Data Flow in Demos
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Page as Demo Page
+    participant Hook as useDemoState
+    participant Engine as Demo Engine
+    participant Pipeline as ExtractionPipeline
+    participant Timeline as MemoryTimeline
+
+    User->>Page: Type message
+    Page->>Hook: Update input state
+    
+    User->>Page: Send message
+    Hook->>Engine: calculateContextBudget()
+    Engine-->>Hook: Budget data
+    
+    Hook->>Pipeline: startExtraction()
+    
+    loop Extraction Stages
+        Pipeline->>Pipeline: Extract ACUs
+        Pipeline->>Timeline: Update progress
+        Pipeline->>Page: Stage update
+    end
+    
+    Pipeline->>Hook: Extraction complete
+    Hook->>Timeline: Render memories
+    
+    User->>Timeline: Click memory
+    Timeline->>Page: Show details
+    Page->>User: Display ACU details
+```
+
+## Tailwind & Styling
+
+```mermaid
+flowchart TB
+    subgraph "Styling Architecture"
+        
+        tailwind["tailwind.config.ts"]
+        
+        subgraph "Custom Configuration"
+            colors["Custom colors (violet, cyan, emerald, etc.)"]
+            extend["theme extend"]
+            animation["Custom animations"]
+        end
+
+        subgraph "Global Styles"
+            base["base layer"]
+            components["components layer"]
+            utilities["utilities layer"]
+        end
+
+        subgraph "CSS Variables"
+            glass["Glass effect vars"]
+            glow["Glow effects"]
+            gradient["Gradients"]
+        end
+    end
+
+    subgraph "Classes Used"
+        utility["Tailwind utility classes"]
+        custom["Custom cva() classes"]
+        cn["clsx + tailwind-merge"]
+    end
+```

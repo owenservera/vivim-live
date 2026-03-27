@@ -1,0 +1,848 @@
+# VIVIM Source Code Visualization Documents
+
+This document provides a comprehensive visualization of the entire VIVIM source code project.
+
+## Table of Contents
+
+1. [Project Structure](#1-project-structure)
+2. [System Architecture](#2-system-architecture)
+3. [Database Schema](#3-database-schema)
+4. [Context Pipeline](#4-context-pipeline)
+5. [API Routes](#5-api-routes)
+6. [Frontend Components](#6-frontend-components)
+7. [Memory System](#7-memory-system)
+8. [Security & Auth](#8-security--auth)
+9. [Data Flow](#9-data-flow)
+10. [Rights Layer & Sentinel](#10-rights-layer--sentinel)
+
+---
+
+## 1. Project Structure
+
+```mermaid
+graph TD
+    subgraph "Root"
+        root["C:\\0-BlackBoxProject-0\\vivim-source-code"]
+    end
+
+    subgraph "Packages"
+        subgraph "frontend"
+            fe["packages/frontend"]
+            fe_src["src/"]
+            fe_app["app/"]
+            fe_comp["components/"]
+            fe_hooks["hooks/"]
+            fe_lib["lib/"]
+            fe_utils["utils/"]
+            fe_types["types/"]
+        end
+        
+        subgraph "backend"
+            be["packages/backend"]
+            be_src["src/"]
+            be_routes["routes/"]
+            be_services["services/"]
+            be_context["context/"]
+            be_workers["workers/"]
+            be_middleware["middleware/"]
+            be_lib["lib/"]
+            be_prisma["prisma/"]
+        end
+        
+        sh["packages/shared"]
+    end
+
+    subgraph "Documentation"
+        docs["VIVIM.docs/"]
+        chain["chain-of-trust/"]
+        cinematic["cinematic-platform/"]
+    end
+
+    root --> packages
+    root --> docs
+    packages --> fe
+    packages --> be
+    packages --> sh
+    fe --> fe_src
+    fe_src --> fe_app
+    fe_src --> fe_comp
+    fe_src --> fe_hooks
+    fe_src --> fe_lib
+    fe_src --> fe_utils
+    fe_src --> fe_types
+    be --> be_src
+    be_src --> be_routes
+    be_src --> be_services
+    be_src --> be_context
+    be_src --> be_workers
+    be_src --> be_middleware
+    be_src --> be_lib
+    be --> be_prisma
+```
+
+## 2. System Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend (Next.js 15)"
+        FE["VIVIM Live App"]
+        Next["Next.js 15"]
+        React["React 19"]
+        Tailwind["Tailwind v4"]
+        Radix["Radix UI"]
+        Framer["Framer Motion"]
+        
+        FE --> Next
+        Next --> React
+        FE --> Tailwind
+        FE --> Radix
+        FE --> Framer
+        
+        subgraph "Frontend Services"
+            Chat["Chat Context"]
+            Translation["Translation System"]
+            DemoEngine["Demo Engine"]
+        end
+        
+        FE --> Chat
+        FE --> Translation
+        FE --> DemoEngine
+    end
+
+    subgraph "Backend (Express)"
+        API["VIVIM API Server"]
+        Express["Express 5"]
+        Bun["Bun Runtime"]
+        
+        API --> Express
+        API --> Bun
+        
+        subgraph "Backend Core Services"
+            ContextEngine["Context Engine"]
+            MemoryService["Memory Service"]
+            ChatbotService["Chatbot Service"]
+            VirtualUser["Virtual User Management"]
+            CorpusService["Corpus Service"]
+        end
+        
+        API --> ContextEngine
+        API --> MemoryService
+        API --> ChatbotService
+        API --> VirtualUser
+        API --> CorpusService
+    end
+
+    subgraph "Database Layer"
+        DB["PostgreSQL + Prisma"]
+        Prisma["Prisma ORM"]
+        PGVector["pgVector (Embeddings)"]
+        LibSQL["LibSQL Client"]
+        
+        DB --> Prisma
+        DB --> PGVector
+        DB --> LibSQL
+    end
+
+    subgraph "AI Providers"
+        OpenAI["OpenAI"]
+        Anthropic["Anthropic Claude"]
+        Google["Google Gemini"]
+        XAI["xAI Grok"]
+        Zai["Z.ai"]
+        Ollama["Ollama"]
+        
+        ContextEngine --> OpenAI
+        ContextEngine --> Anthropic
+        ContextEngine --> Google
+        ContextEngine --> XAI
+        ContextEngine --> Zai
+        ContextEngine --> Ollama
+    end
+
+    subgraph "Shared Package"
+        Shared["@vivim/shared"]
+        Types["TypeScript Types"]
+        Auth["Auth Utilities"]
+        
+        Shared --> Types
+        Shared --> Auth
+    end
+
+    FE <-->|"HTTP/WebSocket"| API
+    API <--> DB
+    Shared <--> FE
+    Shared <--> API
+```
+
+## 3. Database Schema (Key Models)
+
+```mermaid
+erDiagram
+    User ||--o{ ApiKey : "has"
+    User ||--o{ Device : "owns"
+    User ||--o{ Conversation : "owns"
+    User ||--o{ Memory : "stores"
+    User ||--o{ TopicProfile : "creates"
+    User ||--o{ EntityProfile : "defines"
+    User ||--o{ ContextSettings : "configures"
+
+    Conversation ||--o{ Message : "contains"
+    Conversation ||--o{ AtomicChatUnit : "segmented into"
+    Conversation ||--o{ ContextBundle : "bundles"
+    Conversation ||--o{ TopicConversation : "categorized in"
+
+    Message ||--o{ AtomicChatUnit : "extracted from"
+
+    AtomicChatUnit {
+        string id PK
+        string content
+        string type
+        string category
+        string state
+        float importance
+        string authorDid
+        float[] embedding
+    }
+
+    ContextBundle {
+        string id PK
+        string userId FK
+        string bundleType
+        string compiledPrompt
+        int tokenCount
+        bool isDirty
+    }
+
+    Memory {
+        string id PK
+        string userId FK
+        string content
+        string category
+        float importance
+        float[] embedding
+        bool isActive
+    }
+
+    TopicProfile {
+        string id PK
+        string userId FK
+        string slug
+        string label
+        float[] embedding
+    }
+
+    EntityProfile {
+        string id PK
+        string userId FK
+        string name
+        string type
+        float[] embedding
+    }
+
+    ContextSettings {
+        string id PK
+        string userId FK
+        int maxContextTokens
+        Json preferences
+    }
+
+    VirtualUser ||--o{ Conversation : "captures"
+    VirtualUser ||--o{ ConversationCompaction : "compacts"
+```
+
+## 4. Context Pipeline (8-Layer Architecture)
+
+```mermaid
+flowchart LR
+    subgraph "User Message Input"
+        UM["User Message"]
+    end
+
+    subgraph "8-Layer Context Assembly"
+        L0["L0: Identity Core<br/>(~300 tokens)"]
+        L1["L1: Global Preferences<br/>(~500 tokens)"]
+        L2["L2: Topic Context<br/>(~1,500 tokens)"]
+        L3["L3: Entity Context<br/>(~1,000 tokens)"]
+        L4["L4: Conversation Arc<br/>(~2,000 tokens)"]
+        L5["L5: JIT Retrieval<br/>(~2,500 tokens)"]
+        L6["L6: Message History<br/>(~3,500 tokens)"]
+        L7["L7: User Message<br/>(Variable)"]
+    end
+
+    subgraph "Pipeline Stages"
+        Detect["Context Detection"]
+        Embed["Embedding Generation"]
+        Bundle["Bundle Compilation"]
+        Budget["Token Budget Calculation"]
+        Assemble["Prompt Assembly"]
+    end
+
+    UM --> Detect
+    Detect --> Embed
+    
+    subgraph "Parallel Fetch Stage"
+        PF[("Parallel Fetch")]
+    end
+    
+    Embed --> PF
+    PF --> L0
+    PF --> L1
+    
+    subgraph "Bundle Compilation"
+        BC[("Bundle Compiler")]
+    end
+    
+    BC --> L2
+    BC --> L3
+    BC --> L4
+    BC --> L5
+    
+    L0 --> Budget
+    L1 --> Budget
+    L2 --> Budget
+    L3 --> Budget
+    L4 --> Budget
+    L5 --> Budget
+    
+    Budget --> Assemble
+    
+    L6 --> Assemble
+    L7 --> Assemble
+    
+    subgraph "Output"
+        LLM["LLM Prompt"]
+    end
+    
+    Assemble --> LLM
+```
+
+### Context Pipeline Detail
+
+```mermaid
+flowchart TB
+    subgraph "ParallelContextPipeline Class"
+        start["assembleParallel(params)"]
+        
+        subgraph "Stage 0: Parallel Fetch"
+            S0["Promise.allSettled"]
+            fetchSettings["fetchSettings()"]
+            embedMessage["embedMessage()"]
+            fetchConversation["fetchConversation()"]
+        end
+        
+        subgraph "Stage 1: Detection + Bundles"
+            S1["Promise.allSettled"]
+            detectContext["detectContext()"]
+            fetchIdentityBundle["fetchOrCompileBundle(identity_core)"]
+            fetchPrefsBundle["fetchOrCompileBundle(global_prefs)"]
+        end
+        
+        subgraph "Stage 2: Dynamic Bundles"
+            S2["Promise.allSettled"]
+            jitRetrieve["jitRetrieve()"]
+            fetchConvBundle["fetchOrCompileBundle(conversation)"]
+            fetchTopicBundles["fetchOrCompileBundle(topic)"]
+            fetchEntityBundles["fetchOrCompileBundle(entity)"]
+        end
+        
+        subgraph "Stage 3: Assembly"
+            S3["compilePromptFromBundles"]
+            calcBudget["Budget Calculation"]
+            compile["Prompt Compilation"]
+        end
+        
+        output["Return AssembledContext + Metrics"]
+        
+        start --> S0
+        S0 --> fetchSettings
+        S0 --> embedMessage
+        S0 --> fetchConversation
+        S0 --> S1
+        
+        S1 --> detectContext
+        S1 --> fetchIdentityBundle
+        S1 --> fetchPrefsBundle
+        S1 --> S2
+        
+        S2 --> jitRetrieve
+        S2 --> fetchConvBundle
+        S2 --> fetchTopicBundles
+        S2 --> fetchEntityBundles
+        S2 --> S3
+        
+        S3 --> calcBudget
+        calcBudget --> compile
+        compile --> output
+    end
+
+    subgraph "Streaming Variant"
+        stream["assembleStreaming()"]
+        yieldIdentity["Yield Identity (Priority 100)"]
+        yieldPrefs["Yield Preferences (Priority 90)"]
+        yieldTopics["Yield Topics (Priority 70)"]
+        yieldEntities["Yield Entities (Priority 60)"]
+        yieldConv["Yield Conversation (Priority 80)"]
+        yieldJIT["Yield JIT (Priority 50)"]
+        
+        stream --> yieldIdentity
+        yieldIdentity --> yieldPrefs
+        yieldPrefs --> yieldTopics
+        yieldTopics --> yieldEntities
+        yieldEntities --> yieldConv
+        yieldConv --> yieldJIT
+    end
+```
+
+## 5. API Routes
+
+```mermaid
+graph TB
+    subgraph "Backend Routes"
+        
+        subgraph "Chatbot Routes"
+            chatbot["/routes/chatbot"]
+            chatbot_index["index.ts"]
+            chatbot_routes["POST /<br/>GET /:id<br/>PUT /:id<br/>DELETE /:id"]
+        end
+        
+        subgraph "Corpus Routes"
+            corpus["/routes/corpus"]
+            corpus_index["index.ts"]
+            corpus_routes["POST /upload<br/>GET /search<br/>GET /:id"]
+        end
+        
+        subgraph "Conversations Routes"
+            conv["/routes/conversations.render.ts"]
+            conv_routes["GET /<br/>GET /:id<br/>GET /:id/render"]
+        end
+        
+        subgraph "Virtual User Routes"
+            vuser["/routes/virtual-user.ts"]
+            vuser_routes["POST /register<br/>POST /authenticate<br/>GET /profile"]
+        end
+        
+        subgraph "Memory Routes"
+            memory["/routes/memory.ts"]
+            memory_routes["GET /<br/>POST /<br/>PUT /:id<br/>DELETE /:id<br/>GET /search"]
+        end
+        
+        subgraph "Context Engine Routes"
+            ctx["/routes/context-engine.ts"]
+            ctx_routes["POST /assemble<br/>POST /stream<br/>GET /bundles"]
+        end
+        
+        subgraph "Context Settings Routes"
+            ctxset["/routes/context-settings.ts"]
+            ctxset_routes["GET /:userId<br/>PUT /:userId<br/>GET /:userId/budget"]
+        end
+        
+        subgraph "Doc Search Routes"
+            docsearch["/routes/doc-search.ts"]
+            docsearch_routes["GET /search<br/>GET /index"]
+        end
+    end
+
+    subgraph "Middleware"
+        auth["virtual-user-auth.ts"]
+        privacy["virtual-user-privacy.ts"]
+    end
+
+    subgraph "Services"
+        ctx_orch["context-orchestrator.ts"]
+        ctx_assembler["context-assembler.ts"]
+        ctx_cache["context-cache.ts"]
+        ctx_event["context-event-bus.ts"]
+        bundle_comp["bundle-compiler.ts"]
+        vum["virtual-user-manager.ts"]
+        vma["virtual-memory-adapter.ts"]
+    end
+
+    chatbot --> chatbot_routes
+    corpus --> corpus_routes
+    conv --> conv_routes
+    vuser --> vuser_routes
+    memory --> memory_routes
+    ctx --> ctx_routes
+    ctxset --> ctxset_routes
+    docsearch --> docsearch_routes
+
+    chatbot_routes --> auth
+    vuser_routes --> auth
+    memory_routes --> privacy
+
+    auth --> ctx_orch
+    auth --> vum
+    privacy --> vma
+    ctx_orch --> ctx_assembler
+    ctx_orch --> ctx_cache
+    ctx_orch --> ctx_event
+    ctx_assembler --> bundle_comp
+```
+
+## 6. Frontend Components
+
+```mermaid
+graph TB
+    subgraph "App Pages"
+        page["app/page.tsx"]
+        chat["app/chat/page.tsx"]
+        layout["app/layout.tsx"]
+    end
+
+    subgraph "Demo Pages (app/demos)"
+        live_memory["live-memory"]
+        context_engine["context-engine"]
+        zero_knowledge["zero-knowledge-privacy"]
+        sovereign_history["sovereign-history"]
+        decentralized["decentralized-network"]
+        secure_collab["secure-collaboration"]
+        dynamic_int["dynamic-intelligence"]
+        rights_layer["rights-layer"]
+        sentinel["sentinel-detection"]
+        marketplace["marketplace"]
+    end
+
+    subgraph "Core Components"
+        navbar["navbar.tsx"]
+        hero["hero-visual.tsx"]
+        neural_bg["neural-bg.tsx"]
+        provider_logos["provider-logos.tsx"]
+    end
+
+    subgraph "UI Components (Radix-based)"
+        button["button.tsx"]
+        card["card.tsx"]
+        dialog["dialog.tsx"]
+        input["input.tsx"]
+        textarea["textarea.tsx"]
+        switch["switch.tsx"]
+        slider["slider.tsx"]
+        tabs["tabs.tsx"]
+        badge["badge.tsx"]
+        avatar["avatar.tsx"]
+        tooltip["tooltip.tsx"]
+        dropdown["dropdown-menu.tsx"]
+        accordion["accordion.tsx"]
+    end
+
+    subgraph "Custom Components"
+        animated_counter["animated-counter.tsx"]
+        reading_progress["reading-progress.tsx"]
+        context_budget_viz["context-budget-viz.tsx"]
+        memory_timeline["MemoryTimeline.tsx"]
+        extraction_pipeline["ExtractionPipeline.tsx"]
+        knowledge_graph["InteractiveKnowledgeGraph.tsx"]
+    end
+
+    subgraph "Demo Components"
+        live_memory_demo["live-memory-demo.tsx"]
+        context_engine_demo["dynamic-intelligence-demo.tsx"]
+        zero_knowledge_demo["zero-knowledge-privacy-demo.tsx"]
+        sovereign_demo["sovereign-history-demo.tsx"]
+        network_demo["decentralized-network-demo.tsx"]
+        collab_demo["secure-collaboration-demo.tsx"]
+    end
+
+    subgraph "Hooks"
+        useDemoState["useDemoState.ts"]
+        useMobile["use-mobile.ts"]
+        useReducedMotion["useReducedMotion.ts"]
+        useToast["use-toast.ts"]
+    end
+
+    subgraph "Libraries"
+        chat_lib["lib/chat/"]
+        translation_lib["lib/translation/"]
+        utils["utils/"]
+    end
+
+    page --> demo_pages
+    demo_pages --> custom_components
+    demo_pages --> ui_components
+    custom_components --> ui_components
+    page --> core_components
+    core_components --> hooks
+    core_components --> libraries
+```
+
+## 7. Memory System (ACU Architecture)
+
+```mermaid
+flowchart TB
+    subgraph "Memory Architecture"
+        
+        subgraph "Atomic Chat Units (ACU)"
+            acu["ACU - Atomic Chat Unit"]
+            
+            subgraph "ACU Types (9 Categories)"
+                episodic["Episodic Memory"]
+                semantic["Semantic Memory"]
+                procedural["Procedural Memory"]
+                factual["Factual Knowledge"]
+                preference["Preference"]
+                identity["Identity"]
+                relationship["Relationship"]
+                goal["Goal"]
+                project["Project"]
+            end
+            
+            acu --> episodic
+            acu --> semantic
+            acu --> procedural
+            acu --> factual
+            acu --> preference
+            acu --> identity
+            acu --> relationship
+            acu --> goal
+            acu --> project
+        end
+        
+        subgraph "ACU Fields"
+            id["id: UUID"]
+            content["content: string"]
+            type["type: string"]
+            category["category: string"]
+            importance["importance: float"]
+            embedding["embedding: float[]"]
+            authorDid["authorDid: string"]
+            state["state: ACTIVE|ARCHIVED|DELETED"]
+            createdAt["createdAt: timestamp"]
+        end
+        
+        subgraph "Memory Operations"
+            create["createACU()"]
+            search["semanticSearch()"]
+            retrieve["jitRetrieve()"]
+            update["updateImportance()"]
+            archive["archive()"]
+        end
+        
+        episodic --> acu_fields
+        semantic --> acu_fields
+        search --> retrieve
+        create --> update
+    end
+
+    subgraph "Hybrid Retrieval"
+        embedding["Embedding Service"]
+        vector_db["Vector Search (pgvector)"]
+        keyword["Keyword Search"]
+        hybrid["Hybrid Scoring"]
+        
+        query["User Query"] --> embedding
+        embedding --> vector_db
+        vector_db --> hybrid
+        keyword --> hybrid
+        hybrid --> results["Ranked Results"]
+    end
+```
+
+## 8. Security & Auth
+
+```mermaid
+flowchart LR
+    subgraph "Authentication Flow"
+        
+        subgraph "Virtual User System"
+            vureg["Virtual User Registration"]
+            vuauth["Virtual User Authentication"]
+            vuprofile["Virtual User Profile"]
+        end
+        
+        subgraph "Auth Methods"
+            jwt["JWT Tokens"]
+            oauth["OAuth 2.0 (Google)"]
+            totp["TOTP (2FA)"]
+            device["Device Registration"]
+        end
+        
+        subgraph "Middleware"
+            auth_mw["virtual-user-auth.ts"]
+            privacy_mw["virtual-user-privacy.ts"]
+        end
+        
+        vureg --> vuprofile
+        vuauth --> jwt
+        oauth --> jwt
+        totp --> jwt
+        device --> vuprofile
+        
+        jwt --> auth_mw
+        auth_mw --> privacy_mw
+    end
+
+    subgraph "Privacy & Zero-Knowledge"
+        zk["Zero-Knowledge Proofs"]
+        encryption["Client-side Encryption"]
+        key_mgmt["Key Management (never leaves device)"]
+        audit["Audit Logging"]
+        
+        zk --> encryption
+        encryption --> key_mgmt
+        key_mgmt --> audit
+    end
+
+    subgraph "Encryption Keys"
+        master["Master Key (user's device)"]
+        derived["Derived Keys (per conversation)"]
+        
+        master --> derived
+        derived --> encryption
+    end
+```
+
+## 9. Data Flow & Event Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Event System"
+        event_bus["ContextEventBus"]
+        
+        emit_telemetry["emit('telemetry:*')"]
+        emit_cache["emit('cache:*')"]
+        emit_assembly["emit('assembly:*')"]
+        
+        event_bus --> emit_telemetry
+        event_bus --> emit_cache
+        event_bus --> emit_assembly
+    end
+
+    subgraph "Context Event Types"
+        telemetry["telemetry:assembly_complete<br/>telemetry:retrieval_complete<br/>telemetry:budget_exceeded"]
+        cache_events["cache:hit<br/>cache:miss<br/>cache:evicted"]
+        assembly["assembly:started<br/>assembly:completed<br/>assembly:failed"]
+    end
+
+    subgraph "Service Orchestration"
+        orch["ContextOrchestrator"]
+        
+        subgraph "Orchestration Steps"
+            init["Initialize Pipeline"]
+            detect["Detect Context"]
+            retrieve["Retrieve Memories"]
+            compile["Compile Bundles"]
+            assemble["Assemble Context"]
+            stream["Stream to LLM"]
+        end
+        
+        orch --> init
+        init --> detect
+        detect --> retrieve
+        retrieve --> compile
+        compile --> assemble
+        assemble --> stream
+    end
+
+    subgraph "Workers"
+        librarian["librarian-worker.ts<br/>(ACU extraction, indexing)"]
+        cleanup["memory-cleanup-worker.ts<br/>(archive, compaction)"]
+        warmup["context-warmup-worker.ts<br/>(prefetch, cache warming)"]
+    end
+
+    event_bus --> orch
+    orch --> workers
+    workers --> event_bus
+```
+
+## 10. Rights Layer & Sentinel
+
+```mermaid
+flowchart TB
+    subgraph "Rights Layer (Tiers)"
+        
+        subgraph "Ownership Tiers"
+            T0["T0: Personal Only<br/>(Full ownership)"]
+            T1["T1: Personal-Likely"]
+            T2["T2: Shared-Possibly"]
+            T3["T3: Co-Governed<br/>(Dual-key required)"]
+            T4["T4: Restricted<br/>(Enhanced protection)"]
+            T5["T5: Regulated<br/>(Legal/Medical/Financial lockbox)"]
+        end
+        
+        subgraph "TDASS System"
+            tdass["TDASS<br/>(Tiered Data Access System)"]
+            co_gov["Co-Governance"]
+            dual_key["Dual-Key Encryption"]
+            
+            tdass --> co_gov
+            co_gov --> dual_key
+        end
+        
+        subgraph "TPDI Classifier"
+            tpdi["TPDI Classifier<br/>(ML-powered)"]
+            features["Feature Extraction"]
+            ml["ML Classification"]
+            tier_conf["Tier + Confidence"]
+            
+            tpdi --> features
+            features --> ml
+            ml --> tier_conf
+        end
+        
+        T0 --> tdass
+        T1 --> tdass
+        T2 --> tdass
+        T3 --> tdass
+        T4 --> tdass
+        T5 --> tdass
+    end
+
+    subgraph "Sentinel Detection (13 Algorithms)"
+        
+        subgraph "Detection Algorithms"
+            A1["A1: Spectral Membership Inference"]
+            A2["A2: Mutual Information Estimation"]
+            A3["A3: Kolmogorov Uniqueness"]
+            A4["A4: Photon Counting"]
+            A5["A5: Interference Pattern"]
+            A6["A6: Canary Wave Function"]
+            A7["A7: Boltzmann Calibration"]
+            A8["A8: Holographic Watermarking"]
+            A9["A9: Thermodynamic Flow"]
+            A10["A10: Fisher Fingerprinting"]
+            A11["A11: Entanglement Testing"]
+            A12["A12: Diffraction Grating"]
+            A13["A13: Conservation Law"]
+        end
+        
+        subgraph "Canary System"
+            canary["Canary Token System"]
+            detect["Detection Event"]
+            proof["Cryptographic Proof"]
+            
+            canary --> detect
+            detect --> proof
+        end
+        
+        A1 --> sentinel["Sentinel"]
+        A2 --> sentinel
+        A3 --> sentinel
+        A4 --> sentinel
+        A5 --> sentinel
+        A6 --> sentinel
+        A7 --> sentinel
+        A8 --> sentinel
+        A9 --> sentinel
+        A10 --> sentinel
+        A11 --> sentinel
+        A12 --> sentinel
+        A13 --> sentinel
+        
+        sentinel --> canary
+    end
+```
+
+## Summary
+
+This visualization document covers:
+
+1. **Project Structure** - Monorepo with frontend, backend, and shared packages
+2. **System Architecture** - Full stack with Next.js, Express, PostgreSQL
+3. **Database Schema** - Key models for users, conversations, ACUs, memories
+4. **Context Pipeline** - 8-layer parallel assembly with streaming support
+5. **API Routes** - All backend endpoints and middleware
+6. **Frontend Components** - Pages, UI components, hooks, libraries
+7. **Memory System** - ACU architecture with 9 memory types
+8. **Security & Auth** - Virtual users, JWT, Zero-Knowledge encryption
+9. **Data Flow** - Event-driven architecture with workers
+10. **Rights Layer & Sentinel** - 6-tier ownership and 13 detection algorithms

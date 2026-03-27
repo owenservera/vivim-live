@@ -1,0 +1,329 @@
+# 01 - Project Structure Visualization
+
+## Directory Tree
+
+```
+vivim-source-code/
+├── .vercel/                      # Vercel deployment config
+│   ├── project.json
+│   └── README.txt
+│
+├── assets/                       # Static assets
+│   ├── logo.png
+│   ├── logo2.png
+│   ├── logo_vivim.png
+│   ├── logo_V.png
+│   └── development/
+│       └── desktop_topNavbar_issue.png
+│
+├── chain-of-trust/              # Documentation - chain of trust concepts
+│   ├── docs-output/             # Mermaid diagrams
+│   │   ├── mermaid-index.md
+│   │   ├── mermaid-01-system-overview.mmd
+│   │   ├── mermaid-02-rights-detection.mmd
+│   │   ├── mermaid-03-marketplace.mmd
+│   │   ├── mermaid-04-blockchain-sync.mmd
+│   │   ├── mermaid-05-biological-analogy.mmd
+│   │   ├── mermaid-06-development-roadmap.mmd
+│   │   └── README.md
+│   ├── 01-executive-summary.md
+│   ├── 02-technical-concepts.md
+│   ├── 03-development-roadmap.md
+│   ├── 04-product-roadmap.md
+│   ├── 05-user-guide.md
+│   ├── 06-mathematical-foundations.md
+│   ├── 07-glossary.md
+│   └── [Various .md files]
+│
+├── cinematic-platform/          # Scroll-driven experience platform
+│   ├── ARCHITECTURE.md
+│   ├── TECH_STACK.md
+│   ├── PROJECT_SCAFFOLD.md
+│   ├── COMPONENT_LIBRARY.md
+│   ├── DESIGN_SYSTEM.md
+│   ├── DATA_SCHEMA.md
+│   ├── API_SPECIFICATION.md
+│   ├── ANIMATION_GUIDE.md
+│   ├── EXTENSIBILITY.md
+│   ├── DEPLOYMENT.md
+│   └── README.md
+│
+├── VIVIM.docs/                  # VIVIM documentation
+│   └── VIVIM.docs/
+│       ├── UNIFIED_DEBUGGING.md
+│       ├── PITCH/
+│       │   ├── VIVIM_Pitch_Slides_1-5.md
+│       │   ├── VIVIM_Brand_Palette_Schema.md
+│       │   ├── vivim.md
+│       │   ├── [Various pitch documents]
+│       │   └── OPERATIONS/
+│       │       ├── README.md
+│       │       ├── config/
+│       │       ├── diagrams/
+│       │       └── schemas/
+│       └── FOUNDING/
+│           ├── 00_founding_index.md
+│           ├── 01_dao_charter.md
+│           ├── 02_articles_of_digital_association.md
+│           ├── 03_tokenomics_founding_document.md
+│           └── 04_community_operating_agreement.md
+│
+├── packages/                    # Monorepo packages
+│   ├── frontend/                # Next.js 15 frontend
+│   ├── backend/                # Express API server
+│   └── shared/                 # Shared TypeScript types
+│
+├── package.json                # Root package.json (workspaces)
+└── bun.lock                    # Bun lockfile
+```
+
+## Packages Structure
+
+```mermaid
+graph TB
+    subgraph "Root (workspaces)"
+        root["package.json"]
+    end
+
+    subgraph "packages/"
+        
+        subgraph "frontend (vivim-live)"
+            fe_pkg["package.json"]
+            fe_src["src/"]
+            fe_next["next.config.ts"]
+            fe_tailwind["tailwind.config.ts"]
+            fe_tsconfig["tsconfig.json"]
+        end
+
+        subgraph "backend (vivim-server)"
+            be_pkg["package.json"]
+            be_src["src/"]
+            be_prisma["prisma/"]
+            be_tests["tests/"]
+            be_scripts["scripts/"]
+        end
+
+        subgraph "shared (@vivim/shared)"
+            sh_pkg["package.json"]
+            sh_src["src/"]
+            sh_tsconfig["tsconfig.json"]
+        end
+    end
+
+    root -->|"workspaces: [packages/*]"| fe_pkg
+    root -->|"workspaces: [packages/*]"| be_pkg
+    root -->|"workspaces: [packages/*]"| sh_pkg
+```
+
+## Frontend Structure
+
+```
+packages/frontend/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/
+│   │   │   ├── chat/route.ts
+│   │   │   ├── geolocation/route.ts
+│   │   │   ├── translate/route.ts
+│   │   │   └── route.ts
+│   │   ├── demos/
+│   │   │   ├── live-memory/page.tsx
+│   │   │   ├── context-engine/page.tsx
+│   │   │   ├── zero-knowledge-privacy/page.tsx
+│   │   │   ├── sovereign-history/page.tsx
+│   │   │   ├── decentralized-network/page.tsx
+│   │   │   ├── secure-collaboration/page.tsx
+│   │   │   ├── dynamic-intelligence/page.tsx
+│   │   │   ├── rights-layer/page.tsx
+│   │   │   ├── sentinel-detection/page.tsx
+│   │   │   └── marketplace/page.tsx
+│   │   ├── chat/page.tsx
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   │
+│   ├── components/
+│   │   ├── ui/                  # Radix UI components
+│   │   ├── assistant-ui/        # @assistant-ui/react
+│   │   ├── chat/
+│   │   ├── navbar.tsx
+│   │   ├── hero-visual.tsx
+│   │   ├── neural-bg.tsx
+│   │   ├── provider-logos.tsx
+│   │   ├── animated-counter.tsx
+│   │   ├── reading-progress.tsx
+│   │   ├── context-budget-viz.tsx
+│   │   ├── MemoryTimeline.tsx
+│   │   ├── InteractiveKnowledgeGraph.tsx
+│   │   ├── ExtractionPipeline.tsx
+│   │   ├── [Demo components]
+│   │   └── [Demo components]
+│   │
+│   ├── hooks/
+│   │   ├── useDemoState.ts
+│   │   ├── use-mobile.ts
+│   │   ├── useReducedMotion.ts
+│   │   └── use-toast.ts
+│   │
+│   ├── lib/
+│   │   ├── chat/context.ts
+│   │   ├── translation/
+│   │   │   ├── client.ts
+│   │   │   ├── geolocation.ts
+│   │   │   ├── langDetect.ts
+│   │   │   ├── cache.ts
+│   │   │   └── priority.ts
+│   │   └── utils.ts
+│   │
+│   ├── utils/
+│   │   ├── performance.ts
+│   │   ├── demoEventBus.ts
+│   │   └── animations.ts
+│   │
+│   ├── types/
+│   │   ├── chat.ts
+│   │   ├── memory.ts
+│   │   └── demo.ts
+│   │
+│   └── demo-engine/
+│       ├── contextBudgetCalculator.ts
+│       └── mockExtractionEngine.ts
+│
+├── package.json
+├── next.config.ts
+├── tailwind.config.ts
+└── tsconfig.json
+```
+
+## Backend Structure
+
+```
+packages/backend/
+├── src/
+│   ├── routes/
+│   │   ├── chatbot/index.ts
+│   │   ├── corpus/index.ts
+│   │   ├── virtual-user.ts
+│   │   ├── conversations.render.ts
+│   │   ├── doc-search.ts
+│   │   ├── context-engine.ts
+│   │   ├── memory.ts
+│   │   └── context-settings.ts
+│   │
+│   ├── services/
+│   │   ├── orchestrator/
+│   │   │   └── weight-calculator.ts
+│   │   ├── tier-orchestrator.ts
+│   │   ├── virtual-user-manager.ts
+│   │   ├── virtual-memory-adapter.ts
+│   │   ├── conversation-rendering-service.ts
+│   │   ├── streaming-context-service.ts
+│   │   ├── context-ws.ts
+│   │   ├── context-startup.ts
+│   │   ├── unified-context-service.ts
+│   │   ├── page-index-service.ts
+│   │   ├── profile-rollup-service.ts
+│   │   ├── acu-memory-pipeline.ts
+│   │   ├── acu-deduplication-service.ts
+│   │   ├── streaming-import-service.ts
+│   │   ├── virtual-user-privacy.ts
+│   │   └── socket.ts
+│   │
+│   ├── context/                # Context Engine Core
+│   │   ├── index.ts
+│   │   ├── types.ts
+│   │   ├── context-pipeline.ts          # ParallelContextPipeline
+│   │   ├── context-orchestrator.ts
+│   │   ├── context-assembler.ts
+│   │   ├── context-graph.ts
+│   │   ├── context-cache.ts
+│   │   ├── context-event-bus.ts
+│   │   ├── context-telemetry.ts
+│   │   ├── context-thermodynamics.ts
+│   │   ├── bundle-compiler.ts
+│   │   ├── bundle-differ.ts
+│   │   ├── budget-algorithm.ts
+│   │   ├── adaptive-prediction.ts
+│   │   ├── query-optimizer.ts
+│   │   ├── prefetch-engine.ts
+│   │   ├── prediction-engine.ts
+│   │   ├── hybrid-retrieval.ts
+│   │   ├── conversation-context-engine.ts
+│   │   ├── vivim-identity-service.ts
+│   │   ├── settings-service.ts
+│   │   ├── settings-integration.ts
+│   │   ├── settings-types.ts
+│   │   ├── utils/
+│   │   │   ├── token-estimator.ts
+│   │   │   ├── zai-service.ts
+│   │   │   ├── circuit-breaker-service.ts
+│   │   │   ├── embedding-service.ts
+│   │   │   └── acu-quality-scorer.ts
+│   │   └── librarian-worker.ts
+│   │
+│   ├── workers/
+│   │   └── memory-cleanup-worker.ts
+│   │
+│   ├── middleware/
+│   │   ├── virtual-user-auth.ts
+│   │   └── virtual-user-privacy.ts
+│   │
+│   ├── lib/
+│   │   └── events.ts
+│   │
+│   ├── @types/
+│   │   ├── express.d.ts
+│   │   └── opossum.d.ts
+│   │
+│   └── server.js
+│
+├── prisma/
+│   ├── schema.prisma           # Main schema
+│   ├── corpus-schema.prisma    # Corpus-specific schema
+│   ├── seed.ts
+│   ├── seed-real-data.ts
+│   ├── seed-investor.ts
+│   ├── seed-edge-cases.ts
+│   ├── factories/
+│   │   └── seed-factory.ts
+│   └── migrations/
+│
+├── tests/
+│   ├── context-pipeline-integration.test.ts
+│   ├── conversations-api.test.ts
+│   └── sync-integration.test.ts
+│
+├── scripts/
+│   ├── seed-corpus-from-md.ts
+│   ├── generate-vivim-context.js
+│   └── test-e2e.ts
+│
+├── package.json
+└── tsconfig.json
+```
+
+## Shared Package Structure
+
+```
+packages/shared/
+├── src/
+│   ├── index.ts
+│   ├── auth/
+│   │   └── index.ts
+│   └── types/
+│       └── index.ts
+├── package.json
+└── tsconfig.json
+```
+
+## Technology Stack Summary
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 15, React 19, Tailwind v4, Framer Motion |
+| UI Components | Radix UI, @assistant-ui/react |
+| Backend | Express 5, Bun Runtime |
+| Database | PostgreSQL, Prisma ORM, pgVector |
+| AI SDKs | @ai-sdk/* (OpenAI, Anthropic, Google, xAI, etc.) |
+| Real-time | Socket.io |
+| Auth | JWT, OAuth 2.0, TOTP |
+| Caching | Redis (ioredis) |

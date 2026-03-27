@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Github, Menu, X, BookOpen, Cpu, Brain, Lock, History, Network, Users, Zap } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const sectionToId = (section: string): string =>
   section.toLowerCase().split(" ").join("-");
@@ -352,26 +353,54 @@ export function Navbar() {
 
           <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
             <DemosDropdown />
+            <LanguageSwitcher />
 
-            <a
-              href="https://github.com/owenservera/vivim-live"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5 whitespace-nowrap"
-            >
-              <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">GitHub</span>
-            </a>
+            <div className="relative group/github">
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5 whitespace-nowrap"
+              >
+                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">GitHub</span>
+              </button>
 
-            <a
-              href="https://discord.gg/vivim"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-violet-600/20 to-cyan-600/20 border border-white/10 text-white hover:border-white/20 transition-colors whitespace-nowrap"
-            >
-              <span className="hidden sm:inline">Join Discord</span>
-              <span className="sm:hidden">Discord</span>
-            </a>
+              <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover/github:opacity-100 group-hover/github:visible transition-all duration-200">
+                <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[200px] shadow-xl">
+                  <a
+                    href="https://github.com/owenservera/vivim-server"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <span className="text-sm text-white">Backend</span>
+                  </a>
+                  <a
+                    href="https://github.com/owenservera/vivim-pwa"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <span className="text-sm text-white">App</span>
+                  </a>
+                  <a
+                    href="https://github.com/owenservera/vivim-network"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <span className="text-sm text-white">Network</span>
+                  </a>
+                  <a
+                    href="https://github.com/owenservera/vivim-sdk"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                  >
+                    <span className="text-sm text-white">SDK</span>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
 
           <button

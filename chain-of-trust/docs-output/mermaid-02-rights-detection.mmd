@@ -1,0 +1,270 @@
+# Ownership Tiers and Rights System
+
+```mermaid
+flowchart TB
+    subgraph "Ownership Tensor"
+        Entity[Entity Axis]
+        Time[Time Axis]
+        Operation[Operation Axis]
+        
+        Entity -->|Human| User[Human User]
+        Entity -->|Company| Company[Company]
+        Entity -->|Client| Client[Client]
+        Entity -->|Regulator| Regulator[Regulator]
+        
+        Time --> Now[Immediate]
+        Time --> Sunset[Sunset Period]
+        Time --> Expired[Expired]
+        
+        Operation --> View[View]
+        Operation --> Share[Share]
+        Operation --> Sell[Sell]
+        Operation --> Derive[Derive]
+    end
+    
+    style Entity fill:#e94560,stroke:#333,color:#fff
+    style Time fill:#0f3460,stroke:#333,color:#fff
+    style Operation fill:#16213e,stroke:#333,color:#fff
+```
+
+## Tier Classification System
+
+```mermaid
+flowchart LR
+    subgraph "Content Flow"
+        Input[Incoming ACU] --> Classifier[Rights Classifier]
+        
+        Classifier -->|T0 Personal| Tier0[Tier 0: Personal]
+        Classifier -->|T1 Personal-Likely| Tier1[Tier 1: Personal-Likely]
+        Classifier -->|T2 Shared-Possibly| Tier2[Tier 2: Shared-Possibly]
+        Classifier -->|T3 Co-Governed| Tier3[Tier 3: Co-Governed]
+        Classifier -->|T4 Restricted| Tier4[Tier 4: Restricted]
+        Classifier -->|T5 Regulated| Tier5[Tier 5: Regulated]
+        
+        Tier0 --> Vault0[(Vault - User Only)]
+        Tier1 --> Vault1[(Vault - User Only)]
+        Tier2 --> Vault2[(Vault - User Only)]
+        Tier3 --> Vault3[(Vault - Dual Control)]
+        Tier4 --> Vault4[(Vault - Enhanced)]
+        Tier5 --> Vault5[(Vault - Locked)]
+        
+        Vault3 -->|Approval| Export3[Export/Sale]
+        Vault5 -->|Never| Export5[No Export]
+    end
+    
+    style Classifier fill:#e94560,stroke:#333,color:#fff
+    style Tier0 fill:#27ae60,stroke:#333,color:#fff
+    style Tier3 fill:#f39c12,stroke:#333,color:#000
+    style Tier5 fill:#c0392b,stroke:#333,color:#fff
+```
+
+## TPDI Classifier Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Third-Party Determinability Inference (TPDI)"
+        Input[ACU Content] --> Features
+        
+        subgraph "Feature Extraction"
+            Lex[Lexical Features]
+            Sem[Semantic Features]
+            Prov[Provenance Features]
+            Graph[Graph Features]
+            Contract[Contract Features]
+            Device[Device Features]
+            Temporal[Temporal Features]
+        end
+        
+        Features --> ML[ML Classifier]
+        ML --> Output[Tier + Confidence]
+        
+        subgraph "Training Loop"
+            Output --> User[User Feedback]
+            User -->|Confirm/Override| ML
+        end
+    end
+    
+    style Features fill:#0f3460,stroke:#333,color:#fff
+    style ML fill:#e94560,stroke:#333,color:#fff
+    style Output fill:#27ae60,stroke:#333,color:#fff
+```
+
+---
+
+# Co-Governance (TDASS)
+
+```mermaid
+flowchart TB
+    subgraph "TDASS: Temporally Decaying Asymmetric Secret Sharing"
+        
+        subgraph "Active Period (JSC Active)"
+            HumanKey[Human Key Share]
+            CompanyKey[Company Key Share]
+            
+            HumanKey --> Combine1[Both Required]
+            CompanyKey --> Combine1
+            
+            Combine1 --> Export[Export Allowed]
+        end
+        
+        subgraph "Sunset Transition"
+            Fade[Third-party Share Fades]
+            Fade --> Decay[Weight Decays Over Time]
+        end
+        
+        subgraph "Post-Sunset"
+            HumanOnly[Human Key Only]
+            HumanOnly --> Export2[Export Allowed]
+        end
+        
+        subgraph "Tier 5 (Regulated) - Exception"
+            Permanent[Permanent Dual Key]
+            Permanent --> Never[Never Exported]
+        end
+        
+        Active Period --> Sunset Transition
+        Sunset Transition --> Post Sunset
+        Post Sunset -.->|Exception| Tier 5
+    end
+    
+    style HumanKey fill:#e94560,stroke:#333,color:#fff
+    style CompanyKey fill:#3498db,stroke:#333,color:#fff
+    style Permanent fill:#c0392b,stroke:#333,color:#fff
+```
+
+## Dual Control Approval Flow
+
+```mermaid
+sequenceDiagram
+    participant U as Human User
+    participant V as VIVIM Vault
+    participant C as Company (Rights Node)
+    participant M as Marketplace/Export
+
+    U->>V: Request export of Tier 3 content
+    V->>V: Check ownership tensor
+    V->>C: Send approval request (minimal disclosure)
+    
+    Note over C: Review packet shows<br/>- Content descriptor<br/>- Provenance<br/>- Classification
+    
+    C->>V: Approve OR Deny
+    
+    alt Approved
+        V->>M: Execute export (with dual signature)
+        M->>U: Export complete
+    else Denied
+        V->>U: Export denied - company rejected
+    end
+```
+
+---
+
+# Detection Algorithms Overview
+
+```mermaid
+flowchart TB
+    subgraph "13 Detection Algorithms"
+        
+        subgraph "Innate Detection (Fast, Broad)"
+            A1[Spectral Membership Inference]
+            A2[Mutual Information Estimation]
+            A3[Kolmogorov Uniqueness]
+            A13[Conservation Law]
+        end
+        
+        subgraph "Adaptive Detection (Specific, Targeted)"
+            A4[Photon Counting Attribution]
+            A6[Canary Wave Function]
+            A8[Holographic Watermarking]
+            A10[Fisher Fingerprint]
+        end
+        
+        subgraph "Cross-Analysis (Amplification)"
+            A5[Interference Pattern]
+            A9[Thermodynamic Flow]
+            A11[Entanglement Test]
+            A12[Diffraction Grating]
+        end
+        
+        subgraph "Calibration"
+            A7[Boltzmann Calibration]
+        end
+        
+        A1 --> A7
+        A2 --> A7
+        A3 --> A7
+        A4 --> A7
+        A5 --> A7
+        A6 --> A7
+    end
+    
+    style A1 fill:#e94560,stroke:#333,color:#fff
+    style A7 fill:#f39c12,stroke:#333,color:#000
+```
+
+## Detection Pipeline
+
+```mermaid
+flowchart LR
+    subgraph "Detection Pipeline"
+        Vault[(User Vault)] --> Canaries[Deploy Canaries]
+        
+        Canaries --> Target[Target Model]
+        Target --> Probes[Probe Queries]
+        Probes --> Responses[Model Responses]
+        
+        Responses --> |Algorithm 1| SMI[Spectral MI]
+        Responses --> |Algorithm 4| Photon[Photon Counting]
+        Responses --> |Algorithm 5| Cross[Cross-Provider]
+        Responses --> |Algorithm 6| Canary[Canary Detection]
+        
+        SMI --> Combine[Combine Results]
+        Photon --> Combine
+        Cross --> Combine
+        Canary --> Combine
+        
+        Combine --> Calibrate[Boltzmann Calibration]
+        Calibrate --> Evidence[Evidence Package]
+        Calibrate --> Dashboard[User Dashboard]
+    end
+    
+    style Vault fill:#1a1a2e,stroke:#333,color:#fff
+    style Evidence fill:#27ae60,stroke:#333,color:#fff
+    style Dashboard fill:#3498db,stroke:#333,color:#fff
+```
+
+---
+
+# Canary System Detail
+
+```mermaid
+stateDiagram-v2
+    [*] --> GenerateCanary
+    
+    state GenerateCanary {
+        [*] --> CreatePhrase
+        CreatePhrase --> EncodeDID
+        EncodeDID --> EmbedInContent
+        EmbedInContent --> PlantInVault
+    }
+    
+    PlantInVault --> WaitForModel
+    
+    state WaitForModel {
+        [*] --> Superposition
+        Superposition: |canary⟩ = α|undetected⟩ + β|detected⟩
+    }
+    
+    WaitForModel --> ProbeModel: Query model with canary
+    ProbeModel --> Detect: Model shows knowledge
+    
+    state Detect {
+        [*] --> Collapse
+        Collapse: Wave function collapses
+        Collapse --> Record: Record detection event
+    }
+    
+    Detect --> Evidence: Generate proof
+    Evidence --> [*]
+    
+    note right of Superposition: Quantum analogy -<br/>canary exists in<br/>superposition until measured

@@ -1,0 +1,259 @@
+# Blockchain Layer Architecture
+
+```mermaid
+flowchart TB
+    subgraph "VIVIM Hybrid Chain"
+        
+        subgraph "Layer 1: Main Chain (Settlement)"
+            L1_1[Identity Registry]
+            L1_2[Consent Registry]
+            L1_3[Vault Root Commitments]
+            L1_4[Governance]
+        end
+        
+        subgraph "Layer 2: ZK-Rollup"
+            L2_1[Marketplace Transactions]
+            L2_2[Access Control]
+            L2_3[Batch ZK Proofs]
+        end
+        
+        subgraph "Data Availability"
+            DA[IPFS + Erasure Coding]
+        end
+        
+        L1_1 --> L1_2
+        L1_2 --> L1_3
+        L1_3 --> L1_4
+        
+        L2_1 --> L2_2
+        L2_2 --> L2_3
+        
+        L1_3 -.-> DA
+        L2_3 -.-> DA
+    end
+    
+    style L1_1 fill:#e94560,stroke:#333,color:#fff
+    style L1_2 fill:#f39c12,stroke:#333,color:#000
+    style L1_3 fill:#3498db,stroke:#333,color:#fff
+    style L2_1 fill:#27ae60,stroke:#333,color:#fff
+    style DA fill:#9b59b6,stroke:#333,color:#fff
+```
+
+## Block Structure
+
+```mermaid
+flowchart LR
+    subgraph "Block B_n"
+        Height[n: Block Number]
+        PrevHash[H(B_{n-1}): Previous Hash]
+        TxRoot[MerkleRoot(transactions)]
+        StateRoot[State Root]
+        ConsentRoot[Consent Root]
+        Validator[Validator Sig]
+        Timestamp[Timestamp]
+    end
+    
+    Height --> PrevHash
+    PrevHash --> TxRoot
+    TxRoot --> StateRoot
+    StateRoot --> ConsentRoot
+    ConsentRoot --> Validator
+    Validator --> Timestamp
+    
+    style Height fill:#e94560,stroke:#333,color:#fff
+    style PrevHash fill:#0f3460,stroke:#333,color:#fff
+    style TxRoot fill:#16213e,stroke:#333,color:#fff
+```
+
+## State Structure
+
+```mermaid
+flowchart TB
+    subgraph "Global State Trie"
+        
+        subgraph "Per-User Account State"
+            DID[DID: did:vivim:...]
+            Balance[Token Balance]
+            ConsentRoot[Consent Root]
+            VaultRoot[Vault Root]
+            Nonce[Nonce]
+        end
+        
+        DID --> Balance
+        Balance --> ConsentRoot
+        ConsentRoot --> VaultRoot
+        VaultRoot --> Nonce
+    end
+    
+    style DID fill:#e94560,stroke:#333,color:#fff
+    style VaultRoot fill:#3498db,stroke:#333,color:#fff
+```
+
+## Transaction Types
+
+```mermaid
+flowchart TB
+    subgraph "Transaction Algebra"
+        
+        TX1[Register: New identity]
+        TX2[Import: Record data import]
+        TX3[Consent: Update consent]
+        TX4[Revoke: Revoke consent]
+        TX5[List: Marketplace listing]
+        TX6[Purchase: Buy data]
+        TX7[Access: Grant access]
+        TX8[Transfer: Token transfer]
+        TX9[Stake: Validator stake]
+        TX10[Govern: Voting]
+        
+        TX1 --> TX2
+        TX2 --> TX3
+        TX3 --> TX4
+        TX4 --> TX5
+        TX5 --> TX6
+        TX6 --> TX7
+        TX7 --> TX8
+        TX8 --> TX9
+        TX9 --> TX10
+    end
+    
+    style TX1 fill:#e94560,stroke:#333,color:#fff
+    style TX3 fill:#f39c12,stroke:#333,color:#000
+    style TX5 fill:#27ae60,stroke:#333,color:#fff
+```
+
+---
+
+# Proof of Sovereignty (PoSov)
+
+```mermaid
+flowchart TB
+    subgraph "Validator Weight Calculation"
+        
+        Stake[Economic Stake]
+        Users[Users Hosted]
+        Uptime[Uptime]
+        Imports[Imports Facilitated]
+        
+        Stake --> Weight[Validator Weight w_v]
+        Users --> Weight
+        Uptime --> Weight
+        Imports --> Weight
+        
+        Weight --> Proposer[Block Proposer Selection]
+    end
+    
+    note over Weight: w_v = stake_v × (1 + ρ_v)<br/>where ρ_v = λ₁(users/|U|) + λ₂(uptime/T) + λ₃(imports/Σ)
+    
+    style Stake fill:#e94560,stroke:#333,color:#fff
+    style Users fill:#3498db,stroke:#333,color:#fff
+    style Weight fill:#f39c12,stroke:#333,color:#000
+```
+
+## Consensus Flow
+
+```mermaid
+sequenceDiagram
+    participant V1 as Validator 1
+    participant V2 as Validator 2
+    participant V3 as Validator 3
+    participant C as Chain
+    
+    V1->>V1: Propose block
+    V1->>C: Broadcast proposal
+    V2->>C: Attest (vote)
+    V3->>C: Attest (vote)
+    
+    C->>C: Count weighted votes
+    Note over C: Requires 2/3+ weighted votes<br/>for finality
+    
+    C->>V1: Block finalized
+    C->>V2: Block finalized
+    C->>V3: Block finalized
+```
+
+---
+
+# Device Synchronization (P2P)
+
+```mermaid
+flowchart TB
+    subgraph "Multi-Device Architecture"
+        
+        Device1[Device A - Laptop]
+        Device2[Device B - Phone]
+        Device3[Device C - Tablet]
+        
+        Device1 <-->|P2P Sync| Sync[Entanglement Protocol]
+        Device2 <-->|P2P Sync| Sync
+        Device3 <-->|P2P Sync| Sync
+        
+        Sync --> Encrypted[Encrypted Transit]
+        Encrypted --> CRDT[CRDT Merge]
+        CRDT --> Verify[Merkle Verification]
+    end
+    
+    style Device1 fill:#e94560,stroke:#333,color:#fff
+    style Device2 fill:#3498db,stroke:#333,color:#fff
+    style Device3 fill:#27ae60,stroke:#333,color:#fff
+```
+
+## Sync Protocol
+
+```mermaid
+sequenceDiagram
+    participant A as Device A
+    participant B as Device B
+    
+    A->>B: Hello + Device Identity
+    B->>A: Hello + Device Identity
+    
+    A->>A: Compute Merkle root
+    B->>B: Compute Merkle root
+    
+    A->>B: My root is X
+    B->>A: My root is Y
+    
+    alt Roots match
+        Note over A,B: Already in sync - no action
+    else Roots differ
+        A->>B: Send diff (encrypted)
+        B->>A: Send diff (encrypted)
+        
+        A->>A: Merge CRDT
+        B->>B: Merge CRDT
+        
+        A->>A: Verify new root
+        B->>B: Verify new root
+    end
+    
+    Note over A,B: Both roots now match
+```
+
+## CRDT Conflict Resolution
+
+```mermaid
+flowchart TB
+    subgraph "Conflict Resolution Strategy"
+        
+        Add[G-Counter: ACU additions]
+        Meta[LWW-Register: Metadata updates]
+        
+        subgraph "Merge Logic"
+            Merge1[Union of ACU sets]
+            Merge2[Vector clock comparison]
+            Merge3[Last-writer-wins for conflicts]
+        end
+        
+        Add --> Merge1
+        Meta --> Merge2
+        Merge2 --> Merge3
+        
+        Merge1 --> Result[Merged Vault]
+        Merge3 --> Result
+    end
+    
+    style Add fill:#e94560,stroke:#333,color:#fff
+    style Meta fill:#3498db,stroke:#333,color:#fff
+    style Result fill:#27ae60,stroke:#333,color:#fff
+```

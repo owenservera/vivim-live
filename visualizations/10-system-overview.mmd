@@ -1,0 +1,427 @@
+# Complete System Overview Visualization
+
+## End-to-End Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Client Layer"
+        browser["Web Browser"]
+        mobile["Mobile App"]
+        desktop["Desktop App"]
+    end
+
+    subgraph "VIVIM Frontend (Next.js 15)"
+        fe_next["Next.js 15 App Router"]
+        fe_react["React 19"]
+        fe_ui["Radix UI + Custom Components"]
+        fe_state["Context & State Management"]
+        fe_anim["Framer Motion Animations"]
+    end
+
+    subgraph "VIVIM Backend (Express + Bun)"
+        api["Express API"]
+        ws["Socket.io"]
+        mw["Middleware Stack"]
+    end
+
+    subgraph "Core Services"
+        ctx_eng["Context Engine"]
+        mem_svc["Memory Service"]
+        chat_svc["Chatbot Service"]
+        vu_svc["Virtual User Service"]
+        corp_svc["Corpus Service"]
+    end
+
+    subgraph "Context Pipeline"
+        pipeline["ParallelContextPipeline"]
+        cache["ContextCache"]
+        events["ContextEventBus"]
+        embed["Embedding Service"]
+    end
+
+    subgraph "Database Layer"
+        prisma["Prisma ORM"]
+        postgres["PostgreSQL + pgVector"]
+        redis["Redis"]
+    end
+
+    subgraph "AI Integration"
+        multi_ai["Multi-Provider AI Gateway"]
+        providers["OpenAI | Anthropic | Google | xAI | Ollama"]
+    end
+
+    subgraph "Security Layer"
+        auth["Virtual User Auth"]
+        privacy["Zero-Knowledge Privacy"]
+        rights["Rights Layer (T0-T5)"]
+        audit["Audit Logging"]
+    end
+
+    browser --> fe_next
+    mobile --> fe_next
+    desktop --> fe_next
+
+    fe_next --> fe_react
+    fe_react --> fe_ui
+    fe_ui --> fe_state
+    fe_state --> fe_anim
+
+    fe_next --> api
+    fe_next --> ws
+    fe_anim --> ws
+
+    api --> mw
+    mw --> ctx_eng
+    mw --> mem_svc
+    mw --> chat_svc
+    mw --> vu_svc
+    mw --> corp_svc
+
+    ctx_eng --> pipeline
+    pipeline --> cache
+    pipeline --> events
+    pipeline --> embed
+
+    cache --> redis
+    pipeline --> prisma
+    prisma --> postgres
+
+    embed --> providers
+    chat_svc --> providers
+    multi_ai --> providers
+
+    api --> auth
+    api --> privacy
+    api --> rights
+    api --> audit
+```
+
+## Complete Request Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API
+    participant Middleware
+    participant ContextEngine
+    participant Pipeline
+    participant Database
+    participant AI
+
+    User->>Frontend: Type message
+    
+    Frontend->>Frontend: translate()
+    Frontend->>Frontend: detectLanguage()
+    
+    Frontend->>API: POST /chatbot {message}
+    
+    API->>Middleware: authenticate(token)
+    Middleware->>API: user authenticated
+    
+    API->>ContextEngine: assemble(params)
+    
+    ContextEngine->>Pipeline: assembleParallel(params)
+    
+    Note over Pipeline: Stage 0: Parallel fetch
+    Pipeline->>Database: fetch settings
+    Pipeline->>Database: embed message
+    Pipeline->>Database: fetch conversation
+    
+    Note over Pipeline: Stage 1: Detection
+    Pipeline->>Database: semantic search topics
+    Pipeline->>Database: semantic search entities
+    
+    Note over Pipeline: Stage 2: Bundle compilation
+    Pipeline->>Database: fetch identity bundle
+    Pipeline->>Database: fetch preference bundle
+    Pipeline->>Database: JIT retrieve memories
+    Pipeline->>Database: fetch topic bundles
+    
+    Note over Pipeline: Stage 3: Assembly
+    Pipeline->>Pipeline: calculate budget
+    Pipeline->>Pipeline: compile system prompt
+    
+    Pipeline-->>ContextEngine: systemPrompt + metrics
+    
+    ContextEngine->>AI: generateResponse(prompt)
+    
+    Note over AI: Stream response back
+    
+    AI-->>ContextEngine: stream chunks
+    ContextEngine-->>API: stream chunks
+    
+    API-->>Frontend: stream to UI
+    
+    Frontend->>User: Display response
+    
+    Note over Pipeline: Post-processing
+    ContextEngine->>Database: extract ACUs
+    ContextEngine->>Database: update memory graph
+    ContextEngine->>Pipeline: invalidate cache
+```
+
+## Feature Summary Diagram
+
+```mermaid
+flowchart TB
+    subgraph "VIVIM Features"
+        
+        subgraph "Core Features"
+            memory["Sovereign Memory"]
+            context["Dynamic Context"]
+            portable["Portable ACUs"]
+            provider["Provider Agnostic"]
+        end
+
+        subgraph "Privacy Features"
+            zk["Zero-Knowledge Encryption"]
+            rights["Rights Layer (T0-T5)"]
+            audit["Audit Logging"]
+            device["Device Management"]
+        end
+
+        subgraph "Detection Features"
+            sentinel["Sentinel Detection"]
+            canary["Canary System"]
+            algorithms["13 Algorithms"]
+            proof["Cryptographic Proof"]
+        end
+
+        subgraph "Collaboration"
+            share["Secure Sharing"]
+            team["Team Memory"]
+            co_gov["Co-Governance"]
+            sync["P2P Sync"]
+        end
+
+        subgraph "Intelligence"
+            acus["ACU Extraction"]
+            hybrid["Hybrid Retrieval"]
+            thermodynamics["Context Thermodynamics"]
+            prediction["Prediction Engine"]
+        end
+    end
+```
+
+## Technology Stack Summary
+
+```mermaid
+flowchart TB
+    subgraph "Frontend Stack"
+        f1["Next.js 15 (App Router)"]
+        f2["React 19"]
+        f3["TypeScript 5"]
+        f4["Tailwind v4"]
+        f5["Framer Motion"]
+        f6["Radix UI"]
+    end
+
+    subgraph "Backend Stack"
+        b1["Express 5"]
+        b2["Bun Runtime"]
+        b3["TypeScript"]
+        b4["Prisma ORM"]
+        b5["Socket.io"]
+        b6["Zod Validation"]
+    end
+
+    subgraph "Database Stack"
+        d1["PostgreSQL"]
+        d2["pgVector"]
+        d3["Redis (ioredis)"]
+        d4["LibSQL (edge)"]
+    end
+
+    subgraph "AI Stack"
+        a1["@ai-sdk/openai"]
+        a2["@ai-sdk/anthropic"]
+        a3["@ai-sdk/google"]
+        a4["@ai-sdk/xai"]
+        a5["Ollama (local)"]
+    end
+
+    subgraph "Auth Stack"
+        auth1["JWT"]
+        auth2["OAuth 2.0"]
+        auth3["TOTP (2FA)"]
+        auth4["DID (Decentralized)"]
+    end
+
+    subgraph "Infrastructure"
+        i1["Vercel (Frontend)"]
+        i2["Render Railway (Backend)"]
+        i3["Neon (PostgreSQL)"]
+        i4["Upstash (Redis)"]
+    end
+```
+
+## Development & Deployment
+
+```mermaid
+flowchart TB
+    subgraph "Development"
+        dev["npm run dev"]
+        frontend["npm run dev:frontend"]
+        backend["npm run dev:backend"]
+        test["npm run test"]
+        lint["npm run lint"]
+    end
+
+    subgraph "Database"
+        migrate["npm run db:migrate"]
+        generate["npm run db:generate"]
+        studio["npm run db:studio"]
+        seed["npm run db:seed"]
+    end
+
+    subgraph "Build"
+        build["npm run build"]
+        build_fe["npm run build:frontend"]
+        build_be["npm run build:backend"]
+        start["npm run start"]
+    end
+
+    subgraph "CI/CD"
+        ci["GitHub Actions"]
+        test_ci["Run tests"]
+        lint_ci["Lint check"]
+        build_ci["Build check"]
+        deploy["Deploy to Vercel/Railway"]
+    end
+
+    dev --> frontend
+    dev --> backend
+    dev --> test
+    dev --> lint
+    
+    migrate --> generate
+    generate --> studio
+    studio --> seed
+    
+    build --> build_fe
+    build --> build_be
+    build --> start
+    
+    ci --> test_ci
+    ci --> lint_ci
+    ci --> build_ci
+    build_ci --> deploy
+```
+
+## File Organization Summary
+
+```mermaid
+flowchart TB
+    root["C:\\0-BlackBoxProject-0\\vivim-source-code"]
+    
+    subgraph "Root Files"
+        pkg["package.json"]
+        lock["bun.lock"]
+    end
+
+    subgraph "packages/frontend"
+        pf["src/app/**"]
+        cf["src/components/**"]
+        hf["src/hooks/**"]
+        lf["src/lib/**"]
+    end
+
+    subgraph "packages/backend"
+        pb["src/**"]
+        rb["src/routes/**"]
+        sb["src/services/**"]
+        cb["src/context/**"]
+        wb["src/workers/**"]
+        mb["src/middleware/**"]
+        prb["prisma/**"]
+    end
+
+    subgraph "packages/shared"
+        ps["src/**"]
+    end
+
+    subgraph "Documentation"
+        docs["VIVIM.docs/**"]
+        chain["chain-of-trust/**"]
+        cinematic["cinematic-platform/**"]
+    end
+
+    root --> pkg
+    root --> lock
+    
+    root --> pf
+    root --> cf
+    root --> hf
+    root --> lf
+    
+    root --> pb
+    root --> rb
+    root --> sb
+    root --> cb
+    root --> wb
+    root --> mb
+    root --> prb
+    
+    root --> ps
+    
+    root --> docs
+    root --> chain
+    root --> cinematic
+```
+
+## Key Metrics & SLAs
+
+```mermaid
+flowchart TB
+    subgraph "Performance Targets"
+        pt1["Context Assembly: <200ms"]
+        pt2["Token Estimation: <5ms"]
+        pt3["Embedding Generation: <100ms"]
+        pt4["Semantic Search: <50ms"]
+        pt5["Page Load: <1.5s"]
+    end
+
+    subgraph "Capacity"
+        cap1["Max Context Tokens: 128K"]
+        cap2["Max Concurrent Users: 1000+"]
+        cap3["Vector Index Size: 10M+ vectors"]
+        cap4["ACU Storage: Unlimited (per user)"]
+        cap5["Bundle Cache TTL: 1 hour"]
+    end
+
+    subgraph "Reliability"
+        rel1["Uptime: 99.9%"]
+        rel2["Cache Hit Rate: >80%"]
+        rel3["Error Rate: <0.1%"]
+        rel4["P99 Latency: <500ms"]
+    end
+```
+
+## Summary
+
+This visualization document provides a complete overview of the VIVIM system:
+
+### Core Components
+1. **Frontend**: Next.js 15 + React 19 + Tailwind v4 + Framer Motion
+2. **Backend**: Express 5 + Bun Runtime + Prisma ORM
+3. **Database**: PostgreSQL + pgVector + Redis
+4. **AI**: Multi-provider gateway (OpenAI, Anthropic, Google, xAI, Ollama)
+
+### Key Features
+- **8-Layer Context Assembly**: Identity → Preferences → Topics → Entities → Conversation → JIT → History → Message
+- **9 ACU Types**: Episodic, Semantic, Procedural, Factual, Preference, Identity, Relationship, Goal, Project
+- **Rights Layer (T0-T5)**: Personal to Regulated ownership tiers
+- **Sentinel Detection**: 13 algorithms for data usage detection
+- **Zero-Knowledge**: Client-side encryption, keys never leave device
+
+### Integration Points
+- Frontend ↔ Backend: HTTP + WebSocket
+- Backend ↔ Database: Prisma ORM
+- AI Providers: Multi-provider SDK
+- Auth: JWT + DID-based virtual users
+
+---
+
+*Visualization completed: March 2026*
+*Source: C:\0-BlackBoxProject-0\vivim-source-code\*

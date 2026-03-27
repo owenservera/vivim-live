@@ -1,0 +1,586 @@
+# Security, Auth & Rights Layer Visualization
+
+## Authentication Flow
+
+```mermaid
+flowchart TB
+    subgraph "Virtual User System"
+        
+        subgraph "Registration"
+            reg_req["Registration Request"]
+            gen_did["Generate DID (Decentralized ID)"]
+            gen_keys["Generate Ed25519/X25519 keypair"]
+            create_vu["Create VirtualUser record"]
+            store_pub["Store public key"]
+            return_cred["Return: DID, keypair (secret)"]
+        end
+
+        subgraph "Authentication"
+            auth_req["Auth Request"]
+            sign_challenge["Sign challenge with private key"]
+            verify_sig["Verify signature against DID"]
+            issue_jwt["Issue JWT access token"]
+            issue_refresh["Issue refresh token"]
+            create_session["Create server session"]
+        end
+
+        subgraph "JWT Claims"
+            jwt_sub["sub: did"]
+            jwt_iat["iat: issued at"]
+            jwt_exp["exp: expiry"]
+            jwt_aud["aud: audience (VIVIM)"]
+            jwt_role["role: user|admin"]
+        end
+
+        subgraph "Token Refresh"
+            refresh_req["Refresh token request"]
+            validate["Validate refresh token"]
+            issue_new["Issue new access token"]
+            rotate["Rotate refresh token"]
+        end
+    end
+
+    reg_req --> gen_did
+    gen_did --> gen_keys
+    gen_keys --> create_vu
+    create_vu --> store_pub
+    store_pub --> return_cred
+
+    auth_req --> sign_challenge
+    sign_challenge --> verify_sig
+    verify_sig --> issue_jwt
+    verify_sig --> issue_refresh
+    issue_jwt --> create_session
+
+    refresh_req --> validate
+    validate --> issue_new
+    validate --> rotate
+```
+
+## Middleware Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Authentication Middleware (virtual-user-auth.ts)"
+        
+        mw_start["Middleware function"]
+        mw_token["Extract JWT from header"]
+        mw_verify["Verify JWT signature"]
+        mw_decode["Decode JWT payload"]
+        mw_check_exp["Check expiration"]
+        mw_check_aud["Check audience"]
+        mw_attach["Attach user to request"]
+        mw_next["Next()"]
+        mw_err["Error: 401 Unauthorized"]
+    end
+
+    subgraph "Privacy Middleware (virtual-user-privacy.ts)"
+        
+        priv_start["Middleware function"]
+        priv_user["Get user from request"]
+        priv_audit["Log access for audit"]
+        priv_check["Check data ownership"]
+        priv_filter["Filter sensitive data"]
+        priv_tier["Apply Rights Layer rules (T0-T5)"]
+        priv_encrypt["Check encryption status"]
+        priv_next["Next()"]
+        priv_err["Error: 403 Forbidden"]
+    end
+
+    mw_start --> mw_token
+    mw_token --> mw_verify
+    mw_verify --> mw_decode
+    mw_decode --> mw_check_exp
+    mw_check_exp --> mw_check_aud
+    mw_check_aud --> mw_attach
+    mw_attach --> mw_next
+    mw_token --> mw_err
+
+    priv_start --> priv_user
+    priv_user --> priv_audit
+    priv_audit --> priv_check
+    priv_check --> priv_filter
+    priv_filter --> priv_tier
+    priv_tier --> priv_encrypt
+    priv_encrypt --> priv_next
+    priv_check --> priv_err
+```
+
+## Device Management
+
+```mermaid
+flowchart TB
+    subgraph "Device Registration"
+        dev_req["Device registration request"]
+        dev_fingerprint["Get device fingerprint"]
+        gen_device_id["Generate device ID"]
+        gen_keypair["Generate device keypair"]
+        pubkey_enc["Encrypt public key for storage"]
+        store_device["Store device record"]
+        return_device["Return device credentials"]
+    end
+
+    subgraph "Device Trust Flow"
+        user_verify["User verifies device"]
+        trust_level["Set trust level: 0-3"]
+        biometric["Optional biometric"]
+        mfa["MFA confirmation"]
+        trust_confirmed["Device trusted"]
+    end
+
+    subgraph "Device Revocation"
+        revoke_req["Revoke device request"]
+        validate_owner["Validate ownership"]
+        mark_revoked["Mark as revoked"]
+        delete_keys["Delete stored keys"]
+        logout_device["Force logout device"]
+    end
+
+    subgraph "Device Fields"
+        device_id["deviceId: string (unique)"]
+        device_name["deviceName: string"]
+        device_type["deviceType: string"]
+        platform["platform: string"]
+        fingerprint["fingerprint: string"]
+        public_key["publicKey: string"]
+        is_trusted["isTrusted: boolean"]
+        is_active["isActive: boolean"]
+    end
+
+    dev_req --> dev_fingerprint
+    dev_fingerprint --> gen_device_id
+    gen_device_id --> gen_keypair
+    gen_keypair --> store_device
+    store_device --> return_device
+
+    user_verify --> trust_level
+    trust_level --> trust_confirmed
+
+    revoke_req --> validate_owner
+    validate_owner --> mark_revoked
+    mark_revoked --> delete_keys
+    delete_keys --> logout_device
+```
+
+## Zero-Knowledge Privacy
+
+```mermaid
+flowchart TB
+    subgraph "Client-Side Encryption"
+        
+        client_start["User generates master key"]
+        client_derive["Derive encryption key from password"]
+        client_key_local["Key NEVER leaves device"]
+        
+        subgraph "Key Derivation"
+            kdf["Argon2 / PBKDF2"]
+            salt["Unique salt per user"]
+            iter["High iteration count"]
+        end
+    end
+
+    subgraph "Data Encryption"
+        encrypt_data["Encrypt data before sending"]
+        alg["Algorithm: XChaCha20-Poly1305"]
+        nonce["Unique nonce per message"]
+        encrypted["Encrypted payload"]
+        send_server["Send to server (cannot read)"]
+    end
+
+    subgraph "Decryption"
+        receive["Receive encrypted data"]
+        derive_key["Re-derive key locally"]
+        decrypt["Decrypt with key"]
+        verify["Verify integrity"]
+        display["Display to user"]
+    end
+
+    subgraph "Key Recovery"
+        seed["Generate seed phrase (BIP-39)"]
+        backup["Backup to cloud (encrypted)"]
+        restore["Restore from seed"]
+    end
+
+    client_start --> client_derive
+    client_derive --> client_key_local
+    client_key_local --> encrypt_data
+    
+    encrypt_data --> alg
+    alg --> nonce
+    nonce --> encrypted
+    encrypted --> send_server
+    
+    send_server --> receive
+    receive --> derive_key
+    derive_key --> decrypt
+    decrypt --> verify
+    verify --> display
+
+    client_key_local --> seed
+    seed --> backup
+    backup --> restore
+```
+
+## Rights Layer System
+
+```mermaid
+flowchart TB
+    subgraph "Tiered Data Access System (TDASS)"
+        
+        subgraph "6 Ownership Tiers"
+            t0["T0: Personal Only"]
+            t1["T1: Personal-Likely"]
+            t2["T2: Shared-Possibly"]
+            t3["T3: Co-Governed"]
+            t4["T4: Restricted"]
+            t5["T5: Regulated"]
+        end
+
+        subgraph "T0 Description"
+            desc_t0["User owns completely<br/>No sharing allowed<br/>No governance<br/>Full export rights"]
+        end
+
+        subgraph "T1 Description"
+            desc_t1["Probably personal<br/>Open to classification<br/>Auto-upgrade to T0/T2"]
+        end
+
+        subgraph "T2 Description"
+            desc_t2["Could be shared<br/>Ready for co-governance<br/>Share proposal possible"]
+        end
+
+        subgraph "T3 Description"
+            desc_t3["Company gets governance<br/>Dual-key required for exports<br/>Active period: both keys"]
+        end
+
+        subgraph "T4 Description"
+            desc_t4["Enhanced protection<br/>Limited access for owner<br/>Audit logging required"]
+        end
+
+        subgraph "T5 Description"
+            desc_t5["Never exports<br/>Medical/Legal/Financial<br/>Regulatory lockbox<br/>Legal hold support"]
+        end
+    end
+
+    t0 --> desc_t0
+    t1 --> desc_t1
+    t2 --> desc_t2
+    t3 --> desc_t3
+    t4 --> desc_t4
+    t5 --> desc_t5
+```
+
+## Co-Governance (T3)
+
+```mermaid
+flowchart TB
+    subgraph "TDASS Co-Governance Flow"
+        
+        setup["Setup Co-Governance"]
+        user_share["User initiates share with company"]
+        company_accept["Company accepts governance"]
+        create_keys["Create dual-key (user + company)"]
+        
+        active_period["Active Period"]
+        user_key["User key required"]
+        company_key["Company key required"]
+        both_required["Both keys to export/modify"]
+        
+        sunset["Sunset Period"]
+        company_share["Company share fades over time"]
+        user_control["Gradual return to user control"]
+        
+        post_sunset["Post-Sunset"]
+        full_user["User retains full control"]
+        company_revoke["Company governance revoked"]
+        export_user["Export with user key only"]
+    end
+
+    setup --> user_share
+    user_share --> company_accept
+    company_accept --> create_keys
+    create_keys --> active_period
+    
+    active_period --> user_key
+    active_period --> company_key
+    user_key --> both_required
+    company_key --> both_required
+    
+    active_period --> sunset
+    sunset --> company_share
+    company_share --> user_control
+    
+    sunset --> post_sunset
+    post_sunset --> full_user
+    full_user --> company_revoke
+    company_revoke --> export_user
+```
+
+## TPDI Classifier
+
+```mermaid
+flowchart TB
+    subgraph "ML-Powered Tier Classifier"
+        
+        input["Input: Message content"]
+        
+        subgraph "Feature Extraction"
+            tokens["Tokenize text"]
+            embeddings["Generate embeddings"]
+            keywords["Extract keywords"]
+            meta["Extract metadata (time, source)"]
+            sentiment["Analyze sentiment"]
+        end
+
+        subgraph "ML Classification"
+            model["Classification Model"]
+            features["Feature vector"]
+            predict["Prediction"]
+            confidence["Confidence score"]
+            suggest_tier["Suggested tier (T0-T5)"]
+        end
+
+        subgraph "Feedback Loop"
+            user_correct["User corrects classification"]
+            retrain["Retrain model"]
+            improve["Improve accuracy"]
+        end
+
+        subgraph "Output"
+            final_tier["Final tier assignment"]
+            reason["Reason/explanation"]
+            audit["Audit log entry"]
+        end
+    end
+
+    input --> tokens
+    tokens --> embeddings
+    tokens --> keywords
+    keywords --> meta
+    meta --> sentiment
+    
+    embeddings --> features
+    keywords --> features
+    sentiment --> features
+    
+    features --> model
+    model --> predict
+    predict --> confidence
+    confidence --> suggest_tier
+
+    user_correct --> retrain
+    retrain --> improve
+    improve --> model
+
+    suggest_tier --> final_tier
+    final_tier --> reason
+    reason --> audit
+```
+
+## Sentinel Detection System
+
+```mermaid
+flowchart TB
+    subgraph "Sentinel - Data Usage Detection"
+        
+        subgraph "13 Detection Algorithms"
+            a1["A1: Spectral Membership Inference"]
+            a2["A2: Mutual Information Estimation"]
+            a3["A3: Kolmogorov Uniqueness"]
+            a4["A4: Photon Counting"]
+            a5["A5: Interference Pattern"]
+            a6["A6: Canary Wave Function"]
+            a7["A7: Boltzmann Calibration"]
+            a8["A8: Holographic Watermarking"]
+            a9["A9: Thermodynamic Flow"]
+            a10["A10: Fisher Fingerprinting"]
+            a11["A11: Entanglement Testing"]
+            a12["A12: Diffraction Grating"]
+            a13["A13: Conservation Law"]
+        end
+
+        subgraph "Detection Pipeline"
+            collect["Collect detection signals"]
+            analyze["Analyze signals"]
+            score["Calculate probability score"]
+            threshold["Compare to threshold"]
+            detect["Detection confirmed?"]
+            alert["Alert user"]
+            evidence["Generate cryptographic proof"]
+        end
+    end
+
+    a1 --> collect
+    a2 --> collect
+    a3 --> collect
+    a4 --> collect
+    a5 --> collect
+    a6 --> collect
+    a7 --> collect
+    a8 --> collect
+    a9 --> collect
+    a10 --> collect
+    a11 --> collect
+    a12 --> collect
+    a13 --> collect
+
+    collect --> analyze
+    analyze --> score
+    score --> threshold
+    threshold --> detect
+    detect -->|Yes| alert
+    detect -->|Yes| evidence
+    detect -->|No| collect
+```
+
+## Canary System
+
+```mermaid
+flowchart TB
+    subgraph "Canary Token System"
+        
+        plant["Plant canary token"]
+        generate["Generate unique token"]
+        embed["Embed in conversation"]
+        
+        monitor["Monitor for exposure"]
+        detect_ref["Detect model reference"]
+        confirm["Confirmation event"]
+        
+        proof["Generate proof"]
+        timestamp["Timestamp proof"]
+        hash["Hash chain"]
+        evidence["Evidence package"]
+        
+        user_alert["Alert user"]
+        legal_action["Legal action support"]
+    end
+
+    subgraph "Canary Types"
+        text["Text canary"]
+        code["Code canary"]
+        numeric["Numeric canary"]
+        image["Image canary"]
+    end
+
+    subgraph "Quantum State Representation"
+        canary_state["|canary⟩ = α|undetected⟩ + β|detected⟩"]
+        alpha["α: undetected amplitude"]
+        beta["β: detected amplitude"]
+    end
+
+    plant --> generate
+    generate --> embed
+    embed --> text
+    embed --> code
+    embed --> numeric
+    embed --> image
+    
+    embed --> monitor
+    monitor --> detect_ref
+    detect_ref --> confirm
+    
+    confirm --> proof
+    proof --> timestamp
+    timestamp --> hash
+    hash --> evidence
+    
+    evidence --> user_alert
+    user_alert --> legal_action
+```
+
+## Audit Logging
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as API Server
+    participant Audit as Audit Log
+    participant DB as Database
+
+    User->>API: Request (with auth token)
+    API->>API: Check permissions
+    
+    alt Access Granted
+        API->>API: Process request
+        API->>DB: Execute query
+        DB-->>API: Result
+        
+        Note over API: Log access event
+        API->>Audit: write_event({
+            user_id,
+            action,
+            resource,
+            resource_id,
+            result: "success",
+            timestamp,
+            ip_address,
+            user_agent
+        })
+        
+        API-->>User: Response
+    else Access Denied
+        Note over API: Log denial event
+        API->>Audit: write_event({
+            user_id,
+            action,
+            resource,
+            result: "denied",
+            reason,
+            timestamp,
+            ip_address
+        })
+        
+        API-->>User: 403 Forbidden
+    end
+
+    Note over User: Query audit trail
+    User->>API: GET /audit/events
+    API->>Audit: query_events(filters)
+    Audit-->>API: Event list
+    API-->>User: Paginated audit trail
+```
+
+## Encryption Flow Diagram
+
+```mermaid
+flowchart LR
+    subgraph "Encryption Process"
+        pwd["Password input"]
+        derive["Key derivation<br/>(Argon2id)"]
+        master["Master key"]
+        
+        data["Data to encrypt"]
+        nonce["Generate nonce"]
+        encrypt["Encrypt (XChaCha20-Poly1305)"]
+        ciphertext["Ciphertext"]
+        
+        pwd --> derive
+        derive --> master
+        master --> encrypt
+        data --> encrypt
+        nonce --> encrypt
+        encrypt --> ciphertext
+    end
+
+    subgraph "Decryption Process"
+        ciphertext2["Ciphertext"]
+        nonce2["Nonce"]
+        derive2["Derive key from password"]
+        
+        decrypt["Decrypt"]
+        plaintext["Plaintext"]
+        
+        verify["Verify MAC"]
+        
+        ciphertext2 --> decrypt
+        nonce2 --> decrypt
+        derive2 --> decrypt
+        decrypt --> verify
+        verify --> plaintext
+    end
+
+    subgraph "Storage"
+        ciphertext --> storage["Store encrypted blob"]
+        storage --> db["Database"]
+    end
+```

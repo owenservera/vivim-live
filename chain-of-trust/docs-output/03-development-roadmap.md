@@ -1,0 +1,291 @@
+# VIVIM Development Roadmap
+
+## Overview
+
+The development of VIVIM follows nature's own sequence: first the membrane, then the interior, then signaling, then immunity, then multicellular coordination. Each phase builds the next layer of cellular machinery, creating a complete sovereign memory system.
+
+---
+
+## Phase 0: Genesis (Months 1-6)
+### Build the Vault Core and Membrane
+
+**Objective**: Before any capture tool, any integration, any marketplace, the vault itself must exist and be sound.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Vault Kernel** | Append-only encrypted memory store, compartmentalized key hierarchy, local-first, hardware-backed key support | P0 |
+| **The Membrane** | VIVIM Gate, tool registration, capability issuance, channel selectivity filters, stream firewall, ingress quarantine | P0 |
+| **Stream Protocol (VSP)** | Canonical format for all ingress/egress, cryptographic envelope, provenance, sequence numbering, anti-replay | P0 |
+| **Inner Gate** | Staging area to vault admission pipeline, normalization carrier, admission token system, append-only integrity ledger | P1 |
+| **User Control Plane** | Dashboard showing paired tools, active streams, quarantined items, compartment status, emergency controls | P1 |
+
+### Biological Equivalent
+A cell with a functioning membrane, nuclear envelope, and basic internal organization. It can maintain its boundary. It cannot yet interact with the environment in sophisticated ways.
+
+### Success Criteria
+- Vault creates from mnemonic with Argon2id derivation
+- Key hierarchy generates all sub-keys correctly
+- Vault locks/unlocks with passphrase
+- Stream accepts and validates droplets
+- No plaintext data leaves device
+
+---
+
+## Phase 1: First Breath (Months 4-9)
+### Enable Basic Capture and Import
+
+**Objective**: The cell begins exchanging with its environment.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Provider Importers** | OpenAI, Anthropic, Google, Cursor parsers, historical import, normalization to ACUs, encryption | P0 |
+| **Browser Extension** | Chrome and Edge, captures from supported AI sites, streams through VSP | P0 |
+| **Local Daemon** | Background service managing VIVIM Gate, ingress queue, vault engine (macOS, Windows, Linux) | P0 |
+| **Basic Search** | Local full-text and semantic search over admitted vault, respects compartment boundaries | P1 |
+| **Capture Review Inbox** | Shows recently admitted items, allows user confirmation, deletion, reclassification | P2 |
+
+### Overlaps with Phase 0
+- Phase 0 "tail" extends into Phase 1
+- Browser extension development starts before Phase 0 completes
+
+### Success Criteria
+- Can import ChatGPT export → ACUs in vault
+- Can import Claude export → ACUs in vault  
+- Browser extension captures from chat.openai.com
+- Can search vault content semantically
+- No duplicates imported
+
+---
+
+## Phase 2: Innate Immunity (Months 8-12)
+### Deploy Fast Pattern Recognition and Basic Rights Detection
+
+**Objective**: The cell begins distinguishing self from other at a basic level.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Innate Rights Detector** | Fast pattern matching for company names, client IDs, regulated data, legal language, proprietary markers | P0 |
+| **Personal Baseline Model** | Trained on user's clearly personal content, produces deviation scores | P0 |
+| **Basic Rights Envelopes** | Every ACU gets classification: personal, possibly shared, likely company-bound, uncertain | P0 |
+| **Classification Review** | User can confirm/override classifications, feedback improves future detection | P1 |
+| **Workspace Modes** | Personal mode and work mode, classification rules change by mode | P2 |
+
+### Biological Equivalent
+Innate immune system active. The cell detects broad categories of foreign material. Cannot yet make fine-grained distinctions or remember specific threats. But it is no longer blind.
+
+### Success Criteria
+- Company names flagged with 80%+ accuracy
+- Regulated patterns (SSN, medical) detected
+- User can override and system learns
+- Personal vs. work mode switching works
+
+---
+
+## Phase 3: Differentiation (Months 10-15)
+### Add Capture Diversity and Vault Compartmentalization
+
+**Objective**: The cell develops internal compartments and diverse transport channels.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Desktop Capture Agent** | Captures AI interactions from desktop apps, process detection | P0 |
+| **IDE Plugins** | VS Code, Cursor: capture coding AI, rights-aware for work vs. personal repos | P0 |
+| **Mobile Capture** | iOS share extension, Android share sheet, basic mobile browser | P1 |
+| **Vault Compartmentalization** | Open, guarded, sealed compartments, per-compartment key derivation | P0 |
+| **Attachment Capture** | Files uploaded to AI, files generated by AI, hash-linked, encrypted | P1 |
+| **Gap Detection** | Coverage analytics showing which providers/tools producing expected volumes | P2 |
+
+### Success Criteria
+- Desktop AI captured without API access
+- IDE captures coding conversations
+- Mobile app captures on-the-go conversations
+- Compartments require different auth levels
+- Can detect when expected capture fails
+
+---
+
+## Phase 4: Adaptive Immunity (Months 13-18)
+### Deploy Sophisticated Rights Classification and Learning
+
+**Objective**: The organism develops specific, learned, improving threat recognition.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Adaptive Rights Classifier** | Full TPDI (Third-Party Determinability Inference), uses 7 feature types, tiered assignments | P0 |
+| **Span-Level Segmentation (RSS)** | Mixed conversations segmented into personal/rights-bound spans, CRF-based | P0 |
+| **Active Learning Loop** | User confirmations feed back, system improves for user's context | P0 |
+| **Tolerance Model** | Learns which third-party references are innocuous, prevents over-flagging | P1 |
+| **Contract Binding** | Link vault to organizational contracts, covered scopes, tier mappings | P1 |
+| **On-Chain Contract Registration** | Contracts published to VIVIM chain, immutable reference | P2 |
+
+### Biological Equivalent
+Full adaptive immune system. Fine-grained distinctions between foreign harmless, foreign dangerous, self normal, self abnormal. Learns from experience. Remembers. Tolerates what should be tolerated.
+
+### Success Criteria
+- 90%+ accuracy on tier classification
+- Can segment single conversation into multiple tiers
+- System improves with user feedback
+- Can bind contract to organizational scope
+
+---
+
+## Phase 5: Vesicle Machinery (Months 16-22)
+### Build Export System and Marketplace Fabric
+
+**Objective**: The cell can now export selected material in bounded, targeted packages.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Vesicle Builder** | Constructs sealed export packages for every release type: sync, approval, sale, backup, context | P0 |
+| **Egress Engine** | Policy-checked, purpose-declared, minimum-necessary, destination-encrypted, audit-anchored | P0 |
+| **Blockchain Integration** | Memory root commitments, consent records, marketplace listings | P0 |
+| **Marketplace Listing Tools** | ZK proofs of data properties, public descriptors, price setting | P0 |
+| **Sale Flow** | Purchase, consent grant, vesicle delivery, verification, escrow release | P0 |
+| **Revenue Split** | Automatic distribution for co-governed data per contract terms | P1 |
+| **Minimal Disclosure Packets (MDRP)** | Information-bottleneck-optimized review packets for dual-control | P1 |
+
+### Biological Equivalent
+Full secretory pathway. Packages specific cargo, targets specific recipients, releases without membrane compromise. Exosome communication active.
+
+### Success Criteria
+- Can list data for sale with ZK proofs
+- Buyer can purchase and receive encrypted data
+- Co-governed data requires dual approval
+- Revenue splits correctly to parties
+
+---
+
+## Phase 6: Sentinel (Months 18-24)
+### Deploy Detection, Monitoring, and Evidence Systems
+
+**Objective**: The organism develops ability to detect when its material has been taken without permission.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Canary System** | Generation, deployment, baseline testing, periodic detection, evidence packaging | P0 |
+| **Statistical Watermarking** | Directional embedding shift, detection testing across models | P0 |
+| **Membership Inference Engine** | Loss-based, perturbation-based, Min-K%, meta-classifier, batch scanning | P0 |
+| **Privacy Monitor** | Background scanning of vault content against external models | P0 |
+| **Cross-Provider Leak Detection** | Tests whether data to provider A appears in provider B's models | P1 |
+| **Opt-Out Verifier** | Tests whether provider honored user's training opt-out | P1 |
+| **Model Transparency Index** | Collective results aggregated across participating users | P2 |
+| **Temporal Proof Engine** | On-chain timestamps + Merkle proofs + detection = legal evidence | P1 |
+
+### Success Criteria
+- Canaries detect training inclusion
+- Can generate evidence package for legal use
+- Can detect cross-provider contamination
+- Can verify opt-out compliance
+- Collective index shows provider rankings
+
+---
+
+## Phase 7: Multicellular Coordination (Months 22-30)
+### Build Network Effects and Advanced Features
+
+**Objective**: The cell can now communicate with other cells, form tissues, coordinate behavior.
+
+### Deliverables
+
+| Component | Description | Priority |
+|-----------|-------------|----------|
+| **Gap Junctions (P2P Sync)** | libp2p mesh, CRDT sync, encrypted transit, device pairing | P0 |
+| **Quorum Sensing (Collective)** | Anonymous aggregate detection, SMPC for aggregation, Sovereignty Index | P1 |
+| **Shared Memory Circles** | Cross-user sharing with consent, ActivityPub federation | P2 |
+| **Reputation System** | On-chain reputation for buyers and sellers | P1 |
+| **Advanced MCP Context** | Rich context assembly for external AI assistants | P1 |
+| **Mobile App Full** | Full vault browser, search, context on mobile | P1 |
+
+### Success Criteria
+- Multiple devices sync seamlessly
+- Can aggregate with other users (anonymously)
+- Marketplace has reputation system
+- Mobile has full functionality
+
+---
+
+## Timeline Overview
+
+```
+Month:    1   3   6   9  12  15  18  21  24  27  30
+          |---|---|---|---|---|---|---|---|---|---|
+Phase 0:  ████████████
+Phase 1:       █████████████████
+Phase 2:           ██████████████
+Phase 3:               ████████████████
+Phase 4:                   ████████████████
+Phase 5:                       ████████████████
+Phase 6:                           ████████████████
+Phase 7:                               ████████████████
+```
+
+### Key Milestones
+
+| Milestone | Target | Definition |
+|-----------|--------|------------|
+| **M0.1** | Month 3 | Vault creates, locks, unlocks from mnemonic |
+| **M1** | Month 6 | Can import ChatGPT and Claude exports |
+| **M2** | Month 9 | Browser extension captures from one site |
+| **M3** | Month 12 | Basic rights classification functional |
+| **M4** | Month 15 | Can segment conversation into tiers |
+| **M5** | Month 18 | Marketplace listing and purchase works |
+| **M6** | Month 21 | Detection finds canary in test model |
+| **M7** | Month 24 | Full detection suite operational |
+| **M8** | Month 30 | Multi-device sync, collective detection |
+
+---
+
+## Resource Requirements
+
+### Core Team (Phase 0-1)
+- 2x Cryptography/Security Engineers
+- 1x Backend/Storage Engineer
+- 1x Mobile Engineer
+- 1x Frontend/UI Engineer
+
+### Expanded Team (Phase 2-4)
+- Add: ML Engineer (classification)
+- Add: Blockchain Engineer
+- Add: Detection Researcher
+
+### Full Team (Phase 5-7)
+- Add: Marketplace Developer
+- Add: Network/Peer-to-Peer Engineer
+- Add: Detection Engineer
+
+---
+
+## Technical Dependencies
+
+```
+Phase 0 ──┬──► Phase 1 ──┬──► Phase 2 ──┬──► Phase 3 ──┬──► Phase 4
+          │              │              │              │
+          │              │              │              └──► Phase 5
+          │              │              │                      │
+          │              │              │                      └──► Phase 6
+          │              │              └──────────────────────────► Phase 7
+          │              │
+          │              └────────────────────────────────────────────► Phase 5
+          │
+          └───────────────────────────────────────────────────────────► Phase 5
+```
+
+Note: Some paths can parallelize once foundation is established.
+
+---
+
+*This roadmap builds VIVIM from a secure vault to a complete sovereign memory ecosystem, following nature's own sequence from membrane to immune system to multicellular coordination.*

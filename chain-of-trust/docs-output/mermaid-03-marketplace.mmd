@@ -1,0 +1,209 @@
+# Marketplace Protocol
+
+```mermaid
+flowchart TB
+    subgraph "Marketplace Actors"
+        Seller[Data Seller - VIVIM User]
+        Buyer[Data Buyer - Researcher/Company]
+        Platform[VIVIM Platform]
+    end
+    
+    subgraph "Marketplace Process"
+        List[1. List Data]
+        Describe[2. Describe (ZK Proof)]
+        Discover[3. Discover]
+        Negotiate[4. Negotiate Terms]
+        Purchase[5. Purchase]
+        Exchange[6. Exchange]
+        Verify[7. Verify]
+        Settle[8. Settle]
+    end
+    
+    Seller --> List
+    List --> Describe
+    Describe --> Platform
+    Platform --> Discover
+    Buyer --> Discover
+    Discover --> Negotiate
+    Negotiate --> Purchase
+    Purchase --> Exchange
+    Exchange --> Verify
+    Verify --> Settle
+    Settle --> Seller
+    
+    style Seller fill:#e94560,stroke:#333,color:#fff
+    style Buyer fill:#3498db,stroke:#333,color:#fff
+    style Platform fill:#1a1a2e,stroke:#333,color:#fff
+```
+
+## Listing Process
+
+```mermaid
+sequenceDiagram
+    participant U as VIVIM User
+    participant V as Vault
+    participant M as Marketplace
+    participant C as Blockchain
+    
+    U->>V: Select ACUs for listing
+    V->>V: Generate Merkle root of selection
+    
+    V->>V: Create ZK proof of properties
+    Note over V: - Count verification<br/>- Date range verification<br/>- Topic distribution
+    
+    V->>M: Submit listing
+    M->>C: Publish listing descriptor
+    M->>U: Listing active
+    
+    Note over C: On-chain:<br/>- Merkle root<br/>- Price<br/>- Terms<br/>- Seller DID
+```
+
+## Purchase and Delivery Flow
+
+```mermaid
+sequenceDiagram
+    participant B as Buyer
+    participant M as Marketplace
+    participant S as Seller Vault
+    participant C as Blockchain
+    
+    B->>M: Select listing
+    B->>B: Generate ephemeral key pair
+    
+    B->>M: Submit purchase + payment + pubkey
+    M->>C: Lock payment in escrow
+    
+    M->>S: Purchase notification
+    S->>S: Verify on-chain transaction
+    S->>S: Verify consent permits sale
+    S->>S: Derive delivery key (ECDH)
+    S->>S: Re-encrypt selected ACUs
+    
+    S->>M: Deliver encrypted vesicles
+    S->>M: Delivery proof
+    
+    M->>B: Deliver vesicles
+    B->>B: Decrypt with ephemeral key
+    
+    B->>M: Confirm receipt
+    M->>C: Release escrow to seller
+    M->>C: Record access grant
+    
+    Note over C: Buyer now has<br/>capability token<br/>for listed data
+```
+
+## ZK Proof Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Zero-Knowledge Proofs"
+        
+        subgraph "Ownership Proof"
+            OP1[Public: VaultRoot, ACU_id]
+            OP2[Private: Merkle Path, sk]
+            OP1 --> OP3[Prove: I own this ACU]
+        end
+        
+        subgraph "Consent Validity"
+            CP1[Public: ConsentRoot, buyer, action]
+            CP2[Private: Consent, Merkle Path]
+            CP1 --> CP3[Prove: Valid consent exists]
+        end
+        
+        subgraph "Data Property Attestation"
+            PP1[Public: DataCommit, properties]
+            PP2[Private: ACU set]
+            PP1 --> PP3[Prove: Data has properties]
+        end
+        
+        subgraph "Aggregate Statistics"
+            AP1[Public: DataCommit, statistic]
+            AP2[Private: ACU set]
+            AP1 --> AP3[Prove: Statistic is true]
+        end
+        
+        OP3 --> Verify[ZKP Verification]
+        CP3 --> Verify
+        PP3 --> Verify
+        AP3 --> Verify
+    end
+    
+    style OP3 fill:#e94560,stroke:#333,color:#fff
+    style CP3 fill:#3498db,stroke:#333,color:#fff
+    style PP3 fill:#27ae60,stroke:#333,color:#fff
+    style AP3 fill:#9b59b6,stroke:#333,color:#fff
+```
+
+## Minimum Disclosure Review Packet
+
+```mermaid
+flowchart TB
+    subgraph "MDRP: Minimum Disclosure Review Packet"
+        Full[Full ACU Content] --> Extract[Extract Features]
+        
+        Extract --> Optimize[Information Bottleneck]
+        
+        Optimize -->|Minimize| Disclosure[I(M; R)]
+        Optimize -->|Maintain| Decision[I(R; D) ≥ τ]
+        
+        Disclosure --> Packet[Review Packet R]
+        Decision --> Packet
+        
+        Packet --> Review[Third Party Review]
+        Review --> Approve[Approve / Deny]
+    end
+    
+    note over Optimize: optimize: min I(M;R)<br/>subject to: I(R;D) ≥ τ<br/><br/>M = memory object<br/>R = review packet<br/>D = decision
+    
+    style Optimize fill:#e94560,stroke:#333,color:#fff
+    style Packet fill:#0f3460,stroke:#333,color:#fff
+```
+
+---
+
+# Revenue Split for Co-Governed Data
+
+```mermaid
+flowchart LR
+    subgraph "Sale Event"
+        SalePrice[Sale Price: $1000]
+    end
+    
+    subgraph "Distribution"
+        Platform[Platform Fee 15%]
+        Remaining[Remaining: $850]
+        
+        Remaining --> Human[Human: 60% = $510]
+        Remaining --> Company[Company: 40% = $340]
+    end
+    
+    SalePrice --> Platform
+    Platform --> Remaining
+    
+    style SalePrice fill:#e94560,stroke:#333,color:#fff
+    style Human fill:#27ae60,stroke:#333,color:#fff
+    style Company fill:#3498db,stroke:#333,color:#fff
+```
+
+## Pricing Models
+
+```mermaid
+flowchart TB
+    subgraph "Marketplace Pricing Options"
+        
+        Fixed[Fixed Price]
+        Auction[Vickrey Auction]
+        Subscription[Subscription/Streaming]
+        Bonding[Data Bonding Curve]
+        
+        Fixed --> |Simple| Model1
+        Auction --> |Best value| Model2
+        Subscription --> |Ongoing access| Model3
+        Bonding --> |Network effect| Model4
+    end
+    
+    style Fixed fill:#e94560,stroke:#333,color:#fff
+    style Auction fill:#f39c12,stroke:#333,color:#000
+    style Subscription fill:#3498db,stroke:#333,color:#fff
+    style Bonding fill:#9b59b6,stroke:#333,color:#fff
+```

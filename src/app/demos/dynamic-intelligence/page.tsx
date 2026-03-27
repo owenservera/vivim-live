@@ -27,7 +27,7 @@ export default function DynamicIntelligencePage() {
             <span className="text-sm text-slate-300">Dynamic Intelligence Demo</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-amber-400 to-rose-400 bg-clip-text text-transparent">
+            <span className="text-amber-400">
               Continual Learning
             </span>
             <br />

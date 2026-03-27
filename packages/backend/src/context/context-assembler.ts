@@ -1,0 +1,687 @@
+import { PrismaClient, Prisma } from '@prisma/client';
+import type {
+  AssembledContext,
+  AssemblyParams,
+  BudgetInput,
+  CompiledBundle,
+  ComputedBudget,
+  DetectedContext,
+  DetectedEntity,
+  DetectedTopic,
+  IEmbeddingService,
+  ITokenEstimator,
+  JITKnowledge,
+  LayerBudget,
+  TokenBudget,
+} from './types';
+import { BudgetAlgorithm } from './budget-algorithm';
+import { BundleCompiler } from './bundle-compiler';
+import { HybridRetrievalService } from './hybrid-retrieval';
+import { getVIVIMSystemPrompt } from './vivim-identity-service';
+import { getContextCache } from './index';
+import { logger } from '../lib/logger.js';
+import { getModelInfo } from '../types/ai.js';
+
+interface ContextAssemblerConfig {
+  prisma: PrismaClient;
+  embeddingService: IEmbeddingService;
+  tokenEstimator: ITokenEstimator;
+  bundleCompiler: BundleCompiler;
+}
+
+interface TopicMatchResult {
+  id: string;
+  slug: string;
+  label: string;
+  similarity: number;
+}
+
+interface EntityMatchResult {
+  id: string;
+  name: string;
+  type: string;
+  similarity: number;
+}
+
+interface ACUResult {
+  id: string;
+  content: string;
+  type: string;
+  category: string;
+  createdAt: Date;
+  similarity: number;
+}
+
+interface MemoryResult {
+  id: string;
+  content: string;
+  category: string;
+  importance: number;
+  similarity: number;
+}
+
+export class DynamicContextAssembler {
+  private prisma: PrismaClient;
+  private embeddingService: IEmbeddingService;
+  private tokenEstimator: ITokenEstimator;
+  private bundleCompiler: BundleCompiler;
+  private hybridRetrieval: HybridRetrievalService;
+  private cache = getContextCache();
+
+  constructor(config: ContextAssemblerConfig) {
+    this.prisma = config.prisma;
+    this.embeddingService = config.embeddingService;
+    this.tokenEstimator = config.tokenEstimator;
+    this.bundleCompiler = config.bundleCompiler;
+    this.hybridRetrieval = new HybridRetrievalService(config.prisma);
+  }
+
+  async assemble(params: AssemblyParams): Promise<AssembledContext> {
+    const startTime = Date.now();
+
+    const cacheKey = `ctx:${params.virtualUserId}:${params.conversationId}:${params.userMessage.substring(0, 50)}`;
+    const cached = this.cache.get<AssembledContext>('bundle', cacheKey);
+    if (cached) {
+      logger.debug({ cacheKey }, 'Context assembly cache hit');
+      return cached;
+    }
+
+    // Load Context Recipe if provided or use default
+    const recipe = await this.loadRecipe(params.virtualUserId, params.recipeId);
+
+    // Fetch conversation stats if conversationId provided
+    let conversationStats = {
+      messageCount: 0,
+      totalTokens: 0,
+      hasConversation: !!(params.conversationId && params.conversationId !== 'new-chat'),
+    };
+
+    if (conversationStats.hasConversation) {
+      try {
+        const conv = await this.prisma.conversation.findUnique({
+          where: { id: params.conversationId },
+          select: { messageCount: true, totalTokens: true },
+        });
+        if (conv) {
+          conversationStats.messageCount = conv.messageCount;
+          conversationStats.totalTokens = conv.totalTokens || 0;
+        }
+      } catch (e) {
+        // Conversation might not exist, continue with defaults
+        conversationStats.hasConversation = false;
+      }
+    }
+
+    const messageEmbedding = await this.embeddingService.embed(params.userMessage);
+    const detectedContext = await this.detectMessageContext(
+      params.virtualUserId,
+      params.userMessage,
+      messageEmbedding,
+      params.conversationId
+    );
+
+    const [bundles, jitKnowledge] = await Promise.all([
+      this.gatherBundles(params.virtualUserId, detectedContext, params.conversationId, params.personaId, recipe),
+      this.justInTimeRetrieval(
+        params.virtualUserId,
+        params.userMessage,
+        messageEmbedding,
+        detectedContext
+      ),
+    ]);
+
+    const budget = this.computeBudget(
+      bundles,
+      jitKnowledge,
+      params,
+      conversationStats,
+      detectedContext,
+      recipe
+    );
+    const systemPrompt = this.compilePrompt(bundles, jitKnowledge, budget, params.modelId);
+
+    const assemblyTimeMs = Date.now() - startTime;
+
+    await this.trackUsage(bundles, params.conversationId);
+
+    const result: AssembledContext = {
+      systemPrompt,
+      budget,
+      bundlesUsed: bundles.map((b) => b.bundleType as any),
+      metadata: {
+        assemblyTimeMs,
+        detectedTopics: detectedContext.topics.length,
+        detectedEntities: detectedContext.entities.length,
+        cacheHitRate: this.calculateCacheHitRate(bundles),
+        conversationStats,
+        bundlesInfo: bundles.map(b => ({
+          id: b.id,
+          type: b.bundleType,
+          title: `[${b.bundleType.toUpperCase()}] Layer`,
+          tokenCount: b.tokenCount,
+          snippet: b.compiledPrompt.substring(0, 150) + (b.compiledPrompt.length > 150 ? '...' : '')
+        })),
+      },
+    };
+
+    this.cache.set('bundle', cacheKey, result, 5 * 60 * 1000);
+
+    return result;
+  }
+
+  private async detectMessageContext(
+    virtualUserId: string,
+    message: string,
+    embedding: number[],
+    conversationId: string
+  ): Promise<DetectedContext> {
+    let matchedTopics: any[] = [];
+    try {
+      matchedTopics = await this.prisma.$queryRaw<any[]>`
+        SELECT id, slug, label, 1 - (embedding <=> ${embedding}::vector) as similarity
+        FROM topic_profiles
+        WHERE "virtualUserId" = ${virtualUserId}
+          AND embedding IS NOT NULL
+          AND array_length(embedding, 1) > 0
+        ORDER BY embedding <=> ${embedding}::vector
+        LIMIT 3
+      `;
+    } catch (e) {
+      logger.warn({ error: e }, 'Topic semantic search failed, using fallback');
+      const fallback = await this.prisma.topicProfile.findMany({
+        where: { virtualUserId },
+        take: 3,
+        select: { id: true, slug: true, label: true },
+      });
+      matchedTopics = fallback.map((t) => ({ ...t, similarity: 0.5 }));
+    }
+
+    let matchedEntities: any[] = [];
+    try {
+      matchedEntities = await this.prisma.$queryRaw<any[]>`
+        SELECT id, name, type, 1 - (embedding <=> ${embedding}::vector) as similarity
+        FROM entity_profiles
+        WHERE "virtualUserId" = ${virtualUserId}
+          AND embedding IS NOT NULL
+          AND array_length(embedding, 1) > 0
+        ORDER BY embedding <=> ${embedding}::vector
+        LIMIT 3
+      `;
+    } catch (e) {
+      logger.warn({ error: e }, 'Entity semantic search failed, using fallback');
+      const fallback = await this.prisma.entityProfile.findMany({
+        where: { virtualUserId },
+        take: 3,
+        select: { id: true, name: true, type: true },
+      });
+      matchedEntities = fallback.map((e) => ({ ...e, similarity: 0.5 }));
+    }
+
+    const allEntities = await this.prisma.entityProfile.findMany({
+      where: { virtualUserId },
+      select: { id: true, name: true, aliases: true, type: true },
+    });
+
+    const mentionedEntities = allEntities.filter((e) => {
+      const names = [e.name.toLowerCase(), ...e.aliases.map((a) => a.toLowerCase())];
+      const msgLower = message.toLowerCase();
+      return names.some((n) => msgLower.includes(n));
+    });
+
+    const entities = this.mergeEntityMatches(matchedEntities, mentionedEntities);
+
+    const convTopics = await this.prisma.topicConversation.findMany({
+      where: { conversationId },
+      include: { topic: true },
+    });
+
+    // Check if conversation exists (even without linked topics, it's a continuation)
+    const hasConversation = conversationId && conversationId !== 'new-chat';
+
+    return {
+      topics: [
+        ...convTopics.map((ct) => ({
+          slug: ct.topic.slug,
+          profileId: ct.topic.id,
+          source: 'conversation_history' as const,
+          confidence: ct.relevanceScore,
+        })),
+        ...matchedTopics.map((t) => ({
+          slug: t.slug,
+          profileId: t.id,
+          source: 'semantic_match' as const,
+          confidence: t.similarity,
+        })),
+      ],
+      entities,
+      isNewTopic: !hasConversation && matchedTopics.length === 0 && convTopics.length === 0,
+      isContinuation: hasConversation || convTopics.length > 0,
+    };
+  }
+
+  private mergeEntityMatches(
+    semanticMatches: EntityMatchResult[],
+    explicitMatches: Array<{ id: string; name: string; type: string }>
+  ): DetectedEntity[] {
+    const entityMap = new Map<string, DetectedEntity>();
+
+    for (const match of semanticMatches) {
+      entityMap.set(match.id, {
+        id: match.id,
+        name: match.name,
+        type: match.type,
+        source: 'semantic_match',
+        confidence: match.similarity,
+      });
+    }
+
+    for (const match of explicitMatches) {
+      if (!entityMap.has(match.id)) {
+        entityMap.set(match.id, {
+          id: match.id,
+          name: match.name,
+          type: match.type,
+          source: 'explicit_mention',
+          confidence: 1.0,
+        });
+      } else {
+        const existing = entityMap.get(match.id)!;
+        existing.source = 'explicit_mention';
+        existing.confidence = 1.0;
+      }
+    }
+
+    return Array.from(entityMap.values());
+  }
+
+  private async loadRecipe(virtualUserId: string, recipeId?: string): Promise<any | null> {
+    try {
+      if (recipeId) {
+        return await this.prisma.contextRecipe.findUnique({
+          where: { id: recipeId },
+        });
+      }
+
+      // Load default user recipe or system default
+      return await this.prisma.contextRecipe.findFirst({
+        where: {
+          OR: [{ virtualUserId }, { virtualUserId: null, isDefault: true }],
+        },
+        orderBy: { virtualUserId: 'desc' }, // User-specific first
+      });
+    } catch (e) {
+      logger.error({ error: (e as Error).message }, 'Failed to load Context Recipe');
+      return null;
+    }
+  }
+
+  private async gatherBundles(
+    virtualUserId: string,
+    context: DetectedContext,
+    conversationId: string,
+    personaId?: string,
+    recipe?: any
+  ): Promise<CompiledBundle[]> {
+    const normalizedPersonaId = personaId === undefined ? null : personaId;
+    const tasks: Promise<CompiledBundle | null>[] = [];
+
+    const excludedLayers = (recipe?.excludedLayers as string[]) || [];
+
+    const fetchBundle = async (
+      type: string,
+      topicId: string | null,
+      entityId: string | null,
+      convId: string | null,
+      compileFn: () => Promise<any>
+    ) => {
+      // Check if layer is excluded by recipe
+      if (excludedLayers.includes(type)) {
+        return null;
+      }
+
+      let bundle = await this.getBundle(
+        virtualUserId,
+        type,
+        topicId,
+        entityId,
+        convId,
+        normalizedPersonaId
+      );
+      if (!bundle) {
+        try {
+          const dbBundle = await compileFn();
+          if (dbBundle) return this.mapDbBundleToCompiled(dbBundle);
+        } catch (e) {
+          logger.debug({ type, error: e }, `Failed to compile ${type} bundle`);
+        }
+      }
+      return bundle;
+    };
+
+    // L0: Identity core
+    tasks.push(
+      fetchBundle('identity_core', null, null, null, () =>
+        this.bundleCompiler.compileIdentityCore(virtualUserId)
+      )
+    );
+
+    // L1: Global preferences
+    tasks.push(
+      fetchBundle('global_prefs', null, null, null, () =>
+        this.bundleCompiler.compileGlobalPrefs(virtualUserId)
+      )
+    );
+
+    // L2: Topic context
+    if (context.topics.length > 0) {
+      const primaryTopic = context.topics.sort((a, b) => b.confidence - a.confidence)[0];
+      tasks.push(
+        fetchBundle('topic', primaryTopic.profileId, null, null, () =>
+          this.bundleCompiler.compileTopicContext(virtualUserId, primaryTopic.slug)
+        )
+      );
+
+      // Secondary topic (no fallback compilation, just fetch if cached)
+      if (context.topics.length > 1) {
+        const secondaryTopic = context.topics[1];
+        tasks.push(
+          this.getBundle(virtualUserId, 'topic', secondaryTopic.profileId, null, null, normalizedPersonaId)
+        );
+      }
+    }
+
+    // L3: Entity context
+    for (const entity of context.entities.slice(0, 2)) {
+      tasks.push(
+        fetchBundle('entity', null, entity.id, null, () =>
+          this.bundleCompiler.compileEntityContext(virtualUserId, entity.id)
+        )
+      );
+    }
+
+    // L4: Conversation context
+    if (context.isContinuation && conversationId && conversationId !== 'new-chat') {
+      tasks.push(
+        fetchBundle('conversation', null, null, conversationId, () =>
+          this.bundleCompiler.compileConversationContext(virtualUserId, conversationId)
+        )
+      );
+    }
+
+    // L5: Persona-specific context
+    if (personaId) {
+      tasks.push(this.getBundle(virtualUserId, 'persona', null, null, null, normalizedPersonaId));
+    }
+
+    const results = await Promise.all(tasks);
+    return results.filter((b): b is CompiledBundle => b !== null);
+  }
+
+  private async getBundle(
+    virtualUserId: string,
+    bundleType: string,
+    topicProfileId?: string | null,
+    entityProfileId?: string | null,
+    conversationId?: string | null,
+    personaId?: string | null
+  ): Promise<CompiledBundle | null> {
+    const normalizedTopicProfileId = topicProfileId === undefined ? null : topicProfileId;
+    const normalizedEntityProfileId = entityProfileId === undefined ? null : entityProfileId;
+    const normalizedConversationId = conversationId === undefined ? null : conversationId;
+    const normalizedPersonaId = personaId === undefined ? null : personaId;
+
+    const bundle = await this.prisma.contextBundle.findFirst({
+      where: {
+        virtualUserId,
+        bundleType,
+        topicProfileId: normalizedTopicProfileId,
+        entityProfileId: normalizedEntityProfileId,
+        conversationId: normalizedConversationId,
+        personaId: normalizedPersonaId,
+        isDirty: false,
+      },
+      orderBy: { compiledAt: 'desc' },
+    });
+
+    return bundle ? this.mapDbBundleToCompiled(bundle) : null;
+  }
+
+  private mapDbBundleToCompiled(dbBundle: any): CompiledBundle {
+    return {
+      id: dbBundle.id,
+      userId: dbBundle.userId,
+      bundleType: dbBundle.bundleType,
+      compiledPrompt: dbBundle.compiledPrompt,
+      tokenCount: dbBundle.tokenCount,
+      composition: dbBundle.composition || {},
+      version: dbBundle.version,
+      isDirty: dbBundle.isDirty,
+      compiledAt: dbBundle.compiledAt,
+    };
+  }
+
+  private async justInTimeRetrieval(
+    virtualUserId: string,
+    message: string,
+    embedding: number[],
+    context: DetectedContext
+  ): Promise<JITKnowledge> {
+    const topicSlugs = context.topics.map((t) => t.slug);
+
+    const result = await this.hybridRetrieval.retrieve(virtualUserId, message, embedding, topicSlugs);
+
+    return {
+      acus: result.acus.map((acu) => ({
+        id: acu.id,
+        content: acu.content,
+        type: acu.type,
+        category: acu.category,
+        createdAt: acu.createdAt,
+        similarity: acu.similarity,
+      })),
+      memories: result.memories.map((mem) => ({
+        id: mem.id,
+        content: mem.content,
+        category: mem.category,
+        importance: 0.5,
+        similarity: mem.similarity,
+      })),
+    };
+  }
+private computeBudget(
+  bundles: CompiledBundle[],
+  jit: JITKnowledge,
+  params: AssemblyParams,
+  conversationStats: { messageCount: number; totalTokens: number; hasConversation: boolean },
+  detectedContext: DetectedContext,
+  recipe?: any
+): ComputedBudget {
+  // Determine total token budget
+  let totalAvailable = params.settings?.maxContextTokens || 12000;
+
+  // Apply Recipe budget override if present
+  if (recipe?.customBudget) {
+    totalAvailable = recipe.customBudget;
+  }
+
+    
+    // Bounds check against actual model max limit if we have it
+    if (params.providerId && params.modelId) {
+      const modelInfo = getModelInfo(params.providerId, params.modelId);
+      if (modelInfo && modelInfo.context) {
+        // Leave a 5% buffer for completions and safety
+        const modelSafeMax = Math.floor(modelInfo.context * 0.95);
+        if (totalAvailable > modelSafeMax) {
+          logger.info({ userSetting: totalAvailable, modelMax: modelSafeMax }, 'Bounding user context setting to model maximum limit');
+          totalAvailable = modelSafeMax;
+        }
+      }
+    }
+
+    const availableBundles = new Map<string, number>();
+    for (const bundle of bundles) {
+      availableBundles.set(bundle.bundleType, bundle.tokenCount);
+    }
+
+    // Use real conversation stats or defaults
+    const msgCount = conversationStats?.messageCount || 0;
+    const totalTokens = conversationStats?.totalTokens || 0;
+    const hasConv = conversationStats?.hasConversation || false;
+
+    const input: BudgetInput = {
+      totalBudget: totalAvailable,
+      conversationMessageCount: msgCount,
+      conversationTotalTokens: totalTokens,
+      userMessageTokens: this.tokenEstimator.estimateTokens(params.userMessage, params.modelId),
+      detectedTopicCount: detectedContext.topics.length,
+      detectedEntityCount: detectedContext.entities.length,
+      hasActiveConversation: hasConv,
+      knowledgeDepth: params.settings?.knowledgeDepth || 'standard',
+      prioritizeHistory: params.settings?.prioritizeConversationHistory ?? true,
+      availableBundles,
+    };
+
+    const algorithm = new BudgetAlgorithm();
+    let computedLayers = algorithm.computeBudget(input);
+
+    // Apply Recipe weight overrides (priority overrides)
+    if (recipe?.layerWeights && Object.keys(recipe.layerWeights).length > 0) {
+      const weights = recipe.layerWeights as Record<string, number>;
+      for (const [layer, weight] of Object.entries(weights)) {
+        if (computedLayers.has(layer)) {
+          const budget = computedLayers.get(layer)!;
+          budget.priority = weight;
+          // Re-sort or re-allocate if priority changes significantly
+          // (BudgetAlgorithm uses priority for allocation conflicts)
+        }
+      }
+    }
+
+    const totalUsed = Array.from(computedLayers.values()).reduce((sum, layer) => sum + layer.allocated, 0);
+    
+    // Convert Map to Record for JSON serialization
+    const layersRecord: Record<string, LayerBudget> = {};
+    for (const [key, val] of computedLayers.entries()) {
+      layersRecord[key] = val;
+    }
+
+    return {
+      layers: layersRecord,
+      totalAvailable: input.totalBudget,
+      totalUsed,
+    };
+  }
+
+  private compilePrompt(
+    bundles: CompiledBundle[],
+    jit: JITKnowledge,
+    budget: ComputedBudget,
+    modelId?: string
+  ): string {
+    const sections: Array<{ content: string; priority: number; tokens: number }> = [];
+
+    const priorityMap: Record<string, number> = {
+      identity_core: 100,
+      global_prefs: 95,
+      conversation: 90,
+      topic: 80,
+      entity: 70,
+    };
+
+    for (const bundle of bundles) {
+      sections.push({
+        content: bundle.compiledPrompt,
+        priority: priorityMap[bundle.bundleType] ?? 50,
+        tokens: bundle.tokenCount,
+      });
+    }
+
+    if (jit.memories.length > 0) {
+      const memBlock = [
+        `## Additionally Relevant Context`,
+        ...jit.memories.map((m) => `- [${m.category}] ${m.content}`),
+      ].join('\n');
+      sections.push({
+        content: memBlock,
+        priority: 60,
+        tokens: this.tokenEstimator.estimateTokens(memBlock, modelId),
+      });
+    }
+
+    if (jit.acus.length > 0) {
+      const acuBlock = [`## Related Knowledge`, ...jit.acus.map((a) => `- ${a.content}`)].join(
+        '\n'
+      );
+      sections.push({
+        content: acuBlock,
+        priority: 55,
+        tokens: this.tokenEstimator.estimateTokens(acuBlock, modelId),
+      });
+    }
+
+    sections.sort((a, b) => b.priority - a.priority);
+
+    const vivimIdentity = getVIVIMSystemPrompt();
+    const vivimTokens = this.tokenEstimator.estimateTokens(vivimIdentity, modelId);
+
+    let totalTokens = vivimTokens;
+    const included: string[] = [vivimIdentity];
+
+    for (const section of sections) {
+      if (totalTokens + section.tokens > budget.totalAvailable) {
+        const remaining = budget.totalAvailable - totalTokens;
+        if (remaining > 100) {
+          included.push(this.truncateToTokens(section.content, remaining, modelId));
+          totalTokens += remaining;
+        }
+        break;
+      }
+      included.push(section.content);
+      totalTokens += section.tokens;
+    }
+
+    return included.join('\n\n---\n\n');
+  }
+
+  private truncateToTokens(text: string, maxTokens: number, modelId?: string): string {
+    const estimatedTokens = this.tokenEstimator.estimateTokens(text, modelId);
+    if (estimatedTokens <= maxTokens) return text;
+
+    const ratio = maxTokens / estimatedTokens;
+    const targetChars = Math.floor(text.length * ratio);
+    return text.substring(0, targetChars) + '\n[truncated]';
+  }
+
+  private async trackUsage(bundles: CompiledBundle[], conversationId: string): Promise<void> {
+    const bundleIds = bundles.map((b) => b.id);
+
+    await this.prisma.contextBundle.updateMany({
+      where: { id: { in: bundleIds } },
+      data: {
+        lastUsedAt: new Date(),
+        useCount: { increment: 1 },
+      },
+    });
+  }
+
+  private calculateCacheHitRate(bundles: CompiledBundle[]): number {
+    if (bundles.length === 0) return 0;
+    return bundles.filter((b) => !b.isDirty).length / bundles.length;
+  }
+
+  private async recordCacheMiss(bundleType: string, referenceId: string): Promise<void> {
+    await this.prisma.contextBundle.updateMany({
+      where: {
+        bundleType,
+        OR: [
+          { topicProfileId: referenceId },
+          { entityProfileId: referenceId },
+          { conversationId: referenceId },
+        ],
+      },
+      data: {
+        missCount: { increment: 1 },
+      },
+    });
+  }
+}

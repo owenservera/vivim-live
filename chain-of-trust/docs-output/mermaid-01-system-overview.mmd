@@ -1,0 +1,241 @@
+# VIVIM System Overview - Zoom Level 1
+
+```mermaid
+flowchart TB
+    subgraph "User Layer"
+        User[Human User]
+        Device[User's Device]
+        Keys[24-word Mnemonic]
+    end
+
+    subgraph "VIVIM Core"
+        Vault[(Sovereign Vault)]
+        Stream[Universal Stream]
+        Gate[VIVIM Gate]
+    end
+
+    subgraph "External World"
+        Providers[AI Providers]
+        Marketplace[Data Marketplace]
+        Blockchain[Blockchain]
+        Detectors[Detection Engines]
+    end
+
+    User --> Keys
+    Keys -->|Derives| Device
+    Device --> Vault
+    Stream -->|Data In| Gate
+    Gate --> Vault
+    Vault -->|Data Out| Stream
+    Providers -->|Capture| Stream
+    Marketplace <-->|Consent/Trade| Vault
+    Blockchain <-->|Records| Vault
+    Detectors <-->|Probe| Providers
+
+    style Vault fill:#1a1a2e,stroke:#4a4a6a,color:#fff
+    style Stream fill:#16213e,stroke:#4a4a6a,color:#fff
+    style Gate fill:#0f3460,stroke:#4a4a6a,color:#fff
+    style User fill:#e94560,stroke:#333,color:#fff
+```
+
+## High-Level Architecture
+
+```mermaid
+flowchart LR
+    subgraph "Your Device"
+        Capture[Capture Tools] --> Stream[Universal Stream]
+        Stream --> Vault[Encrypted Vault]
+        Vault --> Search[Search & Context]
+    end
+
+    style Capture fill:#e94560,stroke:#333,color:#fff
+    style Stream fill:#0f3460,stroke:#333,color:#fff
+    style Vault fill:#1a1a2e,stroke:#333,color:#fff
+    style Search fill:#16213e,stroke:#333,color:#fff
+```
+
+---
+
+# VIVIM Core Components - Zoom Level 2
+
+```mermaid
+flowchart TB
+    subgraph "VIVIM Vault"
+        DB[(SQLCipher Database)]
+        Index[Vector Index]
+        Graph[Knowledge Graph]
+        Merkle[Merkle Tree]
+        
+        subgraph "Tables"
+            ACUs[ACU Store]
+            Rights[Ownership Tensors]
+            Consent[Consent States]
+            Canaries[Canary Tokens]
+            Detection[Detection Results]
+            Logs[Stream Log]
+        end
+        
+        DB --> ACUs
+        DB --> Rights
+        DB --> Consent
+        DB --> Canaries
+        DB --> Detection
+        DB --> Logs
+        Index --> Graph
+        Graph --> Merkle
+    end
+    
+    style DB fill:#1a1a2e,stroke:#4a4a6a,color:#fff
+    style Index fill:#16213e,stroke:#4a4a6a,color:#fff
+    style Graph fill:#16213e,stroke:#4a4a6a,color:#fff
+    style Merkle fill:#0f3460,stroke:#4a4a6a,color:#fff
+```
+
+## Key Hierarchy
+
+```mermaid
+flowchart TB
+    Mnemonic["24-word Mnemonic"] --> MasterKey[Master Key mk]
+    
+    MasterKey --> VEK[Vault Encryption Key vek]
+    MasterKey --> AKDK[ACU Key Derivation akdk]
+    MasterKey --> SAK[Stream Auth Key sak]
+    MasterKey --> PSK[Provider Keys psk]
+    MasterKey --> THSK[TDASS Keys thsk]
+    MasterKey --> IK[Identity Key ik]
+    MasterKey --> SEK[Sync Keys sek]
+    MasterKey --> RK[Recovery Key rk]
+    
+    VEK --> SQLCipher[(SQLCipher DB)]
+    AKDK --> ACK1[ACK_1]
+    AKDK --> ACK2[ACK_2]
+    AKDK --> ACK3[ACK_n]
+    SAK --> PSSK1[PSSK_Browser]
+    SAK --> PSSK2[PSSK_IDE]
+    SAK --> PSSK3[PSSK_Mobile]
+    
+    style MasterKey fill:#e94560,stroke:#333,color:#fff
+    style Mnemonic fill:#f39c12,stroke:#333,color:#000
+```
+
+---
+
+# Universal Stream Data Flow - Zoom Level 3
+
+```mermaid
+flowchart LR
+    subgraph "Capture Sources"
+        Browser[Browser Extension]
+        IDE[IDE Plugin]
+        API[API Proxy]
+        Mobile[Mobile App]
+    end
+
+    subgraph "Universal Stream Protocol"
+        Droplet[Droplet]
+        Auth[HMAC Auth]
+        Encrypt[XChaCha20]
+        Seq[Sequence Check]
+    end
+
+    subgraph "Stream Receiver"
+        Stage1[1. RECEIVE]
+        Stage2[2. AUTHENTICATE]
+        Stage3[3. SEQUENCE CHECK]
+        Stage4[4. DECRYPT]
+        Stage5[5. INTEGRITY]
+        Stage6[6. VALIDATE]
+        Stage7[7. CLASSIFY]
+        Stage8[8. ACU FORM]
+        Stage9[9. WRITE]
+        Stage10[10. ACKNOWLEDGE]
+    end
+
+    subgraph "Vault"
+        ACU[(ACU Store)]
+    end
+
+    Browser --> Droplet
+    IDE --> Droplet
+    API --> Droplet
+    Mobile --> Droplet
+    
+    Droplet --> Auth --> Encrypt --> Seq
+    Seq --> Stage1 --> Stage2 --> Stage3 --> Stage4
+    Stage4 --> Stage5 --> Stage6 --> Stage7 --> Stage8
+    Stage8 --> Stage9 --> Stage10 --> ACU
+
+    style Droplet fill:#0f3460,stroke:#333,color:#fff
+    style ACU fill:#1a1a2e,stroke:#333,color:#fff
+    style Stage1 fill:#16213e,stroke:#333,color:#fff
+```
+
+## Droplet Structure
+
+```mermaid
+flowchart TB
+    subgraph "USP Droplet"
+        Header["HEADER (plaintext, auth'd)
+        - protocol_version
+        - source_id
+        - sequence_number
+        - timestamp
+        - droplet_type
+        - payload_length
+        - content_hash"]
+        
+        Payload["PAYLOAD (encrypted)
+        - provider
+        - role
+        - content
+        - conversation_id
+        - model
+        - attachments
+        - capture_meta"]
+        
+        HMAC["HMAC TAG
+        HMAC-SHA256(pssk,
+        header || payload)"]
+        
+        Nonce["ANTI-REPLAY NONCE
+        HKDF(pssk, sequence)"]
+    end
+    
+    style Header fill:#e94560,stroke:#333,color:#fff
+    style Payload fill:#0f3460,stroke:#333,color:#fff
+    style HMAC fill:#16213e,stroke:#333,color:#fff
+    style Nonce fill:#16213e,stroke:#333,color:#fff
+```
+
+---
+
+# ACU Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> RawExport
+    RawExport --> Parser: Provider Import
+    Parser --> Normalize: Transform to ACU
+    Normalize --> Encrypt: Per-ACU Key
+    Encrypt --> Sign: Identity Key
+    Sign --> Store: Vault Write
+    Store --> Search: Index
+    Store --> Classify: Rights Detection
+    Classify --> Consent: Assign Tier
+    Consent --> Export: User Action
+    Export --> Marketplace: For Sale
+    Export --> [*]
+    
+    state Parser {
+        [*] --> IdentifyProvider
+        IdentifyProvider --> ExtractFields
+        ExtractFields --> ValidateSchema
+        ValidateSchema --> [*]
+    }
+    
+    state Encrypt {
+        [*] --> DeriveACK
+        DeriveACK --> DeriveNonce
+        DeriveNonce --> XChaCha20Poly1305
+        XChaCha20Poly1305 --> [*]
+    }

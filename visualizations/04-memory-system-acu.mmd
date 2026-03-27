@@ -1,0 +1,473 @@
+# Memory System & ACU Architecture Visualization
+
+## Atomic Chat Unit (ACU) System
+
+```mermaid
+flowchart TB
+    subgraph "ACU Architecture"
+        
+        subgraph "Input Processing"
+            conv["Conversation<br/>(Messages)"]
+            extract["ACU Extraction<br/>(Librarian Worker)"]
+            segment["Segment into<br/>thought units"]
+            classify["Classify by<br/>category/type"]
+        end
+
+        subgraph "ACU Storage"
+            acu_db["ACU Database<br/>(atomic_chat_units table)"]
+            fields["id, content, type, category,<br/>importance, embedding, authorDid,<br/>state, createdAt, updatedAt"]
+        end
+
+        subgraph "9 Memory Categories"
+            cat1["Episodic"]
+            cat2["Semantic"]
+            cat3["Procedural"]
+            cat4["Factual"]
+            cat5["Preference"]
+            cat6["Identity"]
+            cat7["Relationship"]
+            cat8["Goal"]
+            cat9["Project"]
+        end
+
+        subgraph "Retrieval"
+            jit["JIT Retrieval"]
+            hybrid["Hybrid Search"]
+            rank["Ranking & Scoring"]
+            output["Context Output"]
+        end
+    end
+
+    conv --> extract
+    extract --> segment
+    segment --> classify
+    classify --> acu_db
+    acu_db --> cat1
+    acu_db --> cat2
+    acu_db --> cat3
+    acu_db --> cat4
+    acu_db --> cat5
+    acu_db --> cat6
+    acu_db --> cat7
+    acu_db --> cat8
+    acu_db --> cat9
+
+    cat1 --> jit
+    cat2 --> jit
+    cat3 --> jit
+    cat4 --> jit
+    cat5 --> jit
+    cat6 --> jit
+    cat7 --> jit
+    cat8 --> jit
+    cat9 --> jit
+
+    jit --> hybrid
+    hybrid --> rank
+    rank --> output
+```
+
+## ACU Categories Detail
+
+```mermaid
+flowchart LR
+    subgraph "9 ACU Types"
+        
+        subgraph "Episodic (Temporal)"
+            E1[Event: "Last week we discussed..."]
+            E2[Time-bounded]
+            E3[Scene-based]
+        end
+
+        subgraph "Semantic (Knowledge)"
+            S1[Fact: "Python is your primary language"]
+            S2[Concept-based]
+            S3[General knowledge]
+        end
+
+        subgraph "Procedural (Skills)"
+            P1[Process: "You prefer TDD methodology"]
+            P2[How-to knowledge]
+            P3[Methodology]
+        end
+
+        subgraph "Factual (Specific)"
+            F1[Fact: "You work as a senior engineer"]
+            F2[Personal facts]
+            F3[Biographic]
+        end
+
+        subgraph "Preference (Taste)"
+            PF1[Preference: "Prefers dark mode interface"]
+            PF2[User preferences]
+            PF3[UI/UX preferences]
+        end
+
+        subgraph "Identity (Self)"
+            I1[Identity: "Full-stack developer"]
+            I2[Self-concept]
+            I3[Role/Title]
+        end
+
+        subgraph "Relationship (Social)"
+            R1[Relationship: "John is your tech lead"]
+            R2[Interpersonal]
+            R3[Team roles]
+        end
+
+        subgraph "Goal (Objective)"
+            G1[Goal: "Launch MVP by Q2"]
+            G2[Objectives]
+            G3[Milestones]
+        end
+
+        subgraph "Project (Context)"
+            PR1[Project: "E-commerce uses Next.js"]
+            PR2[Project details]
+            PR3[Technical stack]
+        end
+    end
+
+    E1 --> E2 --> E3
+    S1 --> S2 --> S3
+    P1 --> P2 --> P3
+    F1 --> F2 --> F3
+    PF1 --> PF2 --> PF3
+    I1 --> I2 --> I3
+    R1 --> R2 --> R3
+    G1 --> G2 --> G3
+    PR1 --> PR2 --> PR3
+```
+
+## ACU Lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> New: createACU()
+    New --> Active: state = 'ACTIVE'
+    Active --> Updated: updateImportance()
+    Active --> Archived: archive()
+    Active --> Deleted: delete()
+    Updated --> Active
+    Archived --> Active: restore()
+    Archived --> Deleted: permanent delete
+    Deleted --> [*]
+
+    note right of New: Just extracted<br/>from message
+    note right of Active: Available for<br/>retrieval
+    note right of Updated: Importance changed<br/>by decay model
+    note right of Archived: Soft-deleted<br/>still queryable
+    note right of Deleted: Hard delete<br/>permanent removal
+```
+
+## Hybrid Retrieval System
+
+```mermaid
+flowchart TB
+    subgraph "Query Processing"
+        query["User Query"]
+        embed["Embedding Service"]
+        keywords["Keyword Extraction"]
+    end
+
+    subgraph "Vector Search"
+        vs1["Vector Index<br/>(pgvector)"]
+        vs2["Similarity Search<br/>(cosine distance)"]
+        vs3["Top-K Results"]
+    end
+
+    subgraph "Keyword Search"
+        ks1["Full-text Index<br/>(tsvector)"]
+        ks2["BM25 Ranking"]
+        ks3["Top-K Results"]
+    end
+
+    subgraph "Hybrid Scoring"
+        combine["Combine Results"]
+        rerank["Cross-encoder Reranking"]
+        score["Final Score Calculation"]
+        weights["Configurable Weights<br/>(vector: 0.7, keyword: 0.3)"]
+    end
+
+    subgraph "Output"
+        final["Ranked ACUs"]
+    end
+
+    query --> embed
+    query --> keywords
+    embed --> vs1
+    vs1 --> vs2
+    vs2 --> vs3
+    keywords --> ks1
+    ks1 --> ks2
+    ks2 --> ks3
+    vs3 --> combine
+    ks3 --> combine
+    combine --> rerank
+    rerank --> score
+    score --> weights
+    weights --> final
+```
+
+## Memory Decay & Thermodynamics
+
+```mermaid
+flowchart TB
+    subgraph "Context Thermodynamics"
+        
+        subgraph "Energy Model"
+            energy["Context Energy<br/>(Token budget)"]
+            temp["Temperature<br/>(Retrieval intensity)"]
+            entropy["Entropy<br/(Information chaos)"]
+        end
+
+        subgraph "Decay Algorithm"
+            decay["Importance Decay"]
+            reinforce["Reinforcement<br/(Positive feedback)")]
+            decay_rate["Decay Rate<br/(Time-based)"]
+        end
+
+        subgraph "Compression"
+            compress["Memory Compression"]
+            consolidate["Consolidate similar ACUs"]
+            prune["Prune redundant info"]
+        end
+
+        subgraph "Cortex System"
+            cortex["Cortex System"]
+            long_term["Long-term Memory<br/(High importance)"]
+            short_term["Short-term Memory<br/(Recent, low importance)"]
+            working["Working Memory<br/(Active conversation)"]
+        end
+    end
+
+    energy --> decay
+    temp --> decay
+    entropy --> decay
+    decay --> reinforce
+    reinforce --> compress
+    compress --> consolidate
+    consolidate --> prune
+    prune --> cortex
+    cortex --> long_term
+    cortex --> short_term
+    cortex --> working
+
+    style energy fill:#1a1a2e,stroke:#4a4a6a
+    style cortex fill:#16213e,stroke:#0f3460
+```
+
+## Topic & Entity Profiles
+
+```mermaid
+flowchart TB
+    subgraph "Topic Profile System"
+        tp1["TopicProfile Table"]
+        tp_id["id: UUID (PK)"]
+        tp_user["userId: FK"]
+        tp_slug["slug: string (unique)"]
+        tp_label["label: string"]
+        tp_emb["embedding: float[]"]
+        tp_meta["metadata: JSON"]
+        tp_created["createdAt, updatedAt"]
+        
+        subgraph "Topic ACUs"
+            topic_acu["ACUs linked to topic"]
+            topic_rel["TopicConversation<br/junction table"]
+        end
+    end
+
+    subgraph "Entity Profile System"
+        ep1["EntityProfile Table"]
+        ep_id["id: UUID (PK)"]
+        ep_user["userId: FK"]
+        ep_name["name: string"]
+        ep_type["type: string"]
+        ep_emb["embedding: float[]"]
+        ep_meta["metadata: JSON"]
+        ep_created["createdAt, updatedAt"]
+        
+        subgraph "Entity ACUs"
+            entity_acu["ACUs linked to entity"]
+            entity_rel["EntityConversation<br/junction table"]
+        end
+    end
+
+    subgraph "Auto-Detection"
+        detect["Topic/Entity Detection<br/from message content"]
+        link["Auto-link ACUs to<br/profiles"]
+    end
+
+    tp1 --> topic_acu
+    topic_acu --> topic_rel
+    topic_rel --> detect
+    
+    ep1 --> entity_acu
+    entity_acu --> entity_rel
+    entity_rel --> detect
+    
+    detect --> link
+
+    style tp1 fill:#1a1a2e,stroke:#4a4a6a
+    style ep1 fill:#2d2d44,stroke:#5a5a7a
+    style detect fill:#16213e,stroke:#0f3460
+```
+
+## Memory Operations API
+
+```mermaid
+flowchart LR
+    subgraph "Operations"
+        
+        C[createACU]
+        R[getACUs]
+        U[updateACU]
+        D[deleteACU]
+        S[semanticSearch]
+        B[bulkCreate]
+        A[archive]
+        RST[restore]
+        
+        subgraph "Query Options"
+            filter["Filter by type,<br/>category, state"]
+            limit["Limit, offset,<br/>sorting"]
+            include["Include related<br/>data"]
+        end
+    end
+
+    C --> filter
+    R --> filter
+    R --> limit
+    R --> include
+    U --> filter
+    D --> filter
+    S --> limit
+    B --> include
+    A --> filter
+    RST --> filter
+```
+
+## ACU Database Schema
+
+```sql
+-- Key ACU fields (from schema.prisma)
+model AtomicChatUnit {
+    id              String    @id @default(uuid())
+    content         String
+    type            String    -- 'thought', 'response', 'code', 'fact', etc.
+    category        String    -- 'episodic', 'semantic', 'procedural', etc.
+    state           String    @default("ACTIVE") -- 'ACTIVE', 'ARCHIVED', 'DELETED'
+    importance      Float     @default(0.5)
+    authorDid       String    -- Decentralized ID of author
+    embedding       Float[]   @db.Vector(1536) -- pgvector
+    
+    conversationId  String
+    messageId       String
+    
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+    
+    @@index([userId])
+    @@index([type, category])
+    @@index([state])
+    @@index([importance(sort: Desc)])
+    @@index([embedding])
+}
+```
+
+## Context Bundle System
+
+```mermaid
+flowchart TB
+    subgraph "Bundle Compilation"
+        
+        input["Input Data"]
+        fetch["Fetch Source Data"]
+        compile["Compile Prompt"]
+        token["Token Estimation"]
+        optimize["Optimize for Budget"]
+        output["Compiled Bundle"]
+    end
+
+    subgraph "Bundle Types"
+        identity["identity_core<br/>(User profile, identity)"]
+        prefs["global_prefs<br/>(Preferences, settings)"]
+        topic["topic<br/(Topic-specific context)"]
+        entity["entity<br/(Entity-specific context)"]
+        conv["conversation<br/(Conversation history)"]
+        composite["composite<br/(Cross-cutting)"]
+    end
+
+    subgraph "Bundle Fields"
+        bf_id["id"]
+        bf_user["userId"]
+        bf_type["bundleType"]
+        bf_prompt["compiledPrompt"]
+        bf_tokens["tokenCount"]
+        bf_composition["composition (JSON)"]
+        bf_version["version"]
+        bf_dirty["isDirty"]
+        bf_compiled["compiledAt"]
+    end
+
+    input --> fetch
+    fetch --> compile
+    compile --> token
+    token --> optimize
+    optimize --> output
+
+    output --> identity
+    output --> prefs
+    output --> topic
+    output --> entity
+    output --> conv
+    output --> composite
+
+    style input fill:#1a1a2e,stroke:#4a4a6a
+    style output fill:#16213e,stroke:#0f3460
+```
+
+## Cache Strategy
+
+```mermaid
+flowchart TB
+    subgraph "Context Cache Layers"
+        
+        layer1["L1: Settings Cache<br/>(User settings, preferences)"]
+        layer2["L2: Embedding Cache<br/>(Message -> embedding)"]
+        layer3["L3: Bundle Cache<br/>(Compiled context bundles)"]
+        layer4["L4: Graph Cache<br/>(Context graph state)"]
+    end
+
+    subgraph "Cache Operations"
+        get["get(key)"]
+        set["set(key, value)"]
+        evict["evict(key)"]
+        clear["clear()"]
+        stats["Hit/Miss stats"]
+    end
+
+    subgraph "Invalidation"
+        time["TTL-based expiry"]
+        manual["Manual invalidation"]
+        dirty["Mark dirty on update"]
+    end
+
+    layer1 --> get
+    layer2 --> get
+    layer3 --> get
+    layer4 --> get
+    
+    get --> set
+    set --> evict
+    evict --> clear
+    
+    layer3 --> time
+    layer3 --> manual
+    layer3 --> dirty
+
+    style layer1 fill:#4a1942,stroke:#d4145a
+    style layer2 fill:#4a1942,stroke:#d4145a
+    style layer3 fill:#1a1a2e,stroke:#4a4a6a
+    style layer4 fill:#1a1a2e,stroke:#4a4a6a
+```

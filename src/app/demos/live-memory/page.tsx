@@ -116,7 +116,7 @@ export default function LiveMemoryDemoPage() {
             <span className="text-sm text-slate-300">Live Memory Demo</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="text-violet-400">
               Watch Memory
             </span>
             <br />

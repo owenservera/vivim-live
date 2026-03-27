@@ -30,6 +30,20 @@ import {
   History,
   Network,
   Zap as BrainZap,
+  Lock as Sentinel,
+  ShoppingCart,
+  Eye,
+  FileKey,
+  Scale,
+  Radar,
+  ScanEye,
+  FileCheck,
+  DollarSign,
+  TrendingUp,
+  Handshake,
+  FileWarning,
+  ShieldCheck,
+  ScanLine,
 } from "lucide-react";
 import {
   Collapsible,
@@ -145,6 +159,27 @@ const DEMOS = [
     desc: "Adaptive context that evolves based on your usage patterns",
     icon: BrainZap,
     color: "from-lime-500 to-green-600",
+  },
+  {
+    slug: "rights-layer",
+    title: "Rights Layer",
+    desc: "Granular ownership tiers with co-governance for your data",
+    icon: ShieldCheck,
+    color: "from-amber-500 to-orange-600",
+  },
+  {
+    slug: "sentinel-detection",
+    title: "Sentinel Detection",
+    desc: "13 algorithms that detect if your data was used without permission",
+    icon: Radar,
+    color: "from-red-500 to-rose-600",
+  },
+  {
+    slug: "marketplace",
+    title: "Marketplace",
+    desc: "Monetize your intelligence on your terms",
+    icon: ShoppingCart,
+    color: "from-emerald-500 to-teal-600",
   },
 ];
 
@@ -314,81 +349,94 @@ export default function Home() {
       <Navbar />
 
       <main className="flex-1 relative z-10">
-        <section id="overview" className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden min-h-screen flex items-center">
+        <section id="overview" className="relative pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-violet-500/30 mb-8 glow-pulse">
-                <Sparkles className="w-4 h-4 text-violet-400" />
-                <span className="text-sm text-slate-300">Sovereign • Portable • Personal</span>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="hero-stagger-1"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-violet-500/30 mb-8 glow-pulse">
+                  <Sparkles className="w-4 h-4 text-violet-400" />
+                  <span className="text-sm text-slate-300">Sovereign • Portable • Personal</span>
+                </div>
+              </motion.div>
 
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-                <span className="bg-gradient-to-r from-violet-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 hero-stagger-2"
+              >
+                <span className="text-white">
                   The Living Memory
                 </span>
-              </h1>
-              <h2 className="text-3xl sm:text-4xl font-medium text-white mb-4">
+              </motion.h1>
+              
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="text-3xl sm:text-4xl font-medium text-white mb-4 hero-stagger-3"
+              >
                 for Your AI
-              </h2>
-              <p className="text-lg text-slate-400 max-w-xl mx-auto mb-6">
+              </motion.h2>
+              
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.35 }}
+                className="text-lg text-slate-400 max-w-xl mx-auto mb-6 hero-stagger-3"
+              >
                 A memory layer that <span className="text-violet-400">you own</span>, that works with{" "}
                 <span className="text-cyan-400">any AI provider</span>, and goes <span className="text-emerald-400">wherever you go</span>.
-              </p>
-              <div className="max-w-2xl mx-auto mb-8 px-4 py-3 rounded-xl glass border border-violet-500/20">
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="max-w-2xl mx-auto mb-8 px-4 py-3 rounded-xl glass border border-violet-500/20 hero-stagger-4"
+              >
                 <p className="text-base text-slate-300 italic">
                   &ldquo;It&apos;s not just technology — it&apos;s a philosophy about who owns your AI memory.&rdquo;
                 </p>
-              </div>
+              </motion.div>
 
-              <p className="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-3xl mx-auto mb-8">
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.45 }}
+                className="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-3xl mx-auto mb-8 hero-stagger-4"
+              >
                 A <span className="text-violet-400 font-semibold">sovereign, portable, personal memory</span> and{" "}
                 <span className="text-cyan-400 font-semibold">dynamic context engine</span> that works with{" "}
                 <span className="text-emerald-400 font-semibold">all AI providers</span> — your single, AI-native database.
-              </p>
+              </motion.p>
 
-              <div className="flex flex-wrap justify-center gap-4 mb-12">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/30 glass-card">
-                  <Shield className="w-4 h-4 text-violet-400" />
-                  <span className="text-sm text-violet-300">Full Control & Visibility</span>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 glass-card">
-                  <Globe className="w-4 h-4 text-cyan-400" />
-                  <span className="text-sm text-cyan-300">All Providers</span>
-                </div>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 glass-card">
-                  <Database className="w-4 h-4 text-emerald-400" />
-                  <span className="text-sm text-emerald-300">Single Portable Database</span>
-                </div>
-              </div>
-
-              <div className="relative max-w-2xl mx-auto mb-12">
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600/20 to-cyan-600/20 rounded-3xl blur-3xl" />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="relative max-w-2xl mx-auto mb-12 hero-stagger-5"
+              >
+                <div className="absolute inset-0 bg-violet-600/10 rounded-3xl blur-3xl" />
                 <HeroVisual className="relative" />
-              </div>
+              </motion.div>
 
-              <div className="mt-16 max-w-4xl mx-auto">
-                <div className="p-8 rounded-2xl glass border border-violet-500/20 glow-violet text-center">
-                  <p className="text-xl text-white font-semibold mb-4">
-                    It&apos;s not just technology.
-                  </p>
-                  <p className="text-lg text-slate-300 leading-relaxed mb-4">
-                    It&apos;s a <span className="text-violet-400 font-semibold">philosophy</span> about who owns your AI memory.
-                  </p>
-                  <p className="text-base text-slate-400 leading-relaxed">
-                    VIVIM gives you <span className="text-violet-400">full control and visibility</span> of your AI memory.
-                    Connect <span className="text-cyan-400">all providers</span> to your{" "}
-                    <span className="text-emerald-400">single portable AI-native database</span> —
-                    your memory, your rules, everywhere.
-                  </p>
-                </div>
-              </div>
-
-              <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
-                <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white text-lg px-8 py-6 rounded-xl font-medium glow-violet">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.55 }}
+                className="mt-12 flex flex-col sm:flex-row gap-4 justify-center hero-stagger-6"
+              >
+                <Button className="bg-violet-600 hover:bg-violet-500 text-white text-lg px-8 py-6 rounded-xl font-medium glow-violet btn-animate">
                   <Link href="/demos/live-memory" className="flex items-center gap-2">
                     Try Live Demo
                     <ArrowRight className="w-5 h-5" />
@@ -398,22 +446,22 @@ export default function Home() {
                   href="https://github.com/owenservera/vivim-live"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 border border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-violet-500/50 text-lg px-8 py-6 rounded-xl font-medium transition-all glass"
+                  className="inline-flex items-center justify-center gap-2 border border-slate-600 text-slate-300 hover:bg-slate-800 hover:border-violet-500/50 text-lg px-8 py-6 rounded-xl font-medium transition-all glass btn-animate"
                 >
                   <Code2 className="w-5 h-5" />
                   View on GitHub
                 </a>
-              </div>
+              </motion.div>
             </motion.div>
           </div>
         </section>
 
-        <section className="py-20 lg:py-24 relative bg-slate-900/30">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12 scroll-animate">
+        <section className="py-16 lg:py-20 relative bg-slate-900/30">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-10 scroll-animate">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
                 Works with{" "}
-                <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="text-cyan-400">
                   Any AI Provider
                 </span>
               </h2>
@@ -425,7 +473,7 @@ export default function Home() {
               {PROVIDERS.map((provider) => (
                 <div
                   key={provider.name}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl glass-card hover:border-violet-500/30 transition-colors min-w-[120px]"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl glass-card hover:border-violet-500/30 transition-colors min-w-[120px] card-lift cursor-pointer"
                 >
                   <div className="w-12 h-12 flex items-center justify-center">
                     <ProviderLogo name={provider.name} className="w-10 h-10" />
@@ -437,9 +485,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="the-problem" className="py-20 lg:py-32 relative scroll-animate">
+        <section id="the-problem" className="py-20 lg:py-28 relative scroll-animate">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16 animate-on-scroll">
+            <div className="mb-16 animate-on-scroll max-w-2xl">
               <Badge variant="outline" className="border-red-500/50 text-red-400 mb-6 text-base px-4 py-1">
                 The Problem
               </Badge>
@@ -448,9 +496,9 @@ export default function Home() {
                 <br />
                 <span className="text-red-400">Starts Broken</span>
               </h2>
-              <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-                The context window isn&apos;t just limited — it&apos;s actively working against you.
-                And most &quot;solutions&quot; make it worse.
+              <p className="text-lg text-slate-400">
+                The context window isn't just limited — it's actively working against you.
+                And most "solutions" make it worse.
               </p>
             </div>
 
@@ -460,7 +508,7 @@ export default function Home() {
                 { value: 18, suffix: "/18", label: "Frontier models degrade with context", source: "Chroma, March 2026" },
                 { value: 13, suffix: "B", label: "Vector DB market validates the problem", source: "Kings Research 2026", prefix: "$" },
               ].map((stat, i) => (
-                <div key={i} className="p-4 rounded-xl bg-slate-900/60 border border-slate-800/60 text-center">
+                <div key={i} className={`p-4 rounded-xl bg-slate-900/60 border border-slate-800/60 ${i === 0 ? 'text-left' : i === 1 ? 'text-center' : 'text-right'}`}>
                   <div className="text-2xl font-bold text-red-400 mb-1">
                     <AnimatedCounter value={stat.value} suffix={stat.suffix} prefix={stat.prefix || ""} />
                   </div>
@@ -519,7 +567,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   viewport={{ once: true }}
-                  className={`p-6 rounded-2xl bg-slate-900/60 border ${card.color} group hover:border-slate-600/60 transition-colors`}
+                  className={`p-6 rounded-2xl bg-slate-900/60 border ${card.color} group hover:border-slate-600/60 transition-colors ${i % 2 === 0 ? 'text-left' : 'text-left'}`}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <Badge 
@@ -648,8 +696,11 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Section Divider */}
+        <div className="relative h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent max-w-3xl mx-auto" />
+
         <section id="the-solution" className="py-20 lg:py-32 relative bg-slate-900/30 scroll-animate">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <Badge variant="outline" className="border-emerald-500/50 text-emerald-400 mb-6 text-base px-4 py-1">
                 The Solution
@@ -657,7 +708,7 @@ export default function Home() {
               <h2 className="text-4xl sm:text-5xl font-bold mb-4">
                 What If AI Could
                 <br />
-                <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="text-emerald-400">
                   Truly Remember?
                 </span>
               </h2>
@@ -667,7 +718,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6">
               {SOLUTION_FEATURES.map((feature, i) => (
                 <motion.div
                   key={feature.title}
@@ -675,12 +726,16 @@ export default function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.1 }}
                   viewport={{ once: true }}
-                  className="p-6 rounded-2xl glass-card text-center"
+                  className={`p-6 rounded-2xl glass-card ${
+                    i === 0 ? 'md:col-span-3 text-center max-w-2xl mx-auto' : 'text-center'
+                  }`}
                 >
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center mx-auto mb-4">
-                    <feature.icon className="w-7 h-7 text-white" />
+                  <div className={`rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center mb-4 ${
+                    i === 0 ? 'w-20 h-20' : 'w-14 h-14 mx-auto'
+                  } ${i === 0 ? '' : ''}`}>
+                    <feature.icon className={`text-white ${i === 0 ? 'w-10 h-10' : 'w-7 h-7'}`} />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
+                  <h3 className={`font-bold text-white mb-2 ${i === 0 ? 'text-2xl' : 'text-xl'}`}>{feature.title}</h3>
                   <p className="text-slate-400">{feature.desc}</p>
                 </motion.div>
               ))}
@@ -688,7 +743,7 @@ export default function Home() {
 
             <div className="mt-16 text-center">
               <Link href="/demos/context-engine">
-                <Button className="bg-gradient-to-r from-violet-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white text-lg px-8 py-6 rounded-xl font-medium glow-violet">
+                <Button className="bg-violet-600 hover:bg-violet-500 text-white text-lg px-8 py-6 rounded-xl font-medium glow-violet">
                   See the Context Engine
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
@@ -696,8 +751,8 @@ export default function Home() {
             </div>
 
             {/* Interactive Demos Section */}
-            <div className="mt-20">
-              <div className="text-center mb-12">
+            <div className="mt-16">
+              <div className="text-center mb-10">
                 <Badge variant="outline" className="border-violet-500/50 text-violet-400 mb-4 text-base px-4 py-1">
                   Try It Now
                 </Badge>
@@ -710,21 +765,34 @@ export default function Home() {
               </div>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {DEMOS.map((demo) => {
+                {DEMOS.map((demo, idx) => {
                   const Icon = demo.icon;
+                  const isFeatured = idx === 0;
                   return (
-                    <Link key={demo.slug} href={`/demos/${demo.slug}`}>
+                    <Link 
+                      key={demo.slug} 
+                      href={`/demos/${demo.slug}`}
+                      className={isFeatured ? "md:col-span-2 lg:col-span-2" : ""}
+                    >
                       <motion.div
                         whileHover={{ y: -4 }}
-                        className="p-6 rounded-2xl glass-card border border-white/5 hover:border-violet-500/30 transition-all group"
+                        className={`p-6 rounded-2xl glass-card border transition-all group ${
+                          isFeatured 
+                            ? "border-violet-500/30 hover:border-violet-500/60 h-full" 
+                            : "border-white/5 hover:border-violet-500/30"
+                        }`}
                       >
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${demo.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                          <Icon className="w-6 h-6 text-white" />
+                        <div className={`rounded-xl bg-gradient-to-br ${demo.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${
+                          isFeatured ? "w-16 h-16 mb-6" : "w-12 h-12"
+                        }`}>
+                          <Icon className={`text-white ${isFeatured ? "w-8 h-8" : "w-6 h-6"}`} />
                         </div>
-                        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-violet-300 transition-colors">
+                        <h3 className={`font-bold text-white mb-2 group-hover:text-violet-300 transition-colors ${
+                          isFeatured ? "text-2xl mb-3" : "text-lg"
+                        }`}>
                           {demo.title}
                         </h3>
-                        <p className="text-sm text-slate-400">
+                        <p className={`text-slate-400 ${isFeatured ? "text-base" : "text-sm"}`}>
                           {demo.desc}
                         </p>
                       </motion.div>
@@ -736,9 +804,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="acus" className="py-20 lg:py-32 relative scroll-animate">
+        <section id="acus" className="py-16 lg:py-24 relative scroll-animate">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
               <Badge variant="outline" className="border-violet-500/50 text-violet-400 mb-6 text-base px-4 py-1">
                 Core Innovation
               </Badge>
@@ -795,15 +863,327 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="principles" className="py-20 lg:py-32 relative bg-slate-900/30 scroll-animate">
+        <div className="relative h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent max-w-3xl mx-auto" />
+
+        {/* Rights Layer Section */}
+        <section id="rights-layer" className="py-16 lg:py-24 relative bg-slate-900/30 scroll-animate">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="border-amber-500/50 text-amber-400 mb-6 text-base px-4 py-1">
+                The Rights Layer
+              </Badge>
+              <h2 className="text-4xl sm:text-5xl font-bold mb-4">
+                Your Data,
+                <span className="text-amber-400"> Your Rules</span>
+              </h2>
+              <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+                Granular ownership tiers that adapt to context — personal, shared, or co-governed.
+                Your AI memory, classified by you.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+              {[
+                { tier: "T0", label: "Personal Only", desc: "You own it completely. No sharing, no governance.", color: "from-emerald-500 to-green-600", border: "border-emerald-500/30" },
+                { tier: "T1", label: "Personal-Likely", desc: "Probably personal, but open to classification review.", color: "from-emerald-400 to-teal-500", border: "border-emerald-400/30" },
+                { tier: "T2", label: "Shared-Possibly", desc: "Could be shared — ready for co-governance setup.", color: "from-amber-400 to-orange-500", border: "border-amber-400/30" },
+                { tier: "T3", label: "Co-Governed", desc: "Company gets governance. Dual-key required for exports.", color: "from-orange-500 to-amber-600", border: "border-orange-500/30" },
+                { tier: "T4", label: "Restricted", desc: "Enhanced protection. Limited access even for you.", color: "from-red-500 to-rose-600", border: "border-red-500/30" },
+                { tier: "T5", label: "Regulated", desc: "Never exports. Medical, legal, financial lockbox.", color: "from-red-600 to-red-700", border: "border-red-600/30" },
+              ].map((tier) => (
+                <motion.div
+                  key={tier.tier}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className={`p-5 rounded-xl bg-slate-900/60 border ${tier.border} hover:scale-105 transition-transform`}
+                >
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${tier.color} flex items-center justify-center mb-3`}>
+                    <span className="text-white font-bold text-sm">{tier.tier}</span>
+                  </div>
+                  <h3 className="text-white font-bold mb-2">{tier.label}</h3>
+                  <p className="text-sm text-slate-400">{tier.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="p-6 rounded-2xl glass-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                    <Handshake className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">TDASS Co-Governance</h3>
+                </div>
+                <p className="text-slate-400 text-sm mb-4">
+                  Companies get governance without custody. Your data stays in your vault — they only get a key share for designated scopes.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span className="text-slate-300">Active Period: Both keys required</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-orange-400" />
+                    <span className="text-slate-300">Sunset: Company share fades over time</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-slate-300">Post-Sunset: You keep full control</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 rounded-2xl glass-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                    <Scale className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">TPDI Classifier</h3>
+                </div>
+                <p className="text-slate-400 text-sm mb-4">
+                  ML-powered content classification that learns from your corrections. Gets smarter the more you use it.
+                </p>
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <FileKey className="w-4 h-4" />
+                  <span>Input → Feature Extraction → ML → Tier + Confidence</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <Link href="/demos/rights-layer">
+                <Button className="bg-amber-600 hover:bg-amber-500 text-white text-lg px-8 py-6 rounded-xl font-medium">
+                  Try the Rights Layer
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Sentinel Detection Section */}
+        <section id="sentinel" className="py-16 lg:py-20 relative scroll-animate">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="border-red-500/50 text-red-400 mb-6 text-base px-4 py-1">
+                The Sentinel
+              </Badge>
+              <h2 className="text-4xl sm:text-5xl font-bold mb-4">
+                Know If Your Data
+                <span className="text-red-400"> Was Used</span>
+              </h2>
+              <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+                13 detection algorithms verify your data sovereignty — with cryptographic proof you can take to court.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
+              {[
+                "Spectral Membership Inference",
+                "Mutual Information Estimation",
+                "Kolmogorov Uniqueness",
+                "Photon Counting",
+                "Interference Pattern",
+                "Canary Wave Function",
+                "Boltzmann Calibration",
+                "Holographic Watermarking",
+                "Thermodynamic Flow",
+                "Fisher Fingerprinting",
+                "Entanglement Testing",
+                "Diffraction Grating",
+                "Conservation Law",
+              ].map((algo, i) => (
+                <motion.div
+                  key={algo}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.03 }}
+                  viewport={{ once: true }}
+                  className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/60 hover:border-red-500/30 transition-colors"
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <ScanLine className="w-3 h-3 text-red-400" />
+                    <span className="text-xs text-red-400 font-mono">A{i + 1}</span>
+                  </div>
+                  <p className="text-xs text-slate-300 leading-tight">{algo}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="p-6 rounded-2xl glass-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center">
+                    <ScanEye className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Canary System</h3>
+                </div>
+                <p className="text-slate-400 text-sm mb-4">
+                  Plant unique tokens in your conversations. When AI models reference them without authorization — detection confirmed.
+                </p>
+                <div className="p-3 rounded-lg bg-slate-800/50 border border-red-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-xs text-green-400">Ready</span>
+                  </div>
+                  <p className="text-xs text-slate-500 font-mono">|canary⟩ = α|undetected⟩ + β|detected⟩</p>
+                </div>
+              </div>
+              <div className="p-6 rounded-2xl glass-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                    <FileCheck className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Evidence Package</h3>
+                </div>
+                <p className="text-slate-400 text-sm mb-4">
+                  Cryptographic proof package ready for legal action. Timestamps, Merkle proofs, model response evidence.
+                </p>
+                <div className="p-3 rounded-lg bg-slate-800/50 border border-violet-500/20">
+                  <div className="text-xs text-slate-400 mb-2">Export Format:</div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">JSON</span>
+                    <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">PDF</span>
+                    <span className="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">ZIP</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <Link href="/demos/sentinel-detection">
+                <Button className="bg-red-600 hover:bg-red-500 text-white text-lg px-8 py-6 rounded-xl font-medium">
+                  Try Sentinel Detection
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* Marketplace Section */}
+        <section id="marketplace" className="py-16 lg:py-24 relative bg-slate-900/30 scroll-animate">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <Badge variant="outline" className="border-emerald-500/50 text-emerald-400 mb-6 text-base px-4 py-1">
+                The Marketplace
+              </Badge>
+              <h2 className="text-4xl sm:text-5xl font-bold mb-4">
+                Monetize Your
+                <span className="text-emerald-400"> Intelligence</span>
+              </h2>
+              <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+                Sell your data on your terms — or keep it private. Zero-knowledge proofs let buyers verify without seeing.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-5 gap-4 mb-12">
+              {[
+                { step: "1", label: "List", desc: "Select ACUs, set price, generate ZK proof" },
+                { step: "2", label: "Discover", desc: "Buyers browse verified listings" },
+                { step: "3", label: "Purchase", desc: "Escrow payment secures transaction" },
+                { step: "4", label: "Exchange", desc: "Encrypted delivery via ECDH" },
+                { step: "5", label: "Verify", desc: "ZK proof validation" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.step}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  viewport={{ once: true }}
+                  className="text-center"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-3">
+                    <span className="text-white font-bold">{item.step}</span>
+                  </div>
+                  <h3 className="text-white font-bold mb-1">{item.label}</h3>
+                  <p className="text-xs text-slate-500">{item.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="p-6 rounded-2xl glass-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Revenue Split</h3>
+                </div>
+                <p className="text-slate-400 text-sm mb-4">
+                  Fair distribution for co-governed data sales:
+                </p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-2 rounded bg-slate-800/30">
+                    <span className="text-sm text-slate-400">Platform (15%)</span>
+                    <span className="text-sm text-white font-mono">$150</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2 rounded bg-slate-800/30">
+                    <span className="text-sm text-slate-400">Human (60% × 40%)</span>
+                    <span className="text-sm text-emerald-400 font-mono">$204</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2 rounded bg-slate-800/30">
+                    <span className="text-sm text-slate-400">Company (60% × 40%)</span>
+                    <span className="text-sm text-amber-400 font-mono">$204</span>
+                  </div>
+                  <div className="border-t border-slate-700 pt-2 flex justify-between items-center">
+                    <span className="text-sm text-white font-medium">Total Sale ($1000)</span>
+                    <span className="text-sm text-white font-mono">$1000</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 rounded-2xl glass-card">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white">Zero-Knowledge Proofs</h3>
+                </div>
+                <p className="text-slate-400 text-sm mb-4">
+                  Prove data properties without revealing content:
+                </p>
+                <div className="space-y-2">
+                  <div className="p-2 rounded bg-slate-800/30 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-slate-300">Ownership proof</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-800/30 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-slate-300">Consent validity</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-800/30 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-slate-300">Data property attestation</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-800/30 flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs text-slate-300">Aggregate statistics</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 text-center">
+              <Button className="bg-emerald-600 hover:bg-emerald-500 text-white text-lg px-8 py-6 rounded-xl font-medium">
+                Join the Marketplace Waitlist
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              <p className="text-xs text-slate-500 mt-3">Coming in v3.0 (Month 15)</p>
+            </div>
+          </div>
+        </section>
+
+        <div className="relative h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent max-w-3xl mx-auto" />
+
+        <section id="principles" className="py-16 lg:py-20 relative bg-slate-900/30 scroll-animate">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-violet-500/30 mb-6">
                 <Sparkles className="w-4 h-4 text-violet-400" />
                 <span className="text-sm text-slate-300">Our Philosophy</span>
               </div>
               <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-                <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="text-violet-400">
                   Sovereign AI Memory
                 </span>
                 <br />
@@ -839,9 +1219,11 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="context-layers" className="py-20 lg:py-32 relative scroll-animate">
+        <div className="relative h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent max-w-3xl mx-auto" />
+
+        <section id="context-layers" className="py-16 lg:py-20 relative scroll-animate">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-10">
               <Badge variant="outline" className="border-violet-500/50 text-violet-400 mb-6 text-base px-4 py-1">
                 The 8-Layer System
               </Badge>
@@ -885,12 +1267,12 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="memory-types" className="py-20 lg:py-32 relative bg-slate-900/30 scroll-animate">
+        <section id="memory-types" className="py-16 lg:py-20 relative bg-slate-900/30 scroll-animate">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-10">
               <h2 className="text-4xl sm:text-5xl font-bold mb-4">
                 9 Types of{" "}
-                <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                <span className="text-cyan-400">
                   Human-Like Memory
                 </span>
               </h2>
@@ -921,15 +1303,15 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="developers" className="py-20 lg:py-32 relative scroll-animate">
+        <section id="developers" className="py-16 lg:py-24 relative scroll-animate">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
               <Badge variant="outline" className="border-cyan-500/50 text-cyan-400 mb-6 text-base px-4 py-1">
                 For Developers
               </Badge>
               <h2 className="text-4xl sm:text-5xl font-bold mb-4">
                 Build with{" "}
-                <span className="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">
+                <span className="text-cyan-400">
                   @vivim/sdk
                 </span>
               </h2>

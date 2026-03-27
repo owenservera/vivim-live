@@ -1,0 +1,234 @@
+# Biological Architecture Mapping
+
+```mermaid
+flowchart TB
+    subgraph "VIVIM ↔ Biology Mapping"
+        
+        subgraph "Membrane Layer"
+            M1[VIVIM Gate]
+            M2[Stream Receiver]
+            M3[Source Registration]
+            
+            BioM[Cell Membrane]
+        end
+        
+        subgraph "Interior Layer"
+            I1[ACU Storage]
+            I2[Knowledge Graph]
+            I3[Vector Index]
+            
+            BioI[Nucleus / Genome]
+        end
+        
+        subgraph "Immune Layer"
+            Im1[Membership Inference]
+            Im2[Canary System]
+            Im3[Detection Suite]
+            
+            BioIm[Immune System]
+        end
+        
+        subgraph "Communication Layer"
+            C1[Marketplace]
+            C2[P2P Sync]
+            C3[Blockchain]
+            
+            BioC[Cell Communication]
+        end
+        
+        M1 --> M2 --> M3
+        I1 --> I2 --> I3
+        Im1 --> Im2 --> Im3
+        C1 --> C2 --> C3
+        
+    end
+    
+    style M1 fill:#e94560,stroke:#333,color:#fff
+    style I1 fill:#3498db,stroke:#333,color:#fff
+    style Im1 fill:#f39c12,stroke:#333,color:#000
+    style C1 fill:#27ae60,stroke:#333,color:#fff
+```
+
+## Membrane Transport Mapping
+
+```mermaid
+flowchart TB
+    subgraph "Transport Types"
+        
+        T1[Passive Diffusion<br/>Heartbeat / Metadata]
+        T2[Facilitated Diffusion<br/>Standard ACUs]
+        T3[Active Transport<br/>Priority Queue]
+        T4[Endocytosis<br/>Bulk Import]
+        T5[Exocytosis<br/>Marketplace Export]
+        
+        BioT1[Biology: O₂, CO₂]
+        BioT2[Biology: Glucose via GLUT]
+        BioT3[Biology: Na⁺/K⁺ ATPase]
+        BioT4[Biology: Receptor-mediated]
+        BioT5[Biology: Exosome release]
+    end
+    
+    T1 -.- BioT1
+    T2 -.- BioT2
+    T3 -.- BioT3
+    T4 -.- BioT4
+    T5 -.- BioT5
+    
+    style T1 fill:#27ae60,stroke:#333,color:#fff
+    style T2 fill:#3498db,stroke:#333,color:#fff
+    style T3 fill:#e94560,stroke:#333,color:#fff
+    style T4 fill:#f39c12,stroke:#333,color:#000
+    style T5 fill:#9b59b6,stroke:#333,color:#fff
+```
+
+## DNA → Vault Mapping
+
+```mermaid
+flowchart TB
+    subgraph "Genome → Vault"
+        
+        DNA1[Nucleotide] --> Vault1[Token]
+        DNA2[Codon] --> Vault2[Token Group / Phrase]
+        DNA3[Gene] --> Vault3[ACU]
+        DNA4[Operon] --> Vault4[Conversation Thread]
+        DNA5[Chromosome] --> Vault5[Provider Partition]
+        DNA6[Genome] --> Vault6[Complete Vault]
+        
+        DNA7[Chromatin Folding] --> Vault7[Knowledge Graph]
+        DNA8[DNA Repair] --> Vault8[Integrity Verification]
+        
+    end
+    
+    style DNA1 fill:#e94560,stroke:#333,color:#fff
+    style DNA3 fill:#f39c12,stroke:#333,color:#000
+    style DNA7 fill:#3498db,stroke:#333,color:#fff
+    style DNA8 fill:#27ae60,stroke:#333,color:#fff
+```
+
+## Immune System Mapping
+
+```mermaid
+flowchart TB
+    subgraph "Immune → Detection"
+        
+        Innate[Innate Immune System]
+        Adaptive[Adaptive Immune System]
+        
+        Innate --> PRR[Pattern Recognition<br/>TLR - Algorithms 1-3]
+        Innate --> Complement[Complement Cascade<br/>Algorithm 5]
+        Innate --> NK[NK Cells<br/>Algorithm 13]
+        
+        Adaptive --> BCells[B Cells / Antibodies<br/>Algorithm 6 - Canaries]
+        Adaptive --> TCells[T Cells / Context<br/>Algorithm 4 - Photon Counting]
+        Adaptive --> Education[Thymic Education<br/>Algorithm 7 - Calibration]
+        Adaptive --> Memory[Immunological Memory<br/>Detection Persistence]
+        
+    end
+    
+    style Innate fill:#e94560,stroke:#333,color:#fff
+    style Adaptive fill:#3498db,stroke:#333,color:#fff
+    style PRR fill:#f39c12,stroke:#333,color:#000
+    style BCells fill:#27ae60,stroke:#333,color:#fff
+```
+
+## Epigenetics Mapping
+
+```mermaid
+flowchart TB
+    subgraph "Epigenetics → Ownership Tensor"
+        
+        E1[DNA Methylation] --> R1[Tier Classification]
+        E2[Histone Modifications] --> R2[Operation-Specific Access]
+        E3[Chromatin Remodeling] --> R3[Access State Transitions]
+        E4[Genomic Imprinting] --> R4[Provenance Marking]
+        E5[X-Inactivation] --> R5[TDASS Decay]
+        
+    end
+    
+    note over E1: Methylated = silenced<br/>Unmethylated = active
+    
+    note over E5: Barr body = third-party<br/>key share, progressively<br/>inactivated
+    
+    style E1 fill:#e94560,stroke:#333,color:#fff
+    style E3 fill:#3498db,stroke:#333,color:#fff
+    style E5 fill:#f39c12,stroke:#333,color:#000
+```
+
+---
+
+# Information Flow Summary
+
+```mermaid
+flowchart TB
+    subgraph "Complete Data Flow"
+        
+        subgraph "Ingress"
+            Capture[Capture Tools] --> Stream[Universal Stream]
+            Stream --> Receiver[Stream Receiver]
+            Receiver --> Classify[Rights Classifier]
+            Classify --> ACU[ACU Formation]
+            ACU --> Vault[(Vault Storage)]
+        end
+        
+        subgraph "Processing"
+            Vault --> Index[Vector Index]
+            Vault --> Graph[Knowledge Graph]
+            Vault --> Merkle[Merkle Tree]
+            
+            Graph --> Context[8-Layer Context]
+        end
+        
+        subgraph "Egress"
+            Vault --> MCP[MCP Context Delivery]
+            Vault --> Export[Export to File]
+            Vault --> Marketplace[Marketplace Sale]
+            Vault --> Probe[Detection Probes]
+            Vault --> Sync[P2P Sync]
+        end
+        
+    end
+    
+    style Capture fill:#e94560,stroke:#333,color:#fff
+    style Vault fill:#1a1a2e,stroke:#333,color:#fff
+    style MCP fill:#27ae60,stroke:#333,color:#fff
+    style Marketplace fill:#3498db,stroke:#333,color:#fff
+```
+
+## Complete System State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> VaultCreated
+    
+    state VaultCreated {
+        [*] --> MnemonicGenerated
+        MnemonicGenerated --> KeysDerived
+        KeysDerived --> VaultReady
+    }
+    
+    VaultReady --> Importing: Import provider data
+    Importing --> Capturing: Active capture running
+    
+    state Capturing {
+        [*] --> StreamActive
+        StreamActive --> ACUProcessing
+        ACUProcessing --> Classified
+        Classified --> Stored
+    }
+    
+    Stored --> Searching: User searches
+    Searching --> ContextAssembled: AI assistant query
+    ContextAssembled --> [*]
+    
+    Stored --> Listing: Sell data
+    Listing --> Sold: Marketplace sale
+    Sold --> [*]
+    
+    Stored --> Detecting: Run detection
+    Detecting --> EvidenceGenerated
+    EvidenceGenerated --> [*]
+    
+    Stored --> Syncing: Multi-device sync
+    Syncing --> InSync
+    InSync --> [*]
+```

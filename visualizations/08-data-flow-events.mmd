@@ -1,0 +1,517 @@
+# Data Flow & Event Architecture Visualization
+
+## Complete Data Flow
+
+```mermaid
+flowchart TB
+    subgraph "User Interaction Layer"
+        user["User"]
+        browser["Browser (Frontend)"]
+        mobile["Mobile App"]
+    end
+
+    subgraph "API Gateway Layer"
+        api["Express API Server"]
+        ws["Socket.io Server"]
+        middleware["Middleware Stack"]
+    end
+
+    subgraph "Service Layer"
+        orch["ContextOrchestrator"]
+        chat_svc["ChatbotService"]
+        mem_svc["MemoryService"]
+        vu_svc["VirtualUserService"]
+    end
+
+    subgraph "Context Engine"
+        pipeline["ParallelContextPipeline"]
+        cache["ContextCache"]
+        events["ContextEventBus"]
+        embed["EmbeddingService"]
+    end
+
+    subgraph "Database Layer"
+        prisma["Prisma ORM"]
+        postgres["PostgreSQL"]
+        pgvector["pgVector (Embeddings)"]
+        redis["Redis (Cache)"]
+    end
+
+    subgraph "AI Providers"
+        openai["OpenAI"]
+        anthropic["Anthropic"]
+        google["Google"]
+        xai["xAI"]
+        local["Ollama (Local)"]
+    end
+
+    user --> browser
+    user --> mobile
+    browser --> api
+    mobile --> api
+    browser --> ws
+    
+    api --> middleware
+    middleware --> orch
+    middleware --> chat_svc
+    middleware --> mem_svc
+    middleware --> vu_svc
+
+    orch --> pipeline
+    pipeline --> cache
+    pipeline --> events
+    pipeline --> embed
+    
+    embed --> pgvector
+    
+    cache --> redis
+    pipeline --> prisma
+    prisma --> postgres
+    
+    chat_svc --> openai
+    chat_svc --> anthropic
+    chat_svc --> google
+    chat_svc --> xai
+    chat_svc --> local
+```
+
+## Event System Architecture
+
+```mermaid
+flowchart TB
+    subgraph "ContextEventBus"
+        
+        pub_sub["Publish/Subscribe Pattern"]
+        
+        subgraph "Event Types"
+            telemetry["telemetry:*"]
+            cache["cache:*"]
+            assembly["assembly:*"]
+            retrieval["retrieval:*"]
+        end
+
+        subgraph "Telemetry Events"
+            t1["telemetry:assembly_start"]
+            t2["telemetry:assembly_complete"]
+            t3["telemetry:assembly_error"]
+            t4["telemetry:retrieval_start"]
+            t5["telemetry:retrieval_complete"]
+            t6["telemetry:budget_warning"]
+            t7["telemetry:budget_exceeded"]
+        end
+
+        subgraph "Cache Events"
+            c1["cache:hit"]
+            c2["cache:miss"]
+            c3["cache:evicted"]
+            c4["cache:invalidated"]
+        end
+
+        subgraph "Assembly Events"
+            a1["assembly:started"]
+            a2["assembly:chunk_ready"]
+            a3["assembly:completed"]
+            a4["assembly:failed"]
+        end
+
+        pub_sub --> telemetry
+        pub_sub --> cache
+        pub_sub --> assembly
+        pub_sub --> retrieval
+    end
+
+    subgraph "Event Handlers"
+        logger["Logger"]
+        metrics["Metrics Collector"]
+        alert["Alert System"]
+        webhooks["Webhooks"]
+    end
+
+    telemetry --> logger
+    telemetry --> metrics
+    telemetry --> alert
+    
+    cache --> logger
+    assembly --> webhooks
+```
+
+## Pipeline Event Sequence
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant API as API Server
+    participant EventBus as ContextEventBus
+    participant Pipeline as ParallelContextPipeline
+    participant Cache as ContextCache
+    participant DB as Database
+
+    Client->>API: POST /context-engine/assemble
+    API->>EventBus: emit('assembly:started', params)
+    
+    Note over EventBus: Log start time
+    Note over EventBus: Emit telemetry
+    
+    API->>Pipeline: assembleParallel(params)
+    
+    Note over Pipeline: Stage 0: Parallel fetch
+    Pipeline->>EventBus: emit('telemetry:assembly_start', stage)
+    
+    Pipeline->>Cache: getSettings(userId)
+    alt Cache hit
+        Cache-->>Pipeline: settings
+        Pipeline->>EventBus: emit('cache:hit', 'settings')
+    else Cache miss
+        Pipeline->>DB: fetch settings
+        DB-->>Pipeline: settings
+        Pipeline->>Cache: setSettings
+        Pipeline->>EventBus: emit('cache:miss', 'settings')
+    end
+    
+    Note over Pipeline: Stage 1: Detection
+    Pipeline->>EventBus: emit('telemetry:detection_start')
+    
+    Pipeline->>DB: semantic search topics
+    Pipeline->>EventBus: emit('telemetry:detection_complete', {topics, entities})
+    
+    Note over Pipeline: Stage 2: Bundle compilation
+    Pipeline->>Pipeline: fetchOrCompileBundle('identity_core')
+    Pipeline->>EventBus: emit('telemetry:bundle_compiled', {bundleType, tokens})
+    
+    loop for each bundle
+        Pipeline->>Cache: setBundle
+        Pipeline->>EventBus: emit('cache:hit', bundleType)
+    end
+    
+    Note over Pipeline: Stage 3: Assembly
+    Pipeline->>Pipeline: compilePromptFromBundles
+    Pipeline->>EventBus: emit('assembly:completed', metrics)
+    
+    Pipeline-->>API: AssembledContext + metrics
+    API-->>Client: Response
+    
+    EventBus->>EventBus: aggregate_metrics
+    Note over EventBus: Emit final telemetry event
+```
+
+## Worker Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Librarian Worker (librarian-worker.ts)"
+        
+        lw_start["Trigger: New message received"]
+        
+        subgraph "Extraction Pipeline"
+            extract["Extract ACUs from message"]
+            segment["Segment into thought units"]
+            classify["Classify by type/category"]
+            embed["Generate embeddings"]
+            score["Score importance"]
+        end
+
+        subgraph "Indexing"
+            vector["Index to pgvector"]
+            text["Index to full-text search"]
+            graph["Update context graph"]
+        end
+
+        subgraph "Storage"
+            save["Save to database"]
+            link["Link to conversation"]
+            link_topic["Link to topics"]
+            link_entity["Link to entities"]
+        end
+
+        subgraph "Output"
+            result["Return extracted ACUs"]
+        end
+    end
+
+    subgraph "Memory Cleanup Worker (memory-cleanup-worker.ts)"
+        
+        cw_start["Trigger: Scheduled (cron)"]
+        
+        subgraph "Archive Process"
+            old["Find old ACUs (T+30 days)"]
+            score["Check importance score"]
+            archive["Archive low-importance"]
+        end
+
+        subgraph "Compaction"
+            similar["Find similar ACUs"]
+            merge["Merge duplicates"]
+            compress["Compress storage"]
+        end
+
+        subgraph "Cleanup"
+            deleted["Clean deleted items"]
+            vacuum["Vacuum database"]
+            report["Report cleanup stats"]
+        end
+    end
+
+    subgraph "Context Warmup Worker (context-warmup-worker.ts)"
+        
+        ww_start["Trigger: User login / prefetch"]
+        
+        subgraph "Prefetch"
+            prefetch_id["Prefetch identity bundle"]
+            prefetch_prefs["Prefetch preferences"]
+            prefetch_recent["Prefetch recent conversations"]
+            prefetch_topics["Prefetch active topics"]
+        end
+
+        subgraph "Cache Warming"
+            warm_cache["Warm caches"]
+            bg_tasks["Queue background tasks"]
+            monitor["Monitor completion"]
+        end
+    end
+```
+
+## WebSocket Communication Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant WS as Socket.io
+    participant Context as ContextWS Service
+    participant Pipeline as ParallelContextPipeline
+    participant Cache as ContextCache
+    participant LLM as AI Provider
+
+    Client->>WS: connect(token)
+    WS->>Context: authenticate(token)
+    
+    alt Authentication successful
+        Context-->>WS: authenticated
+        WS-->>Client: connected
+    else Authentication failed
+        WS-->>Client: connect_error
+    end
+
+    Note over Client: Start context assembly
+    Client->>WS: start_assembly({userMessage, conversationId})
+    WS->>Context: handle_start_assembly
+
+    Context->>Pipeline: assembleStreaming(params)
+
+    Note over Pipeline: Yield chunks in priority order
+    loop Streaming chunks
+        Pipeline->>Context: chunk
+        Context->>Client: context_chunk
+    end
+
+    Note over Client: Partial context update request
+    Client->>WS: update_context({query})
+    WS->>Context: handle_update
+
+    Context->>Pipeline: jitRetrieve(query)
+    Pipeline->>Cache: check_cache
+    Cache-->>Pipeline: partial_results
+    Pipeline-->>Context: partial_context
+    Context->>Client: context_update
+
+    Note over Client: Close connection
+    Client->>WS: disconnect
+    WS->>Context: cleanup
+    Context->>Cache: release_resources
+```
+
+## Context Graph Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Context Graph (context-graph.ts)"
+        
+        graph["ContextGraph class"]
+        
+        subgraph "Graph Structure"
+            nodes["Nodes (ACUs, Topics, Entities)"]
+            edges["Edges (relationships)"]
+            weights["Edge weights (similarity)"]
+        end
+
+        subgraph "Node Types"
+            user["User node"]
+            topic["Topic nodes"]
+            entity["Entity nodes"]
+            memory["Memory nodes"]
+            conv["Conversation nodes"]
+        end
+
+        subgraph "Operations"
+            build["Build graph"]
+            update["Update graph"]
+            query["Query graph"]
+            search["Find paths"]
+            recommend["Recommendations"]
+        end
+    end
+
+    subgraph "Graph Updates"
+        trigger["Trigger: New ACU created"]
+        connect["Connect to related nodes"]
+        weight["Update edge weights"]
+        prune["Prune weak connections"]
+        cache["Cache updated graph"]
+    end
+```
+
+## Streaming Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Streaming Context Service"
+        
+        stream_svc["StreamingContextService"]
+        
+        subgraph "Chunk Prioritization"
+            priority100["Priority 100: Identity Core"]
+            priority90["Priority 90: Global Preferences"]
+            priority80["Priority 80: Conversation"]
+            priority70["Priority 70: Topics"]
+            priority60["Priority 60: Entities"]
+            priority50["Priority 50: JIT Knowledge"]
+        end
+
+        subgraph "Buffer Management"
+            buffer["Chunk buffer"]
+            batch["Batch size control"]
+            flush["Flush trigger"]
+            timeout["Timeout handler"]
+        end
+    end
+
+    subgraph "Client Consumption"
+        process["Process chunk"]
+        render["Render to UI"]
+        accumulate["Accumulate context"]
+        stream_status["Update stream status"]
+    end
+```
+
+## Hybrid Retrieval Flow
+
+```mermaid
+flowchart TB
+    subgraph "Hybrid Retrieval (hybrid-retrieval.ts)"
+        
+        input["Query input"]
+        
+        subgraph "Vector Search Branch"
+            vector["Vector index (pgvector)"]
+            similar["Similarity search"]
+            top_k["Top-K results"]
+            scores1["Similarity scores"]
+        end
+
+        subgraph "Keyword Search Branch"
+            keyword["Full-text index"]
+            bm25["BM25 ranking"]
+            top_k2["Top-K results"]
+            scores2["BM25 scores"]
+        end
+
+        subgraph "Score Fusion"
+            fuse["Score fusion (RRF)"]
+            normalize["Normalize scores"]
+            combine["Combine with weights"]
+            rerank["Rerank results"]
+        end
+
+        subgraph "Post-Processing"
+            dedupe["Deduplicate"]
+            filter["Filter by thresholds"]
+            final["Final result set"]
+        end
+    end
+```
+
+## Caching Strategy
+
+```mermaid
+flowchart TB
+    subgraph "Multi-Layer Cache"
+        
+        l1["L1: In-Memory Cache"]
+        l1_settings["Settings cache"]
+        l1_embeddings["Embedding cache"]
+        
+        l2["L2: Redis Cache"]
+        l2_sessions["Session data"]
+        l2_tokens["Token counts"]
+        l2_results["Search results"]
+        
+        l3["L3: Database Cache (Prisma)"]
+        l3_bundles["Compiled bundles"]
+        l3_graph["Graph snapshots"]
+    end
+
+    subgraph "Cache Operations"
+        get["get(key)"]
+        set["set(key, value, ttl)"]
+        invalidate["invalidate(pattern)"]
+        warm["warm(keys)"]
+    end
+
+    subgraph "Invalidation Triggers"
+        update["Data update"]
+        ttl["TTL expiry"]
+        manual["Manual clear"]
+        size["Size limit exceeded"]
+    end
+```
+
+## Monitoring & Telemetry
+
+```mermaid
+flowchart TB
+    subgraph "Context Telemetry (context-telemetry.ts)"
+        
+        metrics["Metrics Collector"]
+        
+        subgraph "Metrics Tracked"
+            m1["Assembly time (ms)"]
+            m2["Token usage"]
+            m3["Cache hit rate"]
+            m4["Retrieval latency"]
+            m5["Bundle compilation time"]
+            m6["Error counts"]
+            m7["Queue depth"]
+        end
+
+        subgraph "Aggregation"
+            aggregate["Aggregate by time"]
+            percentiles["Calculate percentiles (p50, p95, p99)"]
+            rate["Calculate rates (requests/sec)"]
+        end
+
+        subgraph "Export"
+            push["Push to metrics backend"]
+            log["Log to file"]
+            alert["Trigger alerts"]
+        end
+    end
+```
+
+## Circuit Breaker Pattern
+
+```mermaid
+stateDiagram-v2
+    [*] --> Closed
+    
+    Closed --> Open: failureThreshold reached
+    Closed --> HalfOpen: recoveryTimeout elapsed
+    
+    Open --> Closed: Test success
+    Open --> Open: Test fails
+    
+    HalfOpen --> Closed: Test success
+    HalfOpen --> Open: Test fails
+    
+    note right of Closed: Normal operation<br/>Requests pass through
+    note right of Open: Circuit open<br/>Requests rejected immediately
+    note right of HalfOpen: Testing recovery<br/>Limited requests allowed
+```

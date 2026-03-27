@@ -27,7 +27,7 @@ export default function SovereignHistoryPage() {
             <span className="text-sm text-slate-300">Sovereign History Demo</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">
+            <span className="text-blue-400">
               Own Your Archives
             </span>
             <br />

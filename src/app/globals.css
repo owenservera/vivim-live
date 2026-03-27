@@ -499,6 +499,140 @@ textarea:focus-visible {
   }
 }
 
+/* Reduced motion class for JavaScript toggle */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ─── Button Micro-interactions ─── */
+.btn-animate {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-animate:hover {
+  transform: scale(1.02);
+}
+
+.btn-animate:active {
+  transform: scale(0.98);
+}
+
+.btn-animate.glow-violet:hover {
+  box-shadow: 0 0 50px rgba(139, 92, 246, 0.5), 0 0 100px rgba(139, 92, 246, 0.25);
+}
+
+.btn-animate.glow-violet:active {
+  transform: scale(0.98);
+}
+
+/* ─── Input Focus Animations ─── */
+.input-animate {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.input-animate:focus {
+  border-color: #8B5CF6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  transform: scale(1.01);
+}
+
+/* ─── Card Hover Lift ─── */
+.card-lift {
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.25s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* ─── Skeleton Loading ─── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(51, 65, 85, 0.3) 0%,
+    rgba(71, 85, 105, 0.4) 50%,
+    rgba(51, 65, 85, 0.3) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+}
+
+.skeleton-text:last-child {
+  width: 70%;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton-card {
+  height: 120px;
+}
+
+/* ─── Hero Entrance Stagger ─── */
+.hero-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.hero-enter-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.hero-stagger-1 { transition-delay: 0.1s; }
+.hero-stagger-2 { transition-delay: 0.2s; }
+.hero-stagger-3 { transition-delay: 0.3s; }
+.hero-stagger-4 { transition-delay: 0.4s; }
+.hero-stagger-5 { transition-delay: 0.5s; }
+.hero-stagger-6 { transition-delay: 0.6s; }
+.hero-stagger-7 { transition-delay: 0.7s; }
+
+/* ─── Collapsible/Accordion Animations ─── */
+@keyframes slide-collapsible-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.slide-collapsible-down {
+  animation: slide-collapsible-down 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.slide-collapsible-up {
+  animation: slide-collapsible-up 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 /* ─── Mobile Adjustments ─── */
 @media (max-width: 768px) {
   .glass,

@@ -1,0 +1,517 @@
+# API Routes & Services Architecture Visualization
+
+## Backend Routes Overview
+
+```mermaid
+graph TB
+    subgraph "Express API Server"
+        
+        subgraph "Routes Directory"
+            
+            subgraph "Chatbot Routes (/routes/chatbot)"
+                cb_index["index.ts"]
+                cb_handler["POST /<br/>GET /:id<br/>PUT /:id<br/>DELETE /:id"]
+            end
+
+            subgraph "Corpus Routes (/routes/corpus)"
+                corp_index["index.ts"]
+                corp_handler["POST /upload<br/>GET /search<br/>GET /:id<br/>DELETE /:id"]
+            end
+
+            subgraph "Virtual User Routes (/routes/virtual-user.ts)"
+                vu_handler["POST /register<br/>POST /authenticate<br/>GET /profile<br/>PUT /profile"]
+            end
+
+            subgraph "Memory Routes (/routes/memory.ts)"
+                mem_handler["GET /<br/>POST /<br/>PUT /:id<br/>DELETE /:id<br/>GET /search<br/>POST /bulk"]
+            end
+
+            subgraph "Context Engine Routes (/routes/context-engine.ts)"
+                ctx_handler["POST /assemble<br/>POST /stream<br/>GET /bundles<br/>GET /metrics"]
+            end
+
+            subgraph "Context Settings Routes (/routes/context-settings.ts)"
+                ctxset_handler["GET /:userId<br/>PUT /:userId<br/>GET /:userId/budget"]
+            end
+
+            subgraph "Conversations Routes (/routes/conversations.render.ts)"
+                conv_handler["GET /<br/>GET /:id<br/>GET /:id/render"]
+            end
+
+            subgraph "Doc Search Routes (/routes/doc-search.ts)"
+                ds_handler["GET /search<br/>GET /index<br/>POST /index"]
+            end
+        end
+
+        subgraph "Middleware"
+            auth_mw["virtual-user-auth.ts"]
+            privacy_mw["virtual-user-privacy.ts"]
+        end
+    end
+
+    cb_index --> cb_handler
+    cb_handler --> auth_mw
+
+    corp_index --> corp_handler
+    
+    vu_handler --> auth_mw
+    
+    mem_handler --> auth_mw
+    mem_handler --> privacy_mw
+    
+    ctx_handler --> auth_mw
+    
+    ctxset_handler --> auth_mw
+    
+    conv_handler --> auth_mw
+    
+    ds_handler --> auth_mw
+```
+
+## Route Handlers Detail
+
+```mermaid
+flowchart TB
+    subgraph "Chatbot Route (/routes/chatbot/index.ts)"
+        
+        subgraph "POST / - Create/Send Message"
+            send["sendMessage(params)"]
+            validate["Validate input"]
+            assemble["Assemble context"]
+            stream["Stream to LLM"]
+            save["Save ACUs"]
+            respond["Return response"]
+        end
+
+        subgraph "GET /:id - Get Conversation"
+            get_conv["getConversation(id)"]
+            load["Load messages"]
+            format["Format response"]
+        end
+
+        subgraph "PUT /:id - Update Conversation"
+            update["updateConversation(id, data)"]
+            validate_up["Validate changes"]
+            save_up["Save updates"]
+        end
+
+        subgraph "DELETE /:id - Delete Conversation"
+            delete["deleteConversation(id)"]
+            soft["Soft delete or hard delete?"]
+            cascade["Cascade to ACUs"]
+        end
+    end
+
+    subgraph "Context Engine Route (/routes/context-engine.ts)"
+        
+        subgraph "POST /assemble"
+            ctx_assemble["assembleParallel(params)"]
+            blocks["Block until complete"]
+            result["Return full context"]
+        end
+
+        subgraph "POST /stream"
+            ctx_stream["assembleStreaming(params)"]
+            yield_chunks["Yield chunks in priority order"]
+        end
+
+        subgraph "GET /bundles"
+            get_bundles["getBundles(userId, type)"]
+            cache["Check cache first"]
+            fetch_db["Fetch from DB"]
+        end
+
+        subgraph "GET /metrics"
+            get_metrics["getPipelineMetrics(userId)"]
+            aggregate["Aggregate from event bus"]
+        end
+    end
+
+    subgraph "Memory Route (/routes/memory.ts)"
+        
+        subgraph "GET / - List Memories"
+            list["listMemories(userId, filters)"]
+            paginate["Paginate results"]
+        end
+
+        subgraph "POST / - Create Memory"
+            create["createMemory(data)"]
+            embed["Generate embedding"]
+            save_mem["Save to DB"]
+        end
+
+        subgraph "GET /search - Semantic Search"
+            search["semanticSearch(query, filters)"]
+            hybrid["Hybrid search"]
+            rank["Rank results"]
+        end
+
+        subgraph "POST /bulk - Bulk Import"
+            bulk["bulkCreateMemories(data[])"]
+            batch["Batch process"]
+            progress["Return progress"]
+        end
+    end
+```
+
+## Service Layer Architecture
+
+```mermaid
+graph TB
+    subgraph "Core Services"
+        
+        subgraph "Context Services"
+            ctx_pipeline["ParallelContextPipeline"]
+            ctx_orch["ContextOrchestrator"]
+            ctx_assembler["ContextAssembler"]
+            ctx_cache["ContextCache"]
+            ctx_event["ContextEventBus"]
+            ctx_tel["ContextTelemetry"]
+        end
+
+        subgraph "Memory Services"
+            mem_svc["MemoryService"]
+            acu_pipe["ACUMemoryPipeline"]
+            dedupe["ACUDeduplicationService"]
+            hybrid_ret["HybridRetrieval"]
+        end
+
+        subgraph "Virtual User Services"
+            vu_mgr["VirtualUserManager"]
+            vu_adapt["VirtualMemoryAdapter"]
+            vu_priv["VirtualUserPrivacy"]
+        end
+
+        subgraph "Conversation Services"
+            render["ConversationRenderingService"]
+            stream["StreamingContextService"]
+            import_svc["StreamingImportService"]
+        end
+
+        subgraph "Utility Services"
+            embed["EmbeddingService"]
+            token_est["TokenEstimator"]
+            warmup["ContextWarmupWorker"]
+            profile["ProfileRollupService"]
+            page_idx["PageIndexService"]
+        end
+    end
+
+    subgraph "Workers"
+        lib_worker["LibrarianWorker"]
+        cleanup["MemoryCleanupWorker"]
+        warmup_worker["ContextWarmupWorker"]
+    end
+
+    ctx_orch --> ctx_pipeline
+    ctx_orch --> ctx_assembler
+    ctx_orch --> ctx_cache
+    ctx_pipeline --> ctx_event
+    
+    mem_svc --> acu_pipe
+    mem_svc --> hybrid_ret
+    acu_pipe --> dedupe
+    
+    vu_mgr --> vu_adapt
+    vu_mgr --> vu_priv
+    
+    render --> stream
+    stream --> import_svc
+
+    ctx_orch --> lib_worker
+    lib_worker --> cleanup
+    ctx_orch --> warmup_worker
+```
+
+## Service Dependency Flow
+
+```mermaid
+flowchart LR
+    subgraph "Route Handler"
+        handler["Request Handler"]
+    end
+
+    subgraph "Middleware"
+        auth["Auth Middleware"]
+    end
+
+    subgraph "Orchestrator"
+        orch["ContextOrchestrator"]
+    end
+
+    subgraph "Pipeline"
+        pipe["ParallelContextPipeline"]
+    end
+
+    subgraph "Services"
+        cache["ContextCache"]
+        event["ContextEventBus"]
+        embed["EmbeddingService"]
+        bundle["BundleCompiler"]
+    end
+
+    subgraph "Database"
+        db["Prisma Client"]
+    end
+
+    handler --> auth
+    auth --> orch
+    orch --> pipe
+    pipe --> cache
+    pipe --> event
+    pipe --> embed
+    pipe --> bundle
+    embed --> db
+    bundle --> db
+
+    style handler fill:#4a1942,stroke:#d4145a
+    style orch fill:#4a1942,stroke:#d4145a
+    style pipe fill:#1a1a2e,stroke:#4a4a6a
+    style db fill:#16213e,stroke:#0f3460
+```
+
+## Virtual User System
+
+```mermaid
+flowchart TB
+    subgraph "Virtual User Registration"
+        reg_req["Registration Request"]
+        validate_vu["Validate data"]
+        gen_did["Generate DID"]
+        gen_keys["Generate keypair"]
+        create_profile["Create VirtualUser profile"]
+        save_db["Save to DB"]
+        return["Return credentials"]
+    end
+
+    subgraph "Virtual User Authentication"
+        auth_req["Auth Request"]
+        verify_keys["Verify key challenge"]
+        verify_sig["Verify signature"]
+        issue_token["Issue JWT"]
+        session["Create session"]
+    end
+
+    subgraph "Virtual User Profile"
+        vu_id["id: UUID"]
+        vu_did["did: string (DID)"]
+        vu_pubkey["publicKey: string"]
+        vu_type["userType: string"]
+        vu_state["state: ACTIVE|SUSPENDED"]
+        vu_created["createdAt, updatedAt"]
+        vu_metadata["metadata: JSON"]
+    end
+
+    subgraph "Device Management"
+        device_reg["Register Device"]
+        device_trust["Trust Device"]
+        device_revoke["Revoke Device"]
+    end
+
+    reg_req --> validate_vu
+    validate_vu --> gen_did
+    gen_did --> gen_keys
+    gen_keys --> create_profile
+    create_profile --> save_db
+    save_db --> return
+
+    auth_req --> verify_keys
+    verify_keys --> verify_sig
+    verify_sig --> issue_token
+    issue_token --> session
+
+    reg_req --> device_reg
+    device_reg --> device_trust
+    device_trust --> device_revoke
+```
+
+## WebSocket Services
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant WS as Socket.io
+    participant CtxWS as ContextWS
+    participant Pipeline as ParallelContextPipeline
+    participant Cache as ContextCache
+
+    Client->>WS: connect(token)
+    WS->>CtxWS: authenticate(token)
+    CtxWS->>WS: authenticated
+    
+    Client->>WS: start_context_assembly(params)
+    WS->>CtxWS: handle_start_assembly(params)
+    
+    CtxWS->>Pipeline: assembleStreaming(params)
+    
+    Note over Pipeline: Yields chunks
+    
+    loop Streaming
+        Pipeline->>CtxWS: chunk{priority, content}
+        CtxWS->>Client: context_chunk
+    end
+    
+    Client->>WS: update_context(query)
+    WS->>CtxWS: handle_update
+    CtxWS->>Cache: invalidate(query)
+    CtxWS->>Pipeline: partial_retrieve(query)
+    Pipeline->>CtxWS: partial_context
+    CtxWS->>Client: context_update
+
+    Client->>WS: disconnect
+    WS->>CtxWS: handle_disconnect
+    CtxWS->>Cache: release_resources
+```
+
+## Context Settings Management
+
+```mermaid
+flowchart TB
+    subgraph "Settings Model"
+        set_id["id: UUID"]
+        set_user["userId: FK (unique)"]
+        set_tokens["maxContextTokens: int (default: 12000)"]
+        set_priority["defaultPriorityLayer: string"]
+        set_embed["embeddingModel: string"]
+        set_temp["temperature: float"]
+        set_prefs["preferences: JSON"]
+        set_custom["customSettings: JSON"]
+    end
+
+    subgraph "Settings Routes"
+        get_settings["GET /:userId"]
+        update_settings["PUT /:userId"]
+        get_budget["GET /:userId/budget"]
+        reset["POST /:userId/reset"]
+    end
+
+    subgraph "Settings Service"
+        load["loadSettings(userId)"]
+        validate["validateSettings(changes)"]
+        apply["applySettings(changes)"]
+        cache_set["Cache settings"]
+    end
+
+    subgraph "Settings Integration"
+        get_budget["GET /:userId/budget"]
+        budget["Calculate budget based on settings"]
+    end
+
+    get_settings --> load
+    update_settings --> validate
+    validate --> apply
+    apply --> cache_set
+    cache_set --> get_budget
+    get_budget --> budget
+
+    style set_id fill:#1a1a2e,stroke:#4a4a6a
+    style load fill:#1a1a2e,stroke:#4a4a6a
+    style budget fill:#16213e,stroke:#0f3460
+```
+
+## API Request/Response Patterns
+
+```mermaid
+flowchart TB
+    subgraph "Chatbot API"
+        
+        subgraph "Request"
+            req_msg["userMessage: string"]
+            req_conv["conversationId?: string"]
+            req_opts["options?: {stream, model, temperature}"]
+        end
+
+        subgraph "Response (non-streaming)"
+            resp_id["id: string"]
+            resp_content["content: string"]
+            resp_model["model: string"]
+            resp_tokens["tokens: number"]
+            resp_acus["acus: ACU[]"]
+        end
+
+        subgraph "Response (streaming)"
+            stream_start["start: {id, model}"]
+            stream_chunk["chunk: {content, delta}"]
+            stream_done["done: {tokens, acus}"]
+            stream_error["error: {code, message}"]
+        end
+    end
+
+    subgraph "Context Engine API"
+        
+        subgraph "POST /assemble Request"
+            asm_user["userId: string"]
+            asm_msg["userMessage: string"]
+            asm_conv["conversationId?: string"]
+        end
+
+        subgraph "POST /assemble Response"
+            asm_prompt["systemPrompt: string"]
+            asm_budget["budget: {totalUsed, totalAvailable}"]
+            asm_bundles["bundlesUsed: string[]"]
+            asm_meta["metadata: {assemblyTimeMs, detectedTopics, cacheHitRate}"]
+            asm_metrics["metrics: PipelineMetrics"]
+        end
+
+        subgraph "POST /stream Request"
+            stream_req["Same as assemble"]
+        end
+
+        subgraph "POST /stream Response"
+            stream_resp["StreamingResponse<StreamingContextChunk>"]
+        end
+    end
+```
+
+## Error Handling & Circuit Breaker
+
+```mermaid
+flowchart TB
+    subgraph "Circuit Breaker Service"
+        
+        cb_init["CircuitBreaker class"]
+        states["States: CLOSED, OPEN, HALF_OPEN"]
+        
+        subgraph "Closed State"
+            normal["Normal operation"]
+            count_fail["Count failures"]
+            threshold["failureThreshold reached?"]
+        end
+
+        subgraph "Open State"
+            reject["Reject requests"]
+            timer["Wait timeout"]
+            timeout["Timeout reached?"]
+        end
+
+        subgraph "Half-Open State"
+            probe["Probe request"]
+            success["Success?"]
+            close["Close circuit"]
+            open["Re-open circuit"]
+        end
+    end
+
+    subgraph "Error Types"
+        err_auth["AuthError - 401"]
+        err_perm["PermissionError - 403"]
+        err_notfound["NotFoundError - 404"]
+        err_validation["ValidationError - 400"]
+        err_rate["RateLimitError - 429"]
+        err_server["ServerError - 500"]
+    end
+
+    normal --> count_fail
+    count_fail --> threshold
+    threshold -->|Yes| reject
+    reject --> timer
+    timer --> timeout
+    timeout -->|Yes| probe
+    
+    probe --> success
+    success -->|Yes| close
+    success -->|No| open
+
+    style cb_init fill:#1a1a2e,stroke:#4a4a6a
+    style err_server fill:#4a1942,stroke:#d4145a
+```

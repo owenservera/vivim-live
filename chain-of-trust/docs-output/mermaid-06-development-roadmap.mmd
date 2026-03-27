@@ -1,0 +1,329 @@
+# Development Phases - Visual Roadmap
+
+```mermaid
+gantt
+    title VIVIM Development Roadmap (30 months)
+    dateFormat  X
+    axisFormat %m
+    
+    section Phase 0: Genesis
+    Vault Core                    :active, p0a, 0, 6
+    Membrane/USP                  :active, p0b, 0, 6
+    Inner Gate                   :active, p0c, 2, 4
+    Control Plane                :active, p0d, 4, 2
+    
+    section Phase 1: First Breath
+    Provider Importers            :p1a, 4, 5
+    Browser Extension            :p1b, 4, 6
+    Local Daemon                  :p1c, 4, 5
+    Basic Search                  :p1d, 6, 3
+    
+    section Phase 2: Innate Immunity
+    Rights Classifier (Basic)     :p2a, 8, 4
+    Baseline Model                :p2b, 8, 4
+    Rights Envelopes              :p2c, 8, 4
+    Classification Review         :p2d, 10, 2
+    
+    section Phase 3: Differentiation
+    Desktop Capture               :p3a, 10, 5
+    IDE Plugins                   :p3b, 12, 4
+    Mobile Capture                :p3c, 12, 3
+    Compartmentalization          :p3d, 10, 5
+    
+    section Phase 4: Adaptive Immunity
+    TPDI Classifier               :p4a, 13, 5
+    Span Segmentation            :p4b, 14, 4
+    Active Learning              :p4c, 15, 3
+    Contract Binding             :p4d, 16, 2
+    
+    section Phase 5: Vesicle Machinery
+    Vesicle Builder               :p5a, 16, 6
+    Egress Engine                 :p5b, 16, 6
+    Marketplace                   :p5c, 16, 6
+    Revenue Split                 :p5d, 18, 4
+    
+    section Phase 6: Sentinel
+    Canary System                 :p6a, 18, 6
+    Watermarking                  :p6b, 20, 4
+    Detection Suite               :p6c, 20, 4
+    Evidence Generation           :p6d, 22, 2
+    
+    section Phase 7: Multicellular
+    P2P Sync                      :p7a, 22, 8
+    Collective Detection          :p7b, 24, 6
+    Reputation System             :p7c, 26, 4
+    Full Mobile                   :p7d, 28, 2
+```
+
+## Phase Dependencies
+
+```mermaid
+flowchart TB
+    subgraph "Phase Dependencies"
+        
+        P0[Phase 0: Genesis] --> P1
+        P0 --> P2
+        
+        P1[Phase 1: First Breath] --> P2
+        P1 --> P3
+        
+        P2[Phase 2: Innate Immunity] --> P4
+        
+        P3[Phase 3: Differentiation] --> P4
+        P3 --> P5
+        
+        P4[Phase 4: Adaptive Immunity] --> P5
+        P4 --> P6
+        
+        P5[Phase 5: Vesicle Machinery] --> P6
+        P5 --> P7
+        
+        P6[Phase 6: Sentinel] --> P7
+        
+        P7[Phase 7: Multicellular]
+        
+    end
+    
+    style P0 fill:#e94560,stroke:#333,color:#fff
+    style P1 fill:#e67e22,stroke:#333,color:#fff
+    style P2 fill:#f1c40f,stroke:#333,color:#000
+    style P3 fill:#2ecc71,stroke:#333,color:#fff
+    style P4 fill:#3498db,stroke:#333,color:#fff
+    style P5 fill:#9b59b6,stroke:#333,color:#fff
+    style P6 fill:#e74c3c,stroke:#333,color:#fff
+    style P7 fill:#1abc9c,stroke:#333,color:#fff
+```
+
+## Milestone Timeline
+
+```mermaid
+timeline
+    title VIVIM Key Milestones
+    
+    month 3 : M0.1 Vault creates/locks/unlocks
+             : Mnemonic → Argon2id → Keys
+    
+    month 6 : M1 Provider imports work
+             : ChatGPT, Claude → ACUs in vault
+    
+    month 9 : M2 Browser capture functional
+             : Capture from chat.openai.com
+    
+    month 12 : M3 Rights classification works
+              : Automatic T0-T5 assignment
+    
+    month 15 : M4 Span segmentation works
+              : Single conversation → multiple tiers
+    
+    month 18 : M5 Marketplace launches
+              : Listing, purchase, ZK proofs
+    
+    month 21 : M6 Detection finds canary
+              : Canary detected in test model
+    
+    month 24 : M7 Full detection suite
+              : 13 algorithms operational
+    
+    month 30 : M8 Network complete
+              : Multi-device, collective detection
+```
+
+---
+
+# Component Interaction Matrix
+
+```mermaid
+flowchart TB
+    subgraph "Core Interactions"
+        
+        UI[User Interface]
+        API[API Layer]
+        Crypto[Crypto Engine]
+        Storage[Storage Engine]
+        Network[Network Layer]
+        Detector[Detection Engine]
+        Marketplace[Marketplace Engine]
+        
+        UI --> API
+        API --> Crypto
+        API --> Storage
+        API --> Network
+        API --> Detector
+        API --> Marketplace
+        
+        Crypto --> Storage
+        Storage --> Network
+        
+    end
+    
+    style UI fill:#e94560,stroke:#333,color:#fff
+    style API fill:#f39c12,stroke:#333,color:#000
+    style Crypto fill:#27ae60,stroke:#333,color:#fff
+    style Storage fill:#3498db,stroke:#333,color:#fff
+    style Network fill:#9b59b6,stroke:#333,color:#fff
+    style Detector fill:#e74c3c,stroke:#333,color:#fff
+    style Marketplace fill:#1abc9c,stroke:#333,color:#fff
+```
+
+## API Layer Detail
+
+```mermaid
+flowchart LR
+    subgraph "Public API Surface"
+        
+        VaultAPI[Vault API]
+        ImportAPI[Import API]
+        SearchAPI[Search API]
+        ConsentAPI[Consent API]
+        MarketplaceAPI[Marketplace API]
+        DetectionAPI[Detection API]
+        
+    end
+    
+    subgraph "Internal Services"
+        CryptoService[Crypto Service]
+        StorageService[Storage Service]
+        IndexService[Index Service]
+        SyncService[Sync Service]
+    end
+    
+    VaultAPI --> CryptoService
+    ImportAPI --> StorageService
+    SearchAPI --> IndexService
+    ConsentAPI --> StorageService
+    MarketplaceAPI --> StorageService
+    DetectionAPI --> SyncService
+    
+    style VaultAPI fill:#e94560,stroke:#333,color:#fff
+    style SearchAPI fill:#3498db,stroke:#333,color:#fff
+    style MarketplaceAPI fill:#27ae60,stroke:#333,color:#fff
+```
+
+---
+
+# Security Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Security Layers"
+        
+        Physical[Physical Security]
+        Device[Device Security]
+        Software[Software Security]
+        Cryptographic[Cryptographic Security]
+        Protocol[Protocol Security]
+        Social[Social Security]
+        
+    end
+    
+    Physical --> Device
+    Device --> Software
+    Software --> Cryptographic
+    Cryptographic --> Protocol
+    Protocol --> Social
+    
+    note over Physical: Device theft protection<br/>Drive encryption
+    
+    note over Device: OS sandboxing<br/>Process isolation
+    
+    note over Software: Code signing<br/>Update validation
+    
+    note over Cryptographic: Key hierarchy<br/>Per-ACU encryption
+    
+    note over Protocol: USP authentication<br/>ZKP verification
+    
+    note over Social: Phishing protection<br/>Mnemonic security
+```
+
+## Threat Model
+
+```mermaid
+flowchart TB
+    subgraph "Threats and Mitigations"
+        
+        T1[Vault Compromise] --> M1[Client-side encryption, keys never leave device]
+        
+        T2[Consent Forgery] --> M2[On-chain commitments, ZKP verification]
+        
+        T3[Buyer Violation] --> M3[Collateral staking, slashing, reputation]
+        
+        T4[Validator Collusion] --> M4[BFT consensus >2/3 required]
+        
+        T5[Metadata Leakage] --> M5[Differential privacy, ZK proofs]
+        
+        T6[Sybil Attacks] --> M6[Proof-of-stake, reputation gating]
+        
+        T7[Front-Running] --> M7[Encrypted mempool, commit-reveal]
+        
+    end
+    
+    style T1 fill:#e94560,stroke:#333,color:#fff
+    style M1 fill:#27ae60,stroke:#333,color:#fff
+    style T3 fill:#f39c12,stroke:#333,color:#000
+    style M3 fill:#27ae60,stroke:#333,color:#fff
+```
+
+---
+
+# Complete Architecture Summary
+
+```mermaid
+graph TD
+    subgraph "VIVIM System Architecture"
+        
+        subgraph "Client Layer"
+            CLI[CLI Tool]
+            GUI[Desktop GUI]
+            Mobile[iOS/Android]
+            Extension[Browser Extension]
+        end
+        
+        subgraph "Core Layer"
+            Vault[(Vault Engine)]
+            Stream[Universal Stream]
+            Classifier[Rights Classifier]
+            Context[Context Engine]
+        end
+        
+        subgraph "Integration Layer"
+            MCP[MCP Server]
+            Importers[Provider Importers]
+            Exporters[Export Tools]
+        end
+        
+        subgraph "Network Layer"
+            P2P[P2P Sync]
+            Blockchain[Blockchain Node]
+            Marketplace[Marketplace]
+        end
+        
+        subgraph "Detection Layer"
+            Canary[Canary Engine]
+            MI[Membership Inference]
+            Evidence[Evidence Generator]
+        end
+        
+    end
+    
+    CLI --> Vault
+    GUI --> Vault
+    Extension --> Stream
+    Stream --> Vault
+    Vault --> Classifier
+    Vault --> Context
+    Context --> MCP
+    Importers --> Vault
+    Vault --> Exporters
+    Vault <--> P2P
+    Vault --> Blockchain
+    Vault --> Marketplace
+    Vault --> Canary
+    Canary --> MI
+    MI --> Evidence
+    
+    style Vault fill:#1a1a2e,stroke:#4a4a6a,color:#fff
+    style Stream fill:#0f3460,stroke:#333,color:#fff
+    style Classifier fill:#e94560,stroke:#333,color:#fff
+    style Blockchain fill:#3498db,stroke:#333,color:#fff
+    style Canary fill:#f39c12,stroke:#333,color:#000
+```

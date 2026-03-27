@@ -25,6 +25,7 @@ function CollapsibleContent({
   return (
     <CollapsiblePrimitive.CollapsibleContent
       data-slot="collapsible-content"
+      className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-collapsible-up data-[state=open]:slide-collapsible-down"
       {...props}
     />
   )

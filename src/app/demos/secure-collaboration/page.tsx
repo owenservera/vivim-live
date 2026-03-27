@@ -27,7 +27,7 @@ export default function SecureCollaborationPage() {
             <span className="text-sm text-slate-300">Secure Collaboration Demo</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            <span className="text-emerald-400">
               Share With Confidence
             </span>
             <br />

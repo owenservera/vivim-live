@@ -1,0 +1,17 @@
+# Bun configuration for server
+# Reference: https://bun.sh/docs/bundler/watch
+
+[watch]
+# Watch these additional paths beyond the entry point
+include = [
+  "src/**/*",
+  "../common/**/*"
+]
+# Exclude these patterns
+exclude = [
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/*.test.*",
+  "**/*.spec.*",
+  "../network/dist/**"
+]

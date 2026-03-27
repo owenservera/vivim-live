@@ -1,0 +1,422 @@
+# Database Schema Visualization
+
+## Core Entities ERD
+
+```mermaid
+erDiagram
+    User ||--o{ Conversation : "owns"
+    User ||--o{ ApiKey : "has"
+    User ||--o{ Device : "owns"
+    User ||--o{ Memory : "stores"
+    User ||--o{ TopicProfile : "creates"
+    User ||--o{ EntityProfile : "defines"
+    User ||--o{ ContextSettings : "configures"
+    User ||--o{ VirtualUser : "is"
+
+    VirtualUser ||--o{ Conversation : "captures"
+
+    Conversation ||--o{ Message : "contains"
+    Conversation ||--o{ AtomicChatUnit : "segmented into"
+    Conversation ||--o{ ContextBundle : "bundles"
+    Conversation ||--o{ TopicConversation : "belongs to"
+    Conversation ||--o{ ImportedConversation : "is"
+
+    Message ||--o{ AtomicChatUnit : "extracted from"
+    Message ||--o{ MessageStylePreset : "uses"
+
+    TopicProfile ||--o{ TopicConversation : "has"
+    EntityProfile ||--o{ EntityConversation : "has"
+
+    AtomicChatUnit ||--o{ TopicConversation : "linked to"
+    AtomicChatUnit ||--o{ EntityConversation : "linked to"
+    AtomicChatUnit }|..|{ Memory : "related to"
+```
+
+## Key Database Models
+
+```mermaid
+classDiagram
+    class User {
+        +String id PK
+        +String? displayName
+        +String? email
+        +String? avatarUrl
+        +DateTime createdAt
+        +DateTime updatedAt
+        +DateTime lastSeenAt
+        +Json settings
+        +Json privacyPreferences
+    }
+
+    class Conversation {
+        +String id PK
+        +String provider
+        +String sourceUrl
+        +String? contentHash
+        +Int version
+        +String title
+        +String? model
+        +String state
+        +String visibility
+        +DateTime createdAt
+        +DateTime updatedAt
+        +DateTime capturedAt
+        +Int messageCount
+        +Json metadata
+        +String[] tags
+        +String? ownerId FK
+        +String? virtualUserId FK
+    }
+
+    class Message {
+        +String id PK
+        +String conversationId FK
+        +String role
+        +String? author
+        +Json parts
+        +String? contentHash
+        +Int version
+        +DateTime createdAt
+        +Int messageIndex
+        +String status
+        +Json renderedContent
+    }
+
+    class AtomicChatUnit {
+        +String id PK
+        +String content
+        +String type
+        +String category
+        +String state
+        +Float importance
+        +String authorDid
+        +Float[] embedding
+        +String conversationId FK
+        +String messageId FK
+        +String? topicProfileId FK
+        +String? entityProfileId FK
+    }
+
+    class ContextBundle {
+        +String id PK
+        +String userId FK
+        +String bundleType
+        +String compiledPrompt
+        +Int tokenCount
+        +Json composition
+        +Int version
+        +Boolean isDirty
+        +DateTime? compiledAt
+    }
+
+    class Memory {
+        +String id PK
+        +String userId FK
+        +String content
+        +String category
+        +Float importance
+        +Float[] embedding
+        +Boolean isActive
+        +DateTime createdAt
+    }
+
+    class TopicProfile {
+        +String id PK
+        +String userId FK
+        +String slug
+        +String label
+        +Float[] embedding
+        +Json metadata
+    }
+
+    class EntityProfile {
+        +String id PK
+        +String userId FK
+        +String name
+        +String type
+        +Float[] embedding
+        +Json metadata
+    }
+
+    class ContextSettings {
+        +String id PK
+        +String userId FK
+        +Int maxContextTokens
+        +String? defaultPriorityLayer
+        +String? embeddingModel
+        +Float? temperature
+        +Json preferences
+    }
+
+    class VirtualUser {
+        +String id PK
+        +String did
+        +String userType
+        +String publicKey
+        +String? encryptedPrivateKey
+        +String state
+        +Json metadata
+        +DateTime createdAt
+    }
+
+    User "1" --> "*" Conversation
+    User "1" --> "*" Memory
+    User "1" --> "*" TopicProfile
+    User "1" --> "*" EntityProfile
+    User "1" --> "1" ContextSettings
+    Conversation "1" --> "*" Message
+    Conversation "1" --> "*" AtomicChatUnit
+    Message "1" --> "*" AtomicChatUnit
+    AtomicChatUnit "1" --> "*" ContextBundle
+```
+
+## Table Indexes & Performance
+
+```mermaid
+flowchart TB
+    subgraph "Key Indexes"
+        
+        idx1["conversations: capturedAt DESC"]
+        idx2["conversations: provider, capturedAt DESC"]
+        idx3["conversations: ownerId"]
+        idx4["conversations: tags"]
+        
+        idx5["messages: conversationId, messageIndex"]
+        idx6["messages: conversationId, createdAt"]
+        idx7["messages: role"]
+        idx8["messages: contentHash"]
+        
+        idx9["atomic_chat_units: importance DESC"]
+        idx10["atomic_chat_units: embedding (vector)"]
+        idx11["atomic_chat_units: type, category"]
+        idx12["atomic_chat_units: state"]
+        
+        idx13["context_bundles: userId, bundleType"]
+        idx14["memories: userId, category"]
+        idx15["topic_profiles: userId, slug"]
+    end
+
+    subgraph "pgVector Configuration"
+        vec_idx["Embedding index<br/>Cosine distance<br/>HNSW algorithm"]
+    end
+
+    subgraph "Query Optimization"
+        cover["Covering indexes for frequent queries"]
+        partial["Partial indexes for state filtering"]
+        composite["Composite indexes for joins"]
+    end
+```
+
+## Data Relationships Detail
+
+```mermaid
+flowchart LR
+    subgraph "Conversation Flow"
+        new_conv["Create Conversation"]
+        add_msg["Add Message"]
+        extract_acu["Extract ACU"]
+        link_topic["Link to Topic"]
+        link_entity["Link to Entity"]
+        bundle["Create Bundle"]
+        render["Render Preview"]
+    end
+
+    subgraph "ACU Flow"
+        acu_create["Create ACU"]
+        acu_classify["Classify (type, category)"]
+        acu_embed["Generate Embedding"]
+        acu_score["Score Importance"]
+        acu_index["Index in pgvector"]
+        acu_link["Link to relationships"]
+    end
+
+    subgraph "Memory Flow"
+        mem_create["Create Memory"]
+        mem_categorize["Categorize"]
+        mem_embed["Embed"]
+        mem_importance["Calculate Importance"]
+        mem_search["Enable Semantic Search"]
+    end
+
+    new_conv --> add_msg
+    add_msg --> extract_acu
+    extract_acu --> link_topic
+    extract_acu --> link_entity
+    link_topic --> bundle
+    link_entity --> bundle
+    bundle --> render
+
+    acu_create --> acu_classify
+    acu_classify --> acu_embed
+    acu_embed --> acu_score
+    acu_score --> acu_index
+    acu_index --> acu_link
+
+    mem_create --> mem_categorize
+    mem_categorize --> mem_embed
+    mem_embed --> mem_importance
+    mem_importance --> mem_search
+```
+
+## Database Migrations Structure
+
+```mermaid
+flowchart TB
+    subgraph "Prisma Migration Flow"
+        
+        schema["schema.prisma"]
+        generate["prisma generate"]
+        migrate["prisma migrate"]
+        apply["Apply to DB"]
+        
+        seed["prisma seed"]
+        verify["Verify data"]
+    end
+
+    subgraph "Migration Files"
+        init["Initial migration"]
+        add_users["Add users table"]
+        add_conversations["Add conversations"]
+        add_acu["Add ACU support"]
+        add_vector["Add pgvector"]
+        add_context["Add context bundles"]
+        add_rights["Add rights layer"]
+    end
+
+    schema --> generate
+    generate --> migrate
+    migrate --> apply
+    apply --> seed
+    seed --> verify
+```
+
+## Seeding Strategy
+
+```mermaid
+flowchart TB
+    subgraph "Seed Scripts"
+        
+        main_seed["prisma/seed.ts"]
+        real_data["prisma/seed-real-data.ts"]
+        investor["prisma/seed-investor.ts"]
+        edge["prisma/seed-edge-cases.ts"]
+        factory["prisma/factories/seed-factory.ts"]
+    end
+
+    subgraph "Seed Types"
+        dev["Development seed<br/>(Mock data)"]
+        test["Test seed<br/>(Edge cases)"]
+        demo["Demo seed<br/>(Investor-ready)"]
+        prod["Production seed<br/>(Empty/clean)"]
+    end
+
+    subgraph "Factory Pattern"
+        user_fact["User factory"]
+        conv_fact["Conversation factory"]
+        msg_fact["Message factory"]
+        acu_fact["ACU factory"]
+    end
+
+    main_seed --> dev
+    main_seed --> test
+    main_seed --> demo
+    
+    user_fact --> factory
+    conv_fact --> factory
+    msg_fact --> factory
+    acu_fact --> factory
+    
+    factory --> dev
+```
+
+## Database Configuration
+
+```mermaid
+flowchart TB
+    subgraph "Connection Config"
+        conn_string["Database URL"]
+        pool["Connection pool<br/>min: 2, max: 20"]
+        timeout["Query timeout<br/>5000ms"]
+        ssl["SSL mode<br/>prefer"]
+    end
+
+    subgraph "Prisma Settings"
+        preview["Preview features<br/>postgresqlExtensions"]
+        log["Log queries<br/>(warn, error)"]
+        adapter["LibSQL adapter<br/>(for edge)"]
+    end
+
+    subgraph "Extensions"
+        pgvector["pgvector<br/>(vector storage)"]
+        uuid_ossp["uuid-ossp<br/>(UUID generation)"]
+        citext["citext<br/>(Case-insensitive text)"]
+    end
+```
+
+## Schema Versioning
+
+```mermaid
+stateDiagram-v2
+    [*] --> v1_initial
+    
+    v1_initial --> v2_users: Add users table
+    v2_users --> v3_conversations: Add conversations & messages
+    v3_conversations --> v4_acu: Add ACU support
+    v4_acu --> v5_vector: Add vector embeddings
+    v5_vector --> v6_bundles: Add context bundles
+    v6_bundles --> v7_rights: Add rights layer
+    v7_rights --> v8_advanced: Add advanced features
+
+    note right of v1_initial: Initial schema
+    note right of v2_users: User management
+    note right of v3_conversations: Core data
+    note right of v4_acu: Memory extraction
+    note right of v5_vector: Semantic search
+    note right of v6_bundles: Context assembly
+    note right of v7_rights: T0-T5 tiers
+    note right of v8_advanced: Latest features
+```
+
+## Data Import/Export
+
+```mermaid
+flowchart TB
+    subgraph "Import Sources"
+        chatgpt["ChatGPT export"]
+        claude["Claude export"]
+        gemini["Gemini export"]
+        json["Generic JSON"]
+        markdown["Markdown files"]
+    end
+
+    subgraph "Import Process"
+        parse["Parse source format"]
+        normalize["Normalize to ACU format"]
+        dedupe["Deduplicate"]
+        import_bulk["Bulk import (streaming)"]
+        verify["Verify integrity"]
+    end
+
+    subgraph "Export Formats"
+        export_json["JSON (full)"]
+        export_sqlite["SQLite (portable)"]
+        export_ipfs["IPFS (decentralized)"]
+        export_csv["CSV (spreadsheet)"]
+    end
+
+    chatgpt --> parse
+    claude --> parse
+    gemini --> parse
+    json --> parse
+    markdown --> parse
+    
+    parse --> normalize
+    normalize --> dedupe
+    dedupe --> import_bulk
+    import_bulk --> verify
+    
+    verify --> export_json
+    verify --> export_sqlite
+    verify --> export_ipfs
+    verify --> export_csv
+```
