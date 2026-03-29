@@ -36,7 +36,8 @@
     "db:seed": "bun run --filter vivim-server db:seed"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "next": "^15.0.0"
   },
   "engines": {
     "bun": ">=1.0.0"
