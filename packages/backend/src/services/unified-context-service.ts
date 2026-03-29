@@ -34,6 +34,8 @@ export class UnifiedContextService {
   private dynamicAssembler: DynamicContextAssembler | null = null;
   private librarianWorker: LibrarianWorker | null = null;
   private bundleCompiler: BundleCompiler | null = null;
+  private requestCounter = 0;
+  private parityLogCount = parseInt(process.env.PARITY_LOG_EVERY_N || '10', 10);
 
   constructor(config: UnifiedContextServiceConfig = {}) {
     this.config = {
@@ -183,6 +185,12 @@ export class UnifiedContextService {
           parallelFactor: 1,
           errors: [],
         });
+
+        // Parity verification: log every Nth request to compare engines
+        this.requestCounter++;
+        if (this.requestCounter % this.parityLogCount === 0 && this.config.fallbackOnError) {
+          this.logParityReport(result, options, conversationId);
+        }
 
         return {
           systemPrompt: result.systemPrompt,
@@ -395,6 +403,35 @@ export class UnifiedContextService {
         contextBundles: bundleCount,
       },
     };
+  }
+
+  private async logParityReport(newResult: any, options: any, conversationId: string): Promise<void> {
+    try {
+      const oldResult = await oldContextGenerator.getContextForChat(conversationId, options);
+      
+      const newTokens = newResult.budget?.totalUsed || 0;
+      const oldTokens = oldResult.layers?.totalUsed || 0;
+      const tokenDiff = Math.abs(newTokens - oldTokens);
+      const tokenDiffPct = oldTokens > 0 ? (tokenDiff / oldTokens) * 100 : 0;
+
+      const newBundles = newResult.bundlesUsed?.length || 0;
+      const oldBundles = oldResult.bundlesUsed?.length || 0;
+
+      logger.info(
+        {
+          conversationId,
+          requestNumber: this.requestCounter,
+          newEngine: { tokens: newTokens, bundles: newBundles },
+          oldEngine: { tokens: oldTokens, bundles: oldBundles },
+          tokenDifference: tokenDiff,
+          tokenDiffPercent: tokenDiffPct.toFixed(2),
+          bundlesMatch: newBundles === oldBundles,
+        },
+        'CONTEXT PARITY REPORT'
+      );
+    } catch (error) {
+      logger.debug({ error: (error as Error).message }, 'Parity comparison failed');
+    }
   }
 }
 

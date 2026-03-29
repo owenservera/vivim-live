@@ -4,6 +4,50 @@ import { logger } from '../lib/logger.js';
 
 const router = Router();
 
+const DEFAULT_RECIPES = [
+  {
+    id: 'standard_default',
+    name: 'Standard',
+    description: 'Balanced context for general use',
+    layerWeights: { identity_core: 1.0, global_prefs: 1.0, topic: 1.0, entity: 1.0, conversation: 1.0 },
+    excludedLayers: [],
+    customBudget: 12000,
+    isDefault: true,
+  },
+  {
+    id: 'research_deep',
+    name: 'Deep Research',
+    description: 'Maximize topic/entity context for research',
+    layerWeights: { identity_core: 0.5, topic: 1.5, entity: 1.5, conversation: 0.5, global_prefs: 0.8 },
+    excludedLayers: [],
+    customBudget: 20000,
+    isDefault: true,
+  },
+  {
+    id: 'creative_flexible',
+    name: 'Creative',
+    description: 'Flexible context for creative work',
+    layerWeights: { identity_core: 1.2, global_prefs: 1.2, topic: 0.8, entity: 0.8, conversation: 1.0 },
+    excludedLayers: [],
+    customBudget: 15000,
+    isDefault: true,
+  },
+];
+
+async function seedDefaultRecipes() {
+  const prisma = getPrismaClient();
+  for (const recipe of DEFAULT_RECIPES) {
+    await prisma.contextRecipe.upsert({
+      where: { id: recipe.id },
+      update: {},
+      create: recipe,
+    });
+  }
+  logger.info('Default context recipes seeded');
+}
+
+seedDefaultRecipes();
+
 // Middleware to extract user ID (assuming standard auth or passing in headers for now)
 const authenticate = (req, res, next) => {
   const userId = req.headers['x-user-id'] || req.query.userId || req.body.userId;

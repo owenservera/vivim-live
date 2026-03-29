@@ -9,10 +9,14 @@ interface ChatProviderProps {
   threadId?: string;
 }
 
-/**
- * Generate a simple browser fingerprint for anonymous user identification
- */
-function generateFingerprint(): string {
+const FINGERPRINT_KEY = "vivim_user_fp";
+
+function getFingerprint(): string {
+  try {
+    const stored = localStorage.getItem(FINGERPRINT_KEY);
+    if (stored) return stored;
+  } catch {}
+  
   const nav = typeof navigator !== "undefined" ? navigator : {} as any;
   const components = [
     nav.userAgent || "unknown",
@@ -22,7 +26,6 @@ function generateFingerprint(): string {
     typeof window !== "undefined" ? new Date().getTimezoneOffset() : "unknown",
   ];
   
-  // Simple hash
   const str = components.join("|");
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -30,19 +33,23 @@ function generateFingerprint(): string {
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash;
   }
-  return `fp_${Math.abs(hash).toString(36)}`;
+  const fp = `fp_${Math.abs(hash).toString(36)}`;
+  
+  try {
+    localStorage.setItem(FINGERPRINT_KEY, fp);
+  } catch {}
+  
+  return fp;
 }
 
 export function ChatProvider({ children, threadId }: ChatProviderProps) {
   const [userId, setUserId] = useState<string>("anonymous");
   const [conversationId, setConversationId] = useState<string>(threadId || "new-chat");
 
-  // Generate fingerprint on mount
   useEffect(() => {
-    const fp = generateFingerprint();
+    const fp = getFingerprint();
     setUserId(fp);
     
-    // Generate conversation ID if not provided
     if (!threadId) {
       setConversationId(`conv_${Date.now()}_${fp.slice(-6)}`);
     }
@@ -107,9 +114,7 @@ export function ChatProvider({ children, threadId }: ChatProviderProps) {
         throw new Error(`Chat API error: ${response.status} - ${errorText.substring(0, 200)}`);
       }
 
-      // Get context engine info from headers
-      const contextEngine = response.headers.get("x-context-engine") || "unknown";
-      console.log(`[chat] Context engine: ${contextEngine}`);
+      response.headers.get("x-context-engine");
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No response body");

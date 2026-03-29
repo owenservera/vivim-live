@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Lock } from 'lucide-react';
+import { CheckCircle2, Lock, Loader2 } from 'lucide-react';
 import { calculateContextBudget } from '@/demo-engine/contextBudgetCalculator';
 import { BudgetConfig, BudgetResult } from '@/types/demo';
 
@@ -15,11 +15,19 @@ const BASE_LAYERS = [
   { id: 'L7', label: 'Your Message',      color: '#F1F5F9', tokens: 280,  max: 500, locked: true  },
 ];
 
-interface EnhancedBudgetControlsProps {
-  onBudgetChange?: (result: BudgetResult) => void;
+interface ContextRecipe {
+  id: string;
+  name: string;
+  description?: string;
+  layerWeights?: Record<string, number>;
 }
 
-export function EnhancedBudgetControls({ onBudgetChange }: EnhancedBudgetControlsProps) {
+interface EnhancedBudgetControlsProps {
+  onBudgetChange?: (result: BudgetResult) => void;
+  userId?: string;
+}
+
+export function EnhancedBudgetControls({ onBudgetChange, userId }: EnhancedBudgetControlsProps) {
   const [budgets, setBudgets] = useState<Record<string, number>>(
     Object.fromEntries(BASE_LAYERS.map((l) => [l.id, l.tokens]))
   );
@@ -33,6 +41,44 @@ export function EnhancedBudgetControls({ onBudgetChange }: EnhancedBudgetControl
   });
 
   const [budgetResult, setBudgetResult] = useState<BudgetResult | null>(null);
+  const [recipes, setRecipes] = useState<ContextRecipe[]>([]);
+  const [selectedRecipe, setSelectedRecipe] = useState<string>('default');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchRecipes() {
+      if (!userId) return;
+      try {
+        const res = await fetch(`/api/v2/context-recipes?userId=${userId}`);
+        const data = await res.json();
+        if (data.recipes) {
+          setRecipes(data.recipes);
+          const defaultRecipe = data.recipes.find((r: ContextRecipe) => r.name === 'Standard');
+          if (defaultRecipe) setSelectedRecipe(defaultRecipe.id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch recipes:', err);
+      }
+    }
+    fetchRecipes();
+  }, [userId]);
+
+  const handleRecipeChange = async (recipeId: string) => {
+    if (!userId) return;
+    setLoading(true);
+    setSelectedRecipe(recipeId);
+    try {
+      await fetch(`/api/v2/context-recipes/${recipeId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+    } catch (err) {
+      console.error('Failed to save recipe:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const config: BudgetConfig = {
@@ -157,6 +203,29 @@ export function EnhancedBudgetControls({ onBudgetChange }: EnhancedBudgetControl
             ))}
           </div>
         </div>
+
+        {recipes.length > 0 && (
+          <div>
+            <h4 className="text-sm font-semibold text-white mb-2">Context Recipe</h4>
+            <div className="relative">
+              <select
+                value={selectedRecipe}
+                onChange={(e) => handleRecipeChange(e.target.value)}
+                disabled={loading}
+                className="w-full py-2 px-3 rounded-lg bg-slate-800/40 border border-white/5 text-sm text-white appearance-none focus:outline-none focus:ring-2 focus:ring-violet-500/50 disabled:opacity-50"
+              >
+                {recipes.map((recipe) => (
+                  <option key={recipe.id} value={recipe.id}>
+                    {recipe.name}
+                  </option>
+                ))}
+              </select>
+              {loading && (
+                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-violet-400" />
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">

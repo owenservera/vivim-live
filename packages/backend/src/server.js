@@ -23,7 +23,7 @@ import cookieParser from 'cookie-parser';
 import './lib/sentry.js';
 
 import { logger } from './lib/logger.js';
-import { config, validateConfig } from './config/index.js';
+import { config, validateConfig, getDynamicOrigins } from './config/index.js';
 import terminalIntelligence from './lib/terminal-intelligence.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { csrfProtection, setCsrfCookie, isStatelessPath } from './middleware/csrf.js';
@@ -135,53 +135,27 @@ app.use(
 
 // CORS - Cross-Origin Resource Sharing (Enhanced Security)
 // Use configured origins only - never allow all origins in production
+const allowedOrigins = getDynamicOrigins();
+
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
-    // But in production, require proper CORS headers
     if (!origin) {
       return callback(null, true);
     }
 
-    const allowedOrigins = config.isDevelopment
-      ? [
-          'http://localhost:5173',
-          'http://localhost:3000',
-          'http://127.0.0.1:5173',
-          'http://127.0.0.1:3000',
-          'http://0.0.0.0:5173',
-          'http://192.168.0.173:5173',
-          'http://192.168.0.173:3000',
-        ]
-      : config.corsOrigins || [];
-
-    // In development, also allow local network origins
-    let effectiveAllowedOrigins = [...allowedOrigins];
-    if (config.isDevelopment) {
-      effectiveAllowedOrigins = [
-        ...allowedOrigins,
-        // Dynamically add any local network origin
-      ];
-    }
-
-    if (effectiveAllowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else if (config.isDevelopment) {
-      // In development, allow localhost and private network patterns
-      const isLocalNetwork =
-        origin.startsWith('http://localhost:') ||
-        origin.startsWith('http://127.0.0.1:') ||
-        origin.startsWith('http://192.168.') ||
-        origin.startsWith('http://10.') ||
-        origin.startsWith('http://172.');
-
-      if (isLocalNetwork) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
+    // Check against dynamic origins (regex patterns in dev, explicit strings in prod)
+    const isAllowed = allowedOrigins.some((o) => {
+      if (typeof o === 'string') {
+        return o === origin;
       }
+      // Regex pattern matching for dev environment
+      return o.test(origin);
+    });
+
+    if (isAllowed) {
+      callback(null, true);
     } else {
-      // Production: only allow explicitly configured origins
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -198,6 +172,15 @@ const corsOptions = {
     'x-user-id',
   ],
 };
+
+// Validate production has specific origins (not just patterns)
+if (config.isProduction) {
+  const hasExplicitOrigins = allowedOrigins.some((o) => typeof o === 'string');
+  if (!hasExplicitOrigins) {
+    logger.error('Production requires explicit CORS origins, not patterns');
+    process.exit(1);
+  }
+}
 
 app.use(cors(corsOptions));
 
@@ -220,81 +203,6 @@ app.use((req, res, next) => {
     return next();
   }
   return setCsrfCookie(req, res, next);
-});
-
-// Custom CORS middleware for additional logging and headers
-const allowedOrigins = config.isDevelopment
-  ? [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:3000',
-      'http://0.0.0.0:5173',
-      'http://192.168.0.173:5173', // PWA on local IP
-      'http://192.168.0.173:3000', // Server on local IP
-    ]
-  : config.corsOrigins || []; // Use configured origins, default to empty array if none provided
-
-// Validate that production environments have specific origins configured
-if (config.isProduction && allowedOrigins.length === 0) {
-  logger.error('Production environment requires specific CORS origins to be configured');
-  process.exit(1);
-}
-
-app.use((req, res, next) => {
-  const origin = req.get('Origin');
-
-  // Logic to allow origins:
-  // 1. Explicitly allowed in allowedOrigins list
-  // 2. In development, any origin that matches the local network pattern (e.g., 192.168.x.x)
-  let isAllowed = false;
-  if (origin) {
-    if (allowedOrigins.includes(origin)) {
-      isAllowed = true;
-    } else if (config.isDevelopment) {
-      // Allow any local network origin in development for easier testing across devices
-      const isLocalNetwork =
-        origin.startsWith('http://localhost:') ||
-        origin.startsWith('http://127.0.0.1:') ||
-        origin.startsWith('http://192.168.') ||
-        origin.startsWith('http://10.') ||
-        origin.startsWith('http://172.');
-
-      if (isLocalNetwork) {
-        isAllowed = true;
-      }
-    }
-  }
-
-  if (isAllowed && origin) {
-    res.header('Access-Control-Allow-Origin', origin);
-  } else if (config.isDevelopment && !origin) {
-    // Non-browser requests in development
-    res.header('Access-Control-Allow-Origin', '*');
-  }
-
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, X-Request-ID, X-Requested-With, X-API-Key, Accept, Cache-Control'
-  );
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  if (req.method === 'OPTIONS') {
-    if (config.isDevelopment) {
-      console.log(
-        `🔧 [CORS PRE-FLIGHT] ${req.method} ${req.path} - Origin: ${origin || 'none'} - Result: ${isAllowed ? '✅ ALLOWED' : '❌ BLOCKED'}`
-      );
-    }
-    return res.status(200).end();
-  }
-
-  // Log CORS info for non-OPTIONS requests too in development
-  if (origin && config.isDevelopment && !isAllowed) {
-    console.log(`🌐 [CORS BLOCKED] Request from: ${origin} - Path: ${req.path}`);
-  }
-
-  next();
 });
 
 // Compression - Gzip response bodies
@@ -529,21 +437,26 @@ const server = app.listen(config.port, '0.0.0.0', () => {
 });
 
 // ============================================================================
-// SOCKET SERVICE (Data Sync + Signaling)
+// SOCKET SERVICE (Data Sync + Signaling) - OPTIONAL
 // ============================================================================
-// import { socketService } from './services/socket.ts';
+// Socket.IO is NOT required for core chat functionality.
+// It's only used for: real-time sync, P2P signaling, entity broadcasting.
+// Chat streaming uses HTTP SSE (text/event-stream), not WebSockets.
+//
+// To enable Socket.IO (requires socket.io package):
+// import { socketService } from './services/socket.js';
 // socketService.initialize(server);
 // logger.info('🔌 Socket service ready for Data Sync & P2P');
 
 // ============================================================================
 // ENHANCED CONTEXT SYSTEM BOOT
 // ============================================================================
-// Boot the enhanced dynamic context engine after HTTP + Socket are ready
-// bootContextSystem().then(() => {
-//   logger.info('🧠 Context system boot complete');
-// }).catch((err) => {
-//   logger.error({ error: err.message }, 'Context system boot error');
-// });
+// Boot the enhanced dynamic context engine after HTTP server is ready
+bootContextSystem().then(() => {
+  logger.info('🧠 Context system boot complete');
+}).catch((err) => {
+  logger.error({ error: err.message }, 'Context system boot error');
+});
 
 // ============================================================================
 // ADMIN WEBSOCKET SERVICE

@@ -163,4 +163,32 @@ export function validateConfig() {
   return true;
 }
 
+// ============================================================================
+// DYNAMIC CORS ORIGINS
+// ============================================================================
+
+/**
+ * Generates allowed CORS origins based on environment.
+ * Development: Allows localhost, 127.0.0.1, and private network ranges
+ * Production: Only uses explicit CORS_ORIGINS env var
+ */
+export function getDynamicOrigins() {
+  const baseOrigins = config.corsOrigins || [];
+  
+  if (config.nodeEnv === 'development') {
+    // Development: Allow localhost, 127.0.0.1, and private network ranges
+    return [
+      ...baseOrigins,
+      /^http:\/\/localhost:\d+$/,
+      /^http:\/\/127\.0\.0\.1:\d+$/,
+      /^http:\/\/192\.168\.\d+\.\d+:\d+$/,
+      /^http:\/\/10\.\d+\.\d+\.\d+:\d+$/,
+      /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+:\d+$/,
+    ];
+  }
+  
+  // Production: Only use explicitly configured origins
+  return baseOrigins;
+}
+
 export default config;

@@ -190,6 +190,17 @@ export interface PredictedInteraction {
 // ASSEMBLY RESULT TYPES
 // ============================================================================
 
+export interface ContextTrace {
+  layer: string;
+  includedItems: string[];
+  evictedItems: Array<{
+    id: string;
+    reason: 'budget' | 'entropy' | 'relevance' | 'threshold';
+  }>;
+  tokensRequested: number;
+  tokensAllocated: number;
+}
+
 export interface AssembledContext {
   /** The final system prompt with all context layers */
   systemPrompt: string;
@@ -215,6 +226,10 @@ export interface AssembledContext {
       totalTokens: number;
       hasConversation: boolean;
     };
+    avatarState?: 'STRANGER' | 'ACQUAINTANCE' | 'FAMILIAR' | 'KNOWN';
+    confidenceScore?: number;
+    mode?: string;
+    traces?: ContextTrace[];
   };
 }
 

@@ -17,6 +17,7 @@ import { ZAILLMService, ZAIEmbeddingService, createEmbeddingService } from './ut
 import { logger } from '../lib/logger.js';
 import type { TopicProfile, EntityProfile, AtomicChatUnit } from '@prisma/client';
 import { getContextEventBus } from './index.js';
+import { identityScoringService } from '../services/identity-scoring-service.js';
 
 const prisma = getPrismaClient();
 const eventBus = getContextEventBus();
@@ -112,6 +113,12 @@ export class LibrarianWorker {
       // Step 5: Mark ACUs as processed
       await this.markACUsProcessed(userId, analyses);
 
+      // Step 6: Log operations to LibrarianLog for observability
+      await this.logOperations(userId, result);
+
+      // Step 7: Detect identity signals and recalculate confidence score
+      await this.detectIdentitySignals(userId, analyses);
+
       this.lastRunTime = new Date();
 
       logger.info(
@@ -179,13 +186,18 @@ export class LibrarianWorker {
       return String(acu.content || '');
     };
 
-    const contentBatch = acus.map((a) => contents(a)).join('\n---\n');
+    const contentBatch =acus.map((a) => contents(a)).join('\n---\n');
 
     const prompt = `You are the GLMT-4.7 Autonomous Librarian. Analyze the following Atomic Chat Units (ACUs) and extract:
 
 1. **Topics**: recurring themes or subjects (e.g., "rust-lang", "react-hooks", "database-design")
 2. **Entities**: people, places, products, or organizations mentioned with facts about them
-3. **Identity Insights**: patterns about the user's preferences, expertise level, or working style
+3. **Identity Insights**: STRICTLY focus on PERSONAL FACTS that confirm user identity:
+   - "I am a..." / "I work as..." / "My name is..."
+   - "I live in..." / "I prefer..." / "At my company..."
+   - "My wife/husband..." / "My friend..." / personal relationships
+   - Professional: role, company, team, projects
+   - Skills: "I know how to...", "I'm expert in...", "I use..."
 
 ACUs to analyze:
 ${contentBatch}
@@ -196,12 +208,16 @@ Respond with a JSON array of analyses, one per ACU:
     "acuId": "...",
     "suggestedTopics": ["topic1", "topic2"],
     "suggestedEntities": [{"name": "...", "type": "person|product|organization|place", "facts": ["fact1", "fact2"]}],
-    "identityInsights": ["insight1", "insight2"],
+    "identityInsights": [{"type": "personal_fact|professional|relationship|preference", "content": "...", "confidence": 0.0-1.0}],
     "confidence": 0.0-1.0
   }
 ]
 
-Only include topics with confidence > 0.7.`;
+IMPORTANT for identity scoring:
+- Extract EVERY mention of personal facts (name, location, job, family)
+- Identity facts have HIGH value for the contextual signal (S_c)
+- Confidence 0.0-1.0 for each identity insight
+- Only include topics with confidence > 0.7.`;
 
     try {
       const response = await this.config.llmService.chat({
@@ -649,6 +665,94 @@ Only include topics with confidence > 0.7.`;
       identityUpdates: 0,
       bundlesMarkedDirty: 0,
     };
+  }
+
+  private async logOperations(userId: string, result: GraphSynthesisResult): Promise<void> {
+    try {
+      const logs = [];
+
+      if (result.topicsCreated > 0) {
+        logs.push({
+          userId,
+          operation: 'topic_created',
+          details: { count: result.topicsCreated },
+          status: 'success',
+        });
+      }
+
+      if (result.topicsUpdated > 0) {
+        logs.push({
+          userId,
+          operation: 'topic_updated',
+          details: { count: result.topicsUpdated },
+          status: 'success',
+        });
+      }
+
+      if (result.entitiesCreated > 0) {
+        logs.push({
+          userId,
+          operation: 'entity_created',
+          details: { count: result.entitiesCreated },
+          status: 'success',
+        });
+      }
+
+      if (result.entitiesUpdated > 0) {
+        logs.push({
+          userId,
+          operation: 'entity_updated',
+          details: { count: result.entitiesUpdated },
+          status: 'success',
+        });
+      }
+
+      if (result.identityUpdates > 0) {
+        logs.push({
+          userId,
+          operation: 'identity_updated',
+          details: { count: result.identityUpdates },
+          status: 'success',
+        });
+      }
+
+      for (const log of logs) {
+        await prisma.librarianLog.create({ data: log });
+      }
+    } catch (error) {
+      logger.debug({ error: (error as Error).message }, 'Failed to log librarian operations');
+    }
+  }
+
+  private async detectIdentitySignals(userId: string, analyses: ACUAnalysis[]): Promise<void> {
+    try {
+      const identityInsights = analyses
+        .flatMap((a) => a.identityInsights)
+        .filter((i) => i.length > 0);
+
+      if (identityInsights.length === 0) {
+        return;
+      }
+
+      const result = await identityScoringService.calculateScore(userId);
+
+      logger.info(
+        {
+          userId,
+          ics: result.ics,
+          state: result.state,
+          signals: result.signals,
+          promotionNeeded: result.promotionNeeded,
+        },
+        'Identity scoring updated'
+      );
+
+      if (result.promotionNeeded) {
+        logger.info({ userId, state: result.state }, 'User eligible for identity promotion');
+      }
+    } catch (error) {
+      logger.debug({ error: (error as Error).message }, 'Failed to detect identity signals');
+    }
   }
 
   /**

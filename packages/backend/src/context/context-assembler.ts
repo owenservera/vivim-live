@@ -5,6 +5,7 @@ import type {
   BudgetInput,
   CompiledBundle,
   ComputedBudget,
+  ContextTrace,
   DetectedContext,
   DetectedEntity,
   DetectedTopic,
@@ -76,6 +77,38 @@ export class DynamicContextAssembler {
     this.hybridRetrieval = new HybridRetrievalService(config.prisma);
   }
 
+  private async assembleStrangerMode(params: AssemblyParams, startTime: number): Promise<AssembledContext> {
+    const assemblyTimeMs = Date.now() - startTime;
+    const vivimIdentity = getVIVIMSystemPrompt();
+
+    const result: AssembledContext = {
+      systemPrompt: vivimIdentity,
+      budget: {
+        layers: {
+          identity_core: { layer: 'identity_core', minTokens: 0, idealTokens: 0, maxTokens: 0, priority: 0, allocated: 0, elasticity: 0 },
+          global_prefs: { layer: 'global_prefs', minTokens: 0, idealTokens: 0, maxTokens: 0, priority: 0, allocated: 0, elasticity: 0 },
+        },
+        totalAvailable: 2000,
+        totalUsed: this.tokenEstimator.estimateTokens(vivimIdentity, params.modelId),
+      },
+      bundlesUsed: [],
+      metadata: {
+        assemblyTimeMs,
+        detectedTopics: 0,
+        detectedEntities: 0,
+        cacheHitRate: 0,
+        conversationStats: { messageCount: 0, totalTokens: 0, hasConversation: false },
+        avatarState: 'STRANGER',
+        confidenceScore: 0,
+        mode: 'STRANGER_SAFE',
+        traces: [],
+      },
+    };
+
+    logger.info({ virtualUserId: params.virtualUserId }, 'STRANGER mode: minimal context delivered');
+    return result;
+  }
+
   async assemble(params: AssemblyParams): Promise<AssembledContext> {
     const startTime = Date.now();
 
@@ -86,10 +119,20 @@ export class DynamicContextAssembler {
       return cached;
     }
 
-    // Load Context Recipe if provided or use default
+    const vu = await this.prisma.virtualUser.findUnique({
+      where: { id: params.virtualUserId },
+      select: { currentAvatar: true, confidenceScore: true },
+    });
+
+    const avatar = vu?.currentAvatar || 'STRANGER';
+    const confidence = vu?.confidenceScore || 0;
+
+    if (avatar === 'STRANGER') {
+      return this.assembleStrangerMode(params, startTime);
+    }
+
     const recipe = await this.loadRecipe(params.virtualUserId, params.recipeId);
 
-    // Fetch conversation stats if conversationId provided
     let conversationStats = {
       messageCount: 0,
       totalTokens: 0,
@@ -107,7 +150,6 @@ export class DynamicContextAssembler {
           conversationStats.totalTokens = conv.totalTokens || 0;
         }
       } catch (e) {
-        // Conversation might not exist, continue with defaults
         conversationStats.hasConversation = false;
       }
     }
@@ -120,13 +162,16 @@ export class DynamicContextAssembler {
       params.conversationId
     );
 
+    const budgetMultiplier = avatar === 'KNOWN' ? 1.0 : avatar === 'FAMILIAR' ? 0.8 : 0.6;
+
     const [bundles, jitKnowledge] = await Promise.all([
-      this.gatherBundles(params.virtualUserId, detectedContext, params.conversationId, params.personaId, recipe),
+      this.gatherBundles(params.virtualUserId, detectedContext, params.conversationId, params.personaId, recipe, avatar),
       this.justInTimeRetrieval(
         params.virtualUserId,
         params.userMessage,
         messageEmbedding,
-        detectedContext
+        detectedContext,
+        avatar
       ),
     ]);
 
@@ -136,9 +181,10 @@ export class DynamicContextAssembler {
       params,
       conversationStats,
       detectedContext,
-      recipe
+      recipe,
+      budgetMultiplier
     );
-    const systemPrompt = this.compilePrompt(bundles, jitKnowledge, budget, params.modelId);
+    const systemPrompt = this.compilePrompt(bundles, jitKnowledge, budget, params.modelId, avatar);
 
     const assemblyTimeMs = Date.now() - startTime;
 
@@ -154,6 +200,8 @@ export class DynamicContextAssembler {
         detectedEntities: detectedContext.entities.length,
         cacheHitRate: this.calculateCacheHitRate(bundles),
         conversationStats,
+        avatarState: avatar,
+        confidenceScore: confidence,
         bundlesInfo: bundles.map(b => ({
           id: b.id,
           type: b.bundleType,
@@ -161,6 +209,7 @@ export class DynamicContextAssembler {
           tokenCount: b.tokenCount,
           snippet: b.compiledPrompt.substring(0, 150) + (b.compiledPrompt.length > 150 ? '...' : '')
         })),
+        traces: this.generateTraces(bundles, jitKnowledge, budget, detectedContext),
       },
     };
 
@@ -320,7 +369,8 @@ export class DynamicContextAssembler {
     context: DetectedContext,
     conversationId: string,
     personaId?: string,
-    recipe?: any
+    recipe?: any,
+    avatar: string = 'STRANGER'
   ): Promise<CompiledBundle[]> {
     const normalizedPersonaId = personaId === undefined ? null : personaId;
     const tasks: Promise<CompiledBundle | null>[] = [];
@@ -667,6 +717,70 @@ private computeBudget(
   private calculateCacheHitRate(bundles: CompiledBundle[]): number {
     if (bundles.length === 0) return 0;
     return bundles.filter((b) => !b.isDirty).length / bundles.length;
+  }
+
+  private generateTraces(
+    bundles: CompiledBundle[],
+    jit: JITKnowledge,
+    budget: ComputedBudget,
+    detected: DetectedContext
+  ): ContextTrace[] {
+    const traces: ContextTrace[] = [];
+    const layerMap = budget.layers;
+
+    for (const [layer, layerBudget] of Object.entries(layerMap)) {
+      const includedItems: string[] = [];
+      const evictedItems: Array<{ id: string; reason: ContextTrace['evictedItems'][0]['reason'] }> = [];
+
+      const layerBundle = bundles.find(b => b.bundleType === layer);
+      if (layerBundle) {
+        includedItems.push(layerBundle.id);
+      }
+
+      if (layerBudget.allocated < layerBudget.idealTokens) {
+        evictedItems.push({
+          id: `${layer}-budget-cap`,
+          reason: 'budget'
+        });
+      }
+
+      if (layer === 'topic' && detected.topics.length > 3) {
+        const excluded = detected.topics.slice(3);
+        evictedItems.push(...excluded.map(t => ({
+          id: t.profileId,
+          reason: 'threshold' as const
+        })));
+      }
+
+      if (layer === 'entity' && detected.entities.length > 2) {
+        const excluded = detected.entities.slice(2);
+        evictedItems.push(...excluded.map(e => ({
+          id: e.id,
+          reason: 'threshold' as const
+        })));
+      }
+
+      if (layer === 'jit') {
+        const maxAcuTokens = layerBudget.allocated * 0.6;
+        const acuCount = jit.acus.length;
+        if (acuCount > 10) {
+          evictedItems.push({
+            id: 'acu-overflow',
+            reason: 'budget'
+          });
+        }
+      }
+
+      traces.push({
+        layer,
+        includedItems,
+        evictedItems,
+        tokensRequested: layerBudget.idealTokens,
+        tokensAllocated: layerBudget.allocated,
+      });
+    }
+
+    return traces;
   }
 
   private async recordCacheMiss(bundleType: string, referenceId: string): Promise<void> {

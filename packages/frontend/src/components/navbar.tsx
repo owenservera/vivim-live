@@ -1,6 +1,31 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+
+function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
+  let lastCall = 0;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  
+  return ((...args: unknown[]) => {
+    const now = Date.now();
+    const remaining = delay - (now - lastCall);
+    
+    if (remaining <= 0) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+      lastCall = now;
+      fn(...args);
+    } else if (!timeoutId) {
+      timeoutId = setTimeout(() => {
+        lastCall = Date.now();
+        timeoutId = null;
+        fn(...args);
+      }, remaining);
+    }
+  }) as T;
+}
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Github, Menu, X, BookOpen, Cpu, Brain, Lock, History, Network, Users, Zap } from "lucide-react";
@@ -298,10 +323,11 @@ export function Navbar() {
       setActiveSection(currentSection);
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    const throttledScroll = throttle(handleScroll, 16);
+    window.addEventListener("scroll", throttledScroll, { passive: true });
     handleScroll();
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", throttledScroll);
   }, [sections]);
 
   return (

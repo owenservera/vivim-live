@@ -1024,6 +1024,20 @@ model MemoryAnalytics {
   @@map("memory_analytics")
 }
 
+// Librarian worker logs for observability
+model LibrarianLog {
+  id          String   @id @default(uuid())
+  userId      String
+  timestamp   DateTime @default(now()) @db.Timestamptz(6)
+  operation   String   // "topic_created", "topic_updated", "entity_created", "entity_updated", "memory_merged", "identity_updated"
+  details     Json     // { topicSlug, entityName, memoryIds, confidence, etc. }
+  status      String   // "success", "partial", "failed"
+  errorMessage String?
+  
+  @@index([userId, timestamp])
+  @@map("librarian_logs")
+}
+
 model UserContextSettings {
   id                        String   @id @default(uuid())
   virtualUserId             String   @unique

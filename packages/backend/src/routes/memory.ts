@@ -616,4 +616,40 @@ router.get('/types', (req: Request, res: Response) => {
   });
 });
 
+// GET /api/v2/memories/consolidations - Get Librarian consolidation logs
+router.get('/consolidations', async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers['x-user-id'] as string;
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 100);
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'User ID required' });
+    }
+
+    const logs = await prisma.librarianLog.findMany({
+      where: { userId },
+      orderBy: { timestamp: 'desc' },
+      take: limit,
+      skip: offset,
+    });
+
+    const total = await prisma.librarianLog.count({ where: { userId } });
+
+    res.json({
+      success: true,
+      consolidations: logs,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + logs.length < total,
+      },
+    });
+  } catch (error) {
+    log.error({ error: (error as Error).message }, 'Failed to fetch consolidations');
+    res.status(500).json({ success: false, error: 'Failed to fetch consolidations' });
+  }
+});
+
 export default router;
