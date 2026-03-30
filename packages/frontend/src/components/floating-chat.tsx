@@ -84,7 +84,7 @@ export function FloatingChat() {
                     if (lastMsg?.role === "assistant") {
                       lastMsg.content = assistantMessage;
                     } else {
-                      newMessages.push({ role: "assistant", content: assistantMessage });
+                      newMessages.push({ id: createMessageId(), role: "assistant", content: assistantMessage });
                     }
                     return newMessages;
                   });
@@ -99,7 +99,7 @@ export function FloatingChat() {
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: `Sorry, I encountered an error. Please try again.` },
+        { id: createMessageId(), role: "assistant", content: `Sorry, I encountered an error. Please try again.` },
       ]);
     } finally {
       setIsLoading(false);
