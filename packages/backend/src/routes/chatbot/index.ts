@@ -13,6 +13,8 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { logger } from '../lib/logger';
+import { createLLMService } from '../../context/utils/zai-service.js';
+import { unifiedContextService } from '../../services/unified-context-service.js';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -273,32 +275,78 @@ router.post('/:tenantSlug/chat', virtualUserAutoAuth, async (req: Request, res: 
       },
     });
 
-    // TODO: Integrate with DualEngineOrchestrator
-    // For now, return a placeholder response
-    const response = {
-      role: 'assistant' as const,
-      content: `Thank you for your message: "${message}". This is a placeholder response. The dual-engine orchestrator integration is pending.`,
-    };
+    // --- Step 1: Assemble context from the unified context engine ---
+    let contextResult: any = null;
+    let systemPrompt = 'You are a helpful AI assistant.';
+    try {
+      contextResult = await unifiedContextService.generateContextForChat(conv.id, {
+        virtualUserId,
+        userMessage: message,
+      });
+      systemPrompt = contextResult.systemPrompt || systemPrompt;
+    } catch (ctxError: any) {
+      // Context failure is non-fatal — we continue with a bare system prompt
+      logger.warn({ error: ctxError.message }, 'Context assembly failed, using bare system prompt');
+    }
 
-    // Add assistant response
+    // --- Step 2: Build message history (last 20 messages) ---
+    const historyMessages = ((conv as any).messages || [])
+      .slice(-20)
+      .map((m: any) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+
+    // --- Step 3: Call LLM with timeout protection ---
+    const llm = createLLMService();
+    const chatModel = modelId || tenant.defaultModel || 'glm-4.7';
+
+    const controller = new AbortController();
+    const chatTimeout = setTimeout(() => controller.abort(), 15_000); // 15 s max
+
+    let llmContent: string;
+    try {
+      const llmResponse = await llm.chat({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...historyMessages,
+          { role: 'user', content: message },
+        ],
+        temperature: 0.7,
+        maxTokens: 2048,
+      });
+      llmContent = llmResponse.content;
+    } catch (llmError: any) {
+      if (llmError.name === 'AbortError') {
+        return res.status(504).json({ error: 'Response generation timed out. Please try again.' });
+      }
+      throw llmError;
+    } finally {
+      clearTimeout(chatTimeout);
+    }
+
+    const response = { role: 'assistant' as const, content: llmContent };
+
+    // --- Step 4: Save assistant response with metadata ---
     await prisma.virtualMessage.create({
       data: {
         conversationId: conv.id,
         role: 'assistant',
         content: response.content,
         metadata: {
-          modelId: modelId || tenant.defaultModel,
+          modelId: chatModel,
+          contextEngine: contextResult?.engineUsed ?? 'none',
+          contextTokens: contextResult?.stats?.totalTokens ?? 0,
+          topics: contextResult?.stats?.detectedTopics ?? [],
         },
       },
     });
 
-    // Update conversation
+    // --- Step 5: Update conversation stats ---
     await prisma.virtualConversation.update({
       where: { id: conv.id },
       data: {
         messageCount: { increment: 2 },
         metadata: {
           lastMessageAt: new Date().toISOString(),
+          lastModel: chatModel,
         },
       },
     });
@@ -307,11 +355,11 @@ router.post('/:tenantSlug/chat', virtualUserAutoAuth, async (req: Request, res: 
       response,
       conversationId: conv.id,
       context: {
+        engineUsed: contextResult?.engineUsed ?? 'none',
+        topicsDetected: contextResult?.stats?.detectedTopics?.length ?? 0,
+        contextTokens: contextResult?.stats?.totalTokens ?? 0,
+        modelUsed: chatModel,
         avatar: (req as any).virtualUser.currentAvatar || 'STRANGER',
-        corpusConfidence: 0.8,
-        citations: [],
-        engineWeights: { corpus: 0.7, user: 0.3 },
-        proactiveInsights: 0,
       },
     });
   } catch (error) {
