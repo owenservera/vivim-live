@@ -6,12 +6,12 @@ const router = Router();
 
 const DEFAULT_RECIPES = [
   {
-    id: 'standard_default',
-    name: 'Standard',
-    description: 'Balanced context for general use',
-    layerWeights: { identity_core: 1.0, global_prefs: 1.0, topic: 1.0, entity: 1.0, conversation: 1.0 },
-    excludedLayers: [],
-    customBudget: 12000,
+    id: 'vivim_default',
+    name: 'Present VIVIM',
+    description: 'Default recipe for demos - presents VIVIM until a virtual user is confidently identified',
+    layerWeights: {},
+    excludedLayers: ['identity_core', 'global_prefs', 'topic', 'entity', 'conversation'],
+    customBudget: 4000,
     isDefault: true,
   },
   {

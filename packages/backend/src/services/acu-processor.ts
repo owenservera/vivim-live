@@ -17,7 +17,7 @@
 
 import { getPrismaClient } from '../lib/database.js';
 import { logger } from '../lib/logger.js';
-import { decomposeConversation, type ConversationMessage } from './acu-decomposer.js';
+import { decomposeConversation, type ConversationMessage } from './acu-decomposer';
 
 // ---------------------------------------------------------------------------
 // Main export: processConversationToACUs

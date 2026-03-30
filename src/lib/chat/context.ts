@@ -96,8 +96,15 @@ export async function searchDocsCorpus(query: string): Promise<string[]> {
 /**
  * Build system prompt from dual context
  */
-export function buildSystemPrompt(context: DualContext): string {
-  const { user, docs } = context;
+export function buildSystemPrompt(context: DualContext | undefined): string {
+  // Defensive: handle undefined or incomplete context
+  const user = context?.user ?? {
+    id: "anonymous",
+    preferences: { language: "en", responseStyle: "balanced", expertise: "intermediate" },
+    sessionContext: { currentPage: "/chat", recentActions: [], timeZone: "UTC" },
+    memory: { recentTopics: [], preferredFormat: "markdown" },
+  };
+  const docs = context?.docs ?? { corpusId: "none", relevantDocs: [], semanticSearch: { enabled: false, threshold: 0.7, maxResults: 0 } };
 
   return `You are VIVIM Assistant, an intelligent memory companion.
 

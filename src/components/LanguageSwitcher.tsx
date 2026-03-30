@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { translatePage, revertPage, startObserver } from "@/lib/translation/client";
+import { translatePage, revertPage, startObserver, prefetchTranslations, clearPrefetch } from "@/lib/translation/client";
 import { detectLanguage, setLanguagePreference } from "@/lib/translation/langDetect";
 import { suggestLanguageFromLocation, detectLocation } from "@/lib/translation/geolocation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Globe, ChevronDown, MapPin, Zap, Info } from "lucide-react";
+import { Globe, ChevronDown, MapPin } from "lucide-react";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇬🇧" },
@@ -26,11 +26,12 @@ export default function LanguageSwitcher() {
   const [lang, setLang] = useState("en");
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [priorityMode, setPriorityMode] = useState<"viewport" | "linear">("viewport");
   const [locationHint, setLocationHint] = useState<LocationHint | null>(null);
   const [showLocationBanner, setShowLocationBanner] = useState(false);
   const [userCountry, setUserCountry] = useState<string | null>(null);
+  const [prefetchedLang, setPrefetchedLang] = useState<string | null>(null);
   const langRef = useRef(lang);
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     langRef.current = lang;
@@ -59,18 +60,47 @@ export default function LanguageSwitcher() {
     startObserver(() => langRef.current);
   }, []);
 
+  const handleDropdownOpen = () => {
+    setIsOpen(true);
+    
+    if (locationHint?.recommendedLang && locationHint.recommendedLang !== "en") {
+      prefetchTranslations(locationHint.recommendedLang, document.body, "vivim landing page");
+      setPrefetchedLang(locationHint.recommendedLang);
+    }
+  };
+
+  const handleLanguageHover = (code: string) => {
+    if (code === "en" || code === prefetchedLang || loading) return;
+    
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    
+    hoverTimeoutRef.current = setTimeout(() => {
+      prefetchTranslations(code, document.body, "vivim landing page");
+      setPrefetchedLang(code);
+    }, 150);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+  };
+
   const handleChange = async (code: string) => {
     setLoading(true);
     setLang(code);
     setLanguagePreference(code);
     setIsOpen(false);
     setShowLocationBanner(false);
+    clearPrefetch();
 
     if (code === "en") {
       revertPage();
     } else {
       revertPage();
-      await translatePage(code, document.body, "vivim landing page", priorityMode);
+      await translatePage(code, document.body, "vivim landing page");
     }
     setLoading(false);
   };
@@ -139,7 +169,7 @@ export default function LanguageSwitcher() {
       <div className="relative">
         <button
           type="button"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => isOpen ? setIsOpen(false) : handleDropdownOpen()}
           disabled={loading}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5"
           aria-label="Select language"
@@ -177,56 +207,24 @@ export default function LanguageSwitcher() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.15 }}
+                onMouseLeave={handleMouseLeave}
                 className="absolute right-0 top-full mt-2 z-50 bg-slate-900 border border-white/10 rounded-xl p-1 min-w-[200px] shadow-xl"
               >
-                <div className="mb-2 px-3 py-2 border-b border-white/5">
-                  <p className="text-xs font-medium text-slate-400 mb-2">Translation Priority</p>
-                  <div className="flex flex-col gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setPriorityMode("viewport")}
-                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-colors ${
-                        priorityMode === "viewport"
-                          ? "bg-violet-500/15 text-violet-300"
-                          : "text-slate-400 hover:text-white hover:bg-white/5"
-                      }`}
-                    >
-                      <Zap className="w-3.5 h-3.5" />
-                      <div className="text-left">
-                        <span className="font-medium">Viewport First</span>
-                        <span className="text-slate-500">Above the fold content</span>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPriorityMode("linear")}
-                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-colors ${
-                        priorityMode === "linear"
-                          ? "bg-violet-500/15 text-violet-300"
-                          : "text-slate-400 hover:text-white hover:bg-white/5"
-                      }`}
-                    >
-                      <Info className="w-3.5 h-3.5" />
-                      <div className="text-left">
-                        <span className="font-medium">DOM Priority</span>
-                        <span className="text-slate-500">Navigation & headers first</span>
-                      </div>
-                    </button>
+                {locationHint?.recommendedLang && (
+                  <div className="mb-2 px-3 py-1.5 bg-violet-500/5 border-b border-white/5">
+                    <p className="text-xs text-violet-300 flex items-center gap-1.5">
+                      <MapPin className="w-3 h-3" />
+                      Location recommends
+                    </p>
                   </div>
-                </div>
-
-                <div className="mb-2 px-3 py-1.5 bg-violet-500/5 border-b border-white/5">
-                  <p className="text-xs text-violet-300 flex items-center gap-1.5">
-                    <Globe className="w-3 h-3" />
-                    {locationHint?.recommendedLang ? "Location recommends" : "Choose language"}
-                  </p>
-                </div>
+                )}
 
                 {LANGUAGES.map((language) => (
                   <button
                     key={language.code}
                     type="button"
                     onClick={() => handleChange(language.code)}
+                    onMouseEnter={() => handleLanguageHover(language.code)}
                     disabled={loading}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
                       lang === language.code
@@ -238,6 +236,9 @@ export default function LanguageSwitcher() {
                     <span className="flex-1 text-left">{language.label}</span>
                     {locationHint?.recommendedLang === language.code && (
                       <span className="text-xs bg-violet-500/20 text-violet-400 px-1.5 py-0.5 rounded">Auto-suggested</span>
+                    )}
+                    {prefetchedLang === language.code && lang !== language.code && (
+                      <span className="text-xs text-emerald-400">✓</span>
                     )}
                   </button>
                 ))}

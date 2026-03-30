@@ -15,6 +15,9 @@
     "packages/*"
   ],
   "scripts": {
+    "predev": "bun run cleanup",
+    "cleanup": "bun run cleanup:port",
+    "cleanup:port": "bun -e \"const{execSync}=require('child_process');try{const p=execSync('netstat -aon').toString().split('\\n').find(l=>l.includes(':3000')&&l.includes('LISTENING'));if(p){const pid=p.trim().split(/\\s+/)[4];execSync('taskkill /F /PID '+pid,{stdio:'ignore'});console.log('Killed PID',pid)}}catch{}\"",
     "dev": "concurrently \"bun run dev:backend\" \"bun run dev:frontend\"",
     "dev:frontend": "bun run --filter vivim-live dev",
     "dev:backend": "bun run --filter vivim-server dev",

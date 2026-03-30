@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ZAI_API_KEY = process.env.ZAI_API_KEY!;
 const ZAI_BASE_URL = process.env.ZAI_BASE_URL ?? "https://api.z.ai/api/coding/paas/v4";
-const MODEL = process.env.ZAI_MODEL ?? "glm-4.7";
+const MODEL = process.env.ZAI_TRANSLATE_MODEL ?? "glm-4.7-flash"; // Fast model for translation
 const TEMPERATURE = parseFloat(process.env.TRANSLATE_TEMPERATURE ?? "0.1");
+const MAX_STRINGS_PER_REQUEST = 50; // Increased for flash model efficiency
 
 interface TranslateRequest {
   strings: string[];
@@ -96,9 +97,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing strings or targetLang" }, { status: 400 });
     }
 
-    if (strings.length > 50) {
-      log("WARN", "Too many strings", { count: strings.length, max: 50 });
-      return NextResponse.json({ error: "Too many strings (max 50)" }, { status: 400 });
+    if (strings.length > MAX_STRINGS_PER_REQUEST) {
+      log("WARN", "Too many strings", { count: strings.length, max: MAX_STRINGS_PER_REQUEST });
+      return NextResponse.json({ error: `Too many strings (max ${MAX_STRINGS_PER_REQUEST})` }, { status: 400 });
     }
 
     logSection("PROMPTS");

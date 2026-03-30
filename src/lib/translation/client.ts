@@ -1,7 +1,8 @@
 import { getCachedBatch, setCachedBatch } from "./cache";
-import { harvestTextNodesWithPriority, prioritizeAboveFold, type PriorityJob } from "./priority";
+import { harvestTextNodesWithPriority, type PriorityJob } from "./priority";
 
-const BATCH_SIZE = 30;
+const BATCH_SIZE = 50;
+const MAX_PARALLEL_BATCHES = 3;
 
 const log = {
   info: (msg: string, data?: unknown) => console.log(`%c[vivim:translate] ${msg}`, "color: #06b6d4; font-weight: bold;", data ?? ""),
@@ -11,6 +12,33 @@ const log = {
   group: (label: string) => console.group(`%c[vivim:translate] ${label}`, "color: #a855f7; font-weight: bold;"),
   groupEnd: () => console.groupEnd(),
 };
+
+interface TranslationStrategy {
+  aboveFold: PriorityJob[];
+  belowFold: PriorityJob[];
+}
+
+function computeSmartStrategy(jobs: PriorityJob[]): TranslationStrategy {
+  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 800;
+  
+  const aboveFold: PriorityJob[] = [];
+  const belowFold: PriorityJob[] = [];
+  
+  for (const job of jobs) {
+    if (job.boundingBox && job.boundingBox.top < viewportHeight) {
+      aboveFold.push(job);
+    } else {
+      belowFold.push(job);
+    }
+  }
+  
+  aboveFold.sort((a, b) => a.priority - b.priority || 
+    (a.boundingBox?.top ?? 0) - (b.boundingBox?.top ?? 0));
+  belowFold.sort((a, b) => a.priority - b.priority || 
+    (a.boundingBox?.top ?? 0) - (b.boundingBox?.top ?? 0));
+  
+  return { aboveFold, belowFold };
+}
 
 async function fetchTranslations(
   strings: string[],
@@ -95,11 +123,47 @@ async function processBatch(
   log.success(`Batch complete`, { patched: patchedCount, total: jobs.length });
 }
 
+async function processBatchesParallel(
+  jobs: PriorityJob[],
+  targetLang: string,
+  context?: string
+): Promise<void> {
+  const batches: PriorityJob[][] = [];
+  for (let i = 0; i < jobs.length; i += BATCH_SIZE) {
+    batches.push(jobs.slice(i, i + BATCH_SIZE));
+  }
+
+  log.info(`Processing ${batches.length} batches in parallel groups`, { 
+    batchSize: BATCH_SIZE, 
+    maxParallel: MAX_PARALLEL_BATCHES 
+  });
+
+  for (let i = 0; i < batches.length; i += MAX_PARALLEL_BATCHES) {
+    const parallelBatches = batches.slice(i, i + MAX_PARALLEL_BATCHES);
+    await Promise.all(parallelBatches.map(batch => processBatch(batch, targetLang, context)));
+  }
+}
+
+async function processBatchesSequential(
+  jobs: PriorityJob[],
+  targetLang: string,
+  context?: string
+): Promise<void> {
+  const batchCount = Math.ceil(jobs.length / BATCH_SIZE);
+  log.info(`Processing ${batchCount} batches sequentially`, { batchSize: BATCH_SIZE });
+
+  for (let i = 0; i < jobs.length; i += BATCH_SIZE) {
+    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+    const batch = jobs.slice(i, i + BATCH_SIZE);
+    log.info(`Batch ${batchNum}/${batchCount}`, { size: batch.length });
+    await processBatch(batch, targetLang, context);
+  }
+}
+
 export async function translatePage(
   targetLang: string,
   root: HTMLElement = document.body,
-  context?: string,
-  priorityMode: "priority" | "viewport" | "linear" = "viewport"
+  context?: string
 ): Promise<void> {
   const startTime = performance.now();
 
@@ -110,10 +174,10 @@ export async function translatePage(
   }
 
   log.group(`Translate Page → ${targetLang.toUpperCase()}`);
-  log.info("Starting translation", { context: context ?? "default", root: root.tagName, priorityMode });
+  log.info("Starting translation", { context: context ?? "default", root: root.tagName });
 
   const jobs = harvestTextNodesWithPriority(root);
-  log.info("Text nodes harvested", { count: jobs.length, mode: priorityMode });
+  log.info("Text nodes harvested", { count: jobs.length });
 
   if (jobs.length === 0) {
     log.warn("No translatable text found");
@@ -121,28 +185,27 @@ export async function translatePage(
     return;
   }
 
-  let sortedJobs = jobs;
-  if (priorityMode === "viewport") {
-    sortedJobs = prioritizeAboveFold(jobs);
-    const viewportHeight = window.innerHeight;
-    log.info("Prioritized by viewport", { aboveFold: jobs.filter(j => j.boundingBox && j.boundingBox.top < viewportHeight).length });
-  } else if (priorityMode === "priority") {
-    sortedJobs = [...jobs].sort((a, b) => (a.priority ?? 10) - (b.priority ?? 10));
+  const { aboveFold, belowFold } = computeSmartStrategy(jobs);
+  log.info("Smart strategy computed", { 
+    aboveFold: aboveFold.length, 
+    belowFold: belowFold.length 
+  });
+
+  if (aboveFold.length > 0) {
+    log.info("Processing above-fold (parallel)");
+    await processBatchesParallel(aboveFold, targetLang, context);
   }
 
-  const batches = Math.ceil(sortedJobs.length / BATCH_SIZE);
-  log.info(`Processing in ${batches} batch(es)`, { batchSize: BATCH_SIZE, total: sortedJobs.length });
-
-  for (let i = 0; i < sortedJobs.length; i += BATCH_SIZE) {
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    const batch = sortedJobs.slice(i, i + BATCH_SIZE);
-    const firstPriority = batch[0]?.priority ?? "N/A";
-    log.info(`Batch ${batchNum}/${batches}`, { size: batch.length, priority: firstPriority });
-    await processBatch(batch, targetLang, context);
+  if (belowFold.length > 0) {
+    log.info("Processing below-fold (sequential)");
+    await processBatchesSequential(belowFold, targetLang, context);
   }
 
   const duration = performance.now() - startTime;
-  log.success(`Page translation complete`, { totalTranslated: sortedJobs.length, duration: `${duration.toFixed(0)}ms` });
+  log.success(`Page translation complete`, { 
+    totalTranslated: jobs.length, 
+    duration: `${duration.toFixed(0)}ms` 
+  });
   log.groupEnd();
 }
 
@@ -176,7 +239,7 @@ export function startObserver(getLang: () => string): void {
     mutations.forEach((m) => {
       m.addedNodes.forEach((node) => {
         if (node.nodeType === Node.ELEMENT_NODE) {
-          translatePage(lang, node as HTMLElement, undefined, "priority");
+          translatePage(lang, node as HTMLElement, undefined);
         }
       });
     });
@@ -184,4 +247,46 @@ export function startObserver(getLang: () => string): void {
 
   _observer.observe(document.body, { childList: true, subtree: true });
   log.success("MutationObserver started");
+}
+
+let _prefetchAbort: AbortController | null = null;
+
+export async function prefetchTranslations(
+  targetLang: string,
+  root: HTMLElement = document.body,
+  context?: string
+): Promise<void> {
+  if (targetLang === "en") return;
+  
+  _prefetchAbort?.abort();
+  _prefetchAbort = new AbortController();
+  
+  log.info(`Pre-fetching translations for ${targetLang}`);
+  
+  const jobs = harvestTextNodesWithPriority(root);
+  const { aboveFold } = computeSmartStrategy(jobs);
+  
+  const originals = aboveFold.map(j => j.original);
+  const cached = getCachedBatch(targetLang, originals);
+  const missingIdx = cached.map((v, i) => (v === null ? i : -1)).filter((i) => i !== -1);
+  
+  if (missingIdx.length === 0) {
+    log.info(`Pre-fetch: all above-fold already cached`);
+    return;
+  }
+  
+  const missingStrings = missingIdx.map((i) => originals[i]);
+  
+  try {
+    const fresh = await fetchTranslations(missingStrings, targetLang, context);
+    setCachedBatch(targetLang, missingStrings, fresh);
+    log.success(`Pre-fetch complete`, { cached: fresh.length });
+  } catch {
+    log.warn(`Pre-fetch failed or aborted`);
+  }
+}
+
+export function clearPrefetch(): void {
+  _prefetchAbort?.abort();
+  _prefetchAbort = null;
 }
