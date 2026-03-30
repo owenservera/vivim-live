@@ -204,7 +204,7 @@ async function storeBundle(userId, bundleType, bundle, conversationId) {
 }
 
 export async function getContextForChat(conversationId, options = {}) {
-  const { maxTokens = 8000, includeHistory = true } = options;
+  const { maxTokens = 8000, includeHistory = true, userMessage } = options;
 
   const conv = await prisma.conversation.findUnique({
     where: { id: conversationId },
@@ -238,11 +238,13 @@ export async function getContextForChat(conversationId, options = {}) {
       : String(lastMsg.parts);
   }
 
-  const systemPrompt = buildSystemPrompt(layers);
+  const corpusContext = userMessage ? await searchCorpusContext(userMessage) : null;
+  const systemPrompt = buildSystemPrompt(layers, corpusContext);
 
   return {
     systemPrompt,
     layers,
+    corpusContextUsed: !!corpusContext,
     stats: {
       messageCount: conv.messageCount,
       tokenCount: tokenEstimator.estimateTokens(systemPrompt),
@@ -256,18 +258,52 @@ async function getCachedBundle(bundleType, referenceId) {
   });
 }
 
-function buildSystemPrompt(layers) {
+async function searchCorpusContext(userMessage, limit = 5) {
+  try {
+    const corpusCount = await prisma.docCorpus.count();
+    if (corpusCount === 0) {
+      return null;
+    }
+
+    const results = await prisma.$queryRaw`
+      SELECT dc.title, dc.category, string_agg(dch.content, ' ') as content
+      FROM doc_corpus dc
+      LEFT JOIN doc_chunks dch ON dch."corpusId" = dc.id
+      WHERE dc.title IS NOT NULL
+      GROUP BY dc.id, dc.title, dc.category
+      LIMIT ${limit}
+    `;
+
+    if (!results || results.length === 0) {
+      return null;
+    }
+
+    return results.map((doc) => {
+      const content = doc.content || '';
+      const truncatedContent = content.length > 2000 
+        ? content.substring(0, 2000) + '...' 
+        : content;
+      return `## ${doc.title} (${doc.category || 'general'})\n\n${truncatedContent}`;
+    }).join('\n\n---\n\n');
+  } catch (error) {
+    logger.warn({ error: error.message }, 'Corpus search failed');
+    return null;
+  }
+}
+
+function buildSystemPrompt(layers, corpusContext = null) {
   const parts = [];
 
-  // L0: Always include VIVIM identity - this tells the AI who VIVIM is
   parts.push(VIVIM_IDENTITY_PROMPT);
 
-  // L4: Conversation context
+  if (corpusContext) {
+    parts.push(`## VIVIM Documentation Context\n\n${corpusContext}`);
+  }
+
   if (layers.L4) {
     parts.push(layers.L4);
   }
 
-  // L7: Current user message
   if (layers.L7) {
     parts.push(`## Current Request\n\n${layers.L7}`);
   }

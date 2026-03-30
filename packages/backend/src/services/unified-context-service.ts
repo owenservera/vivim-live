@@ -149,11 +149,18 @@ export class UnifiedContextService {
         };
 
         const result = await this.dynamicAssembler.assemble(assemblyParams);
+        
+        const corpusContext = options.userMessage ? await this.getCorpusContext(options.userMessage) : null;
+        if (corpusContext) {
+          result.systemPrompt = result.systemPrompt + '\n\n---\n\n## VIVIM Documentation Context\n\n' + corpusContext;
+        }
+        
         log.info(
           {
             engine: 'dynamic',
             tokens: result.budget.totalUsed,
             layers: result.bundlesUsed.length,
+            corpusContextUsed: !!corpusContext,
           },
           'Context generated with new engine'
         );
@@ -403,6 +410,39 @@ export class UnifiedContextService {
         contextBundles: bundleCount,
       },
     };
+  }
+
+  private async getCorpusContext(userMessage: string, limit = 5): Promise<string | null> {
+    try {
+      const corpusCount = await prisma.docCorpus.count();
+      if (corpusCount === 0) {
+        return null;
+      }
+
+      const results = await prisma.$queryRaw`
+        SELECT dc.title, dc.category, string_agg(dch.content, ' ') as content
+        FROM doc_corpus dc
+        LEFT JOIN doc_chunks dch ON dch."corpusId" = dc.id
+        WHERE dc.title IS NOT NULL
+        GROUP BY dc.id, dc.title, dc.category
+        LIMIT ${limit}
+      ` as Promise<Array<{title: string; category: string | null; content: string | null}>>;
+
+      if (!results || results.length === 0) {
+        return null;
+      }
+
+      return results.map((doc) => {
+        const content = doc.content || '';
+        const truncatedContent = content.length > 2000 
+          ? content.substring(0, 2000) + '...' 
+          : content;
+        return `## ${doc.title} (${doc.category || 'general'})\n\n${truncatedContent}`;
+      }).join('\n\n---\n\n');
+    } catch (error) {
+      logger.warn({ error: (error as Error).message }, 'Corpus search failed');
+      return null;
+    }
   }
 
   private async logParityReport(newResult: any, options: any, conversationId: string): Promise<void> {
