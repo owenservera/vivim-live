@@ -61,6 +61,7 @@ import { NeuralBackground } from "@/components/neural-bg";
 import { HeroVisual } from "@/components/hero-visual";
 import { ReadingProgress } from "@/components/reading-progress";
 import { AnimatedCounter, useScrollAnimation } from "@/components/animated-counter";
+import { FloatingChat } from "@/components/floating-chat";
 
 const LAYER_DATA = [
   { name: "L0", label: "Identity Core", desc: "Who you are — permanent context", tokens: "~300", color: "from-violet-600 to-purple-700" },
@@ -1474,6 +1475,8 @@ export default function Home() {
           )}
         </DialogContent>
       </Dialog>
+
+      <FloatingChat />
     </div>
   );
 }
