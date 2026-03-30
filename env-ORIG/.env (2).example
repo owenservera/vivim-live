@@ -1,0 +1,222 @@
+# OpenScroll Server Environment Variables
+# Copy this file to .env and fill in your values
+
+# ============================================================================
+# DATABASE
+# ============================================================================
+DATABASE_URL="postgresql://openscroll:openscroll_dev_password@localhost:5432/openscroll"
+DATABASE_SSL_REQUIRED=false
+
+# User Database Directory (for per-user SQLite databases)
+USER_DB_DIR="./data/users"
+
+# For Docker Compose
+DB_PASSWORD=openscroll_dev_password
+
+# ============================================================================
+# REDIS (Optional - In-memory fallback if not configured)
+# ============================================================================
+# Redis URL for caching and session storage
+# Format: redis://[username:password@]host:port[/database-number]
+# Default: localhost:6379
+REDIS_URL=redis://localhost:6379
+
+# Redis options (optional)
+# REDIS_TLS_ENABLED=false
+# REDIS_DB=0
+
+# ============================================================================
+# SERVER
+# ============================================================================
+NODE_ENV=development
+PORT=3001
+HOST=0.0.0.0
+
+# Trust proxy headers (set to true if behind nginx/load balancer)
+TRUST_PROXY=false
+
+# ============================================================================
+# CORS
+# ============================================================================
+# Comma-separated list of allowed origins (production only)
+CORS_ORIGINS=https://app.openscroll.com,https://openscroll.com
+
+# ============================================================================
+# RATE LIMITING
+# ============================================================================
+RATE_LIMIT_MAX=100
+RATE_LIMIT_WINDOW_MS=900000
+
+# ============================================================================
+# SECURITY
+# ============================================================================
+# Session secret (generate with: openssl rand -base64 32)
+SESSION_SECRET=your-secret-key-here
+
+# JWT secret (generate with: openssl rand -base64 32)
+JWT_SECRET=your-jwt-secret-here
+
+# API Keys (comma-separated list of valid keys)
+# Default dev key matches pwa/.env.example
+API_KEYS=sk-vivim-dev-key-123456789
+
+# Master API Key (full access)
+MASTER_API_KEY=
+
+# ============================================================================
+# GOOGLE OAUTH (Sign In)
+# ============================================================================
+# Get your credentials from https://console.cloud.google.com/
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:3000/api/v1/auth/google/callback
+GOOGLE_SUCCESS_REDIRECT=http://localhost:5173
+
+# Development: Skip authentication (set to 'true' to disable auth in development)
+SKIP_AUTH_FOR_DEVELOPMENT=false
+
+# ============================================================================
+# EXTRACTION
+# ============================================================================
+# Playwright browser executable path (optional)
+PLAYWRIGHT_BROWSER_PATH=
+
+# Extraction timeout (ms)
+EXTRACTION_TIMEOUT=30000
+
+# Max concurrent extractions
+MAX_CONCURRENT_EXTRACTIONS=5
+
+# ============================================================================
+# LOGGING
+# ============================================================================
+LOG_LEVEL=info
+LOG_FILE_PATH=./logs
+
+# Sentry DSN for error tracking (optional)
+SENTRY_DSN=
+
+# ============================================================================
+# SWAGGER/API DOCS
+# ============================================================================
+ENABLE_SWAGGER=true
+
+# ============================================================================
+# PGADMIN (for Docker Compose)
+# ============================================================================
+PGADMIN_EMAIL=admin@openscroll.local
+PGADMIN_PASSWORD=admin
+
+# ============================================================================
+# SYNC
+# ============================================================================
+# Sync interval (ms)
+SYNC_INTERVAL=5000
+
+# Max sync batch size
+SYNC_BATCH_SIZE=100
+
+# ============================================================================
+# ACU PROCESSING
+# ============================================================================
+# Enable automatic ACU processing after capture
+AUTO_PROCESS_ACUS=true
+
+# ACU processing batch size
+ACU_BATCH_SIZE=10
+
+# ACU processing delay between batches (ms)
+ACU_BATCH_DELAY=1000
+
+# ============================================================================
+# VECTOR SEARCH
+# ============================================================================
+# Embedding model (for future use)
+EMBEDDING_MODEL=all-MiniLM-L6-v2
+
+# Vector dimension
+VECTOR_DIMENSION=384
+
+# ============================================================================
+# Z.AI GLM-4.7 INTEGRATION (Primary AI Provider)
+# ============================================================================
+# Z.AI API Key - Get from https://www.zhipuai.cn/
+# REQUIRED: Set your own API key in production
+ZAI_API_KEY=
+
+# Z.AI Model - GLM-4.7-flash for fast responses
+ZAI_MODEL=glm-4.7-flash
+
+# Z.AI Base URL
+ZAI_BASE_URL=https://api.z.ai/api/paas/v4
+
+# Embedding dimensions for Z.AI (1536 for text-embedding-3-small equivalent)
+ZAI_EMBEDDING_DIMENSIONS=1536
+
+# Compaction model for conversation compression (uses LLM for summarization)
+COMPACTION_MODEL=glm-4.7-flash
+
+# Fallback to mock embeddings if API fails (development only)
+ZAI_EMBEDDING_FALLBACK_TO_MOCK=false
+
+# ============================================================================
+# LIBRARIAN WORKER (GLMT-4.7 Autonomous Learning)
+# ============================================================================
+# Enable/disable the autonomous librarian worker
+LIBRARIAN_ENABLED=true
+
+# Batch size for ACU processing
+LIBRARIAN_BATCH_SIZE=20
+
+# Cooldown between librarian runs (minutes)
+LIBRARIAN_COOLDOWN_MINUTES=30
+
+# ============================================================================
+# CONVERSATION IDLE DETECTION
+# ============================================================================
+# Enable idle detection for triggering librarian worker
+ENABLE_IDLE_DETECTION=true
+
+# Time after assistant response before conversation is considered idle (minutes)
+CONVERSATION_IDLE_TIMEOUT_MINUTES=5
+
+# ============================================================================
+# TOKEN ESTIMATION
+# ============================================================================
+# Token estimator type: 'gpt' (accurate) or 'simple' (word-based, faster)
+TOKEN_ESTIMATOR_TYPE=gpt
+
+# ============================================================================
+# DYNAMIC CONTEXT ENGINE
+# ============================================================================
+# Enable the new context engine (set to 'true' after Phase 1 testing)
+USE_DYNAMIC_CONTEXT=false
+
+# Context engine log level
+DYNAMIC_CONTEXT_LOG_LEVEL=info
+
+# ============================================================================
+# P2P NETWORK
+# ============================================================================
+# libp2p listen addresses
+P2P_LISTEN_ADDRESSES=/ip4/0.0.0.0/tcp/4001,/ip4/0.0.0.0/tcp/4002/ws
+
+# Bootstrap peers - comma-separated multiaddrs for P2P network discovery
+# Format: /ip4/1.2.3.4/tcp/4001/p2p/QmPeerID,...
+# Example: /ip4/104.23.56.18/tcp/4001/p2p/QmBootstrap1,/ip4/203.0.113.50/tcp/4001/p2p/QmBootstrap2
+P2P_BOOTSTRAP_PEERS=
+
+# ============================================================================
+# RATE LIMITING
+# ============================================================================
+# Max requests per 15 minutes (default: 100 production, 1000 development)
+RATE_LIMIT_MAX=100
+
+# ============================================================================
+# DEVELOPMENT
+# ============================================================================
+# Enable debug mode
+DEBUG=false
+
+# Hot reload
+HOT_RELOAD=true
