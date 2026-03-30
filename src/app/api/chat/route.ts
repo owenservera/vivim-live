@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildSystemPrompt } from "@/lib/chat/context";
 import type { ChatRequest } from "@/types/chat";
 
-const ZAI_API_KEY = process.env.ZAI_API_KEY;
+const ZAI_API_KEY = process.env.ZAI_API_KEY!;
 const ZAI_BASE_URL = process.env.ZAI_BASE_URL ?? "https://api.z.ai/api/coding/paas/v4";
-const ZAI_CHAT_MODEL = process.env.ZAI_CHAT_MODEL ?? "glm-4.7";
-const ZAI_CHAT_TEMPERATURE = parseFloat(process.env.ZAI_CHAT_TEMPERATURE ?? "0.7");
+const ZAI_CHAT_MODEL = process.env.ZAI_TRANSLATE_MODEL ?? "glm-4.7-flash";
+const ZAI_CHAT_TEMPERATURE = parseFloat(process.env.TRANSLATE_TEMPERATURE ?? "0.1");
 const ZAI_MAX_TOKENS = parseInt(process.env.ZAI_MAX_TOKENS ?? "4096");
 
 const DEBUG = process.env.DEBUG_CHAT === "true";
