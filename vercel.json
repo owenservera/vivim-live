@@ -4,6 +4,7 @@
   "devCommand": "bun run dev:frontend",
   "installCommand": "bun install",
   "framework": "nextjs",
+  "outputDirectory": "packages/frontend/.next",
   "regions": ["iad1"],
   "alias": ["vivim.live", "www.vivim.live"],
   "headers": [
