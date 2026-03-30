@@ -55,8 +55,8 @@ export function ChatProvider({ children, threadId }: ChatProviderProps) {
     }
   }, [threadId]);
 
-  const adapter: ChatModelAdapter = useCallback(
-    async function* ({ messages, abortSignal }) {
+  const adapter: any = useCallback(
+    async function* ({ messages, abortSignal }: any) {
       // Build dual context (stub for now, will be replaced with backend context)
       const context: DualContext = {
         user: {
@@ -86,12 +86,12 @@ export function ChatProvider({ children, threadId }: ChatProviderProps) {
         },
       };
 
-      const formattedMessages: ChatMessage[] = messages.map((m) => ({
+      const formattedMessages: ChatMessage[] = messages.map((m: any) => ({
         role: m.role as "user" | "assistant",
         content:
           m.content
-            .filter((p) => p.type === "text")
-            .map((p) => (p as { type: "text"; text: string }).text)
+            .filter((p: any) => p.type === "text")
+            .map((p: any) => (p as { type: "text"; text: string }).text)
             .join(""),
       }));
 

@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
     // Step 1: Get context from backend context engine
     let systemPrompt = "";
-    let contextStats = {};
+    let contextStats: any = {};
 
     try {
       log("INFO", "Fetching context from backend", { backendUrl: BACKEND_URL });
