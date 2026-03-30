@@ -633,6 +633,38 @@ textarea:focus-visible {
   animation: slide-collapsible-up 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+/* ─── Progressive Translation ─── */
+.vivim-translating {
+  position: relative;
+}
+
+.vivim-translating::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, oklch(0.3 0 0 / 0.1), transparent);
+  animation: vivim-translate-shimmer 1.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes vivim-translate-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+[dir="rtl"] .vivim-translating::after {
+  background: linear-gradient(-90deg, transparent, oklch(0.3 0 0 / 0.1), transparent);
+}
+
+[dir="rtl"] .vivim-translating::after {
+  animation-name: vivim-translate-shimmer-rtl;
+}
+
+@keyframes vivim-translate-shimmer-rtl {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
 /* ─── Mobile Adjustments ─── */
 @media (max-width: 768px) {
   .glass,
