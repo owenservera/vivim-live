@@ -1,4 +1,4 @@
-const GEO_API = "http://ip-api.com/json";
+const GEO_API = "https://ip-api.com/json";
 const CACHE_KEY = "vivim_geo";
 const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
