@@ -29,6 +29,7 @@ interface QueuedRequest<T> {
   reject: (error: Error) => void;
   priority: RequestPriority;
   submittedAt: number;
+  timeoutMs: number;
   startedAt?: number;
   completedAt?: number;
 }
@@ -168,15 +169,16 @@ export class GlobalRateLimiter extends EventEmitter {
       queueLength: this.queue.length
     });
 
+    const requestTimeoutMs = request.startedAt ? this.config.timeoutMs : this.config.timeoutMs;
     const timeout = setTimeout(() => {
-      const error = new Error(`Request timeout after ${timeoutMs}ms`);
+      const error = new Error(`Request timeout after ${requestTimeoutMs}ms`);
       (error as any).code = 'TIMEOUT';
       request.reject(error);
       this.totalFailed++;
       this.processingCount--;
       this.emit('timeout', { id: request.id });
       this.processQueue();
-    }, timeoutMs);
+    }, requestTimeoutMs);
 
     try {
       const result = await request.fn();
