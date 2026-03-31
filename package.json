@@ -44,5 +44,8 @@
   },
   "engines": {
     "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "uuid": "^13.0.0"
   }
 }

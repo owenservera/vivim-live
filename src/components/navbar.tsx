@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Github, Menu, X, BookOpen, Cpu, Brain, Lock, History, Network, Users, Zap } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { SocialShare } from "./SocialShare";
 
 const sectionToId = (section: string): string =>
   section.toLowerCase().split(" ").join("-");
@@ -183,6 +184,7 @@ function MobileMenu({
             </nav>
 
             <div className="p-4 border-t border-white/5 space-y-2">
+              <SocialShare />
               <Link
                 href="/demos/live-memory"
                 onClick={onClose}
@@ -352,6 +354,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
+            <SocialShare />
             <DemosDropdown />
             <LanguageSwitcher />
 

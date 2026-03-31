@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ReducedMotionWrapper } from "@/components/ReducedMotionWrapper";
+import { initializeGlobalRateLimiter } from "@/lib/rate-limiter/init";
 import "./globals.css";
+
+// Initialize global rate limiter on server startup
+if (typeof window === 'undefined') {
+  initializeGlobalRateLimiter();
+}
 
 const inter = Inter({
   variable: "--font-inter",
@@ -64,6 +70,21 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.png",
     apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "VIVIM",
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  manifest: "/manifest.json",
+  other: {
+    "theme-color": "#020617",
+    "mask-icon": "/mask-icon.svg",
   },
 };
 

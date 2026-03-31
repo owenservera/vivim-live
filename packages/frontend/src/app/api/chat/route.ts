@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ChatRequest } from "@/types/chat";
+import { globalRateLimiter, RequestPriority } from "@/lib/rate-limiter";
 
 const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:3001";
 const ZAI_API_KEY = process.env.ZAI_API_KEY;
@@ -124,51 +125,59 @@ export async function POST(req: NextRequest) {
       messageCount: zaiMessages.length,
     });
 
-    // Step 3: Call Z.AI API
-    const zaiResponse = await fetch(`${ZAI_BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${ZAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: ZAI_CHAT_MODEL,
-        messages: zaiMessages,
-        stream: true,
-        temperature: ZAI_CHAT_TEMPERATURE,
-        max_tokens: ZAI_MAX_TOKENS,
-      }),
-    });
-
-    if (!zaiResponse.ok) {
-      const errorText = await zaiResponse.text();
-      log("ERROR", "Z.AI API error", {
-        status: zaiResponse.status,
-        error: errorText.substring(0, 500),
-      });
-      
-      let errorDetail = `Z.AI API error: ${zaiResponse.status}`;
-      if (zaiResponse.status === 401) {
-        errorDetail = "Invalid or missing ZAI_API_KEY. Please check your API key configuration.";
-      } else if (zaiResponse.status === 403) {
-        errorDetail = "Access forbidden. Check your ZAI_API_KEY permissions.";
-      } else if (zaiResponse.status === 429) {
-        errorDetail = "Rate limit exceeded. Please try again later.";
-      }
-
-      return NextResponse.json(
-        { 
-          error: errorDetail,
-          details: errorText.substring(0, 500),
-          debug: {
+    // Step 3: Call Z.AI API through global rate limiter
+    const zaiResponse = await globalRateLimiter.submit(
+      async () => {
+        const response = await fetch(`${ZAI_BASE_URL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${ZAI_API_KEY}`,
+          },
+          body: JSON.stringify({
             model: ZAI_CHAT_MODEL,
-            apiKeyConfigured: !!ZAI_API_KEY,
-            baseUrl: ZAI_BASE_URL,
+            messages: zaiMessages,
+            stream: true,
+            temperature: ZAI_CHAT_TEMPERATURE,
+            max_tokens: ZAI_MAX_TOKENS,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          log("ERROR", "Z.AI API error", {
+            status: response.status,
+            error: errorText.substring(0, 500),
+          });
+
+          let errorDetail = `Z.AI API error: ${response.status}`;
+          if (response.status === 401) {
+            errorDetail = "Invalid or missing ZAI_API_KEY. Please check your API key configuration.";
+          } else if (response.status === 403) {
+            errorDetail = "Access forbidden. Check your ZAI_API_KEY permissions.";
+          } else if (response.status === 429) {
+            errorDetail = "Rate limit exceeded. Please try again later.";
           }
-        },
-        { status: zaiResponse.status }
-      );
-    }
+
+          const errorResponse = Response.json(
+            {
+              error: errorDetail,
+              details: errorText.substring(0, 500),
+              debug: {
+                model: ZAI_CHAT_MODEL,
+                apiKeyConfigured: !!ZAI_API_KEY,
+                baseUrl: ZAI_BASE_URL,
+              }
+            },
+            { status: response.status }
+          );
+          throw errorResponse;
+        }
+
+        return response;
+      },
+      { priority: RequestPriority.HIGH, timeoutMs: 90000 }
+    );
 
     log("INFO", "Z.AI streaming started", { requestId });
 
@@ -185,11 +194,42 @@ export async function POST(req: NextRequest) {
         "X-Context-Engine": contextStats.engineUsed ?? "fallback",
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     const duration = Date.now() - startTime;
+    
+    // Handle Response errors thrown from rate limiter
+    if (error instanceof Response) {
+      return error;
+    }
+    
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
-    
+
+    // Handle queue-specific errors
+    if (error.code === 'QUEUE_FULL') {
+      log("WARN", `Request ${requestId} rejected - queue full`);
+      return NextResponse.json(
+        { 
+          error: "Service busy", 
+          details: "Too many requests queued. Please try again in a moment.",
+          requestId 
+        },
+        { status: 503 }
+      );
+    }
+
+    if (error.code === 'TIMEOUT') {
+      log("ERROR", `Request ${requestId} timed out`);
+      return NextResponse.json(
+        { 
+          error: "Request timeout", 
+          details: "The request took too long to process. Please try again.",
+          requestId 
+        },
+        { status: 504 }
+      );
+    }
+
     log("ERROR", "Unhandled error", {
       requestId,
       duration: `${duration}ms`,
@@ -199,7 +239,7 @@ export async function POST(req: NextRequest) {
 
     let userMessage = "Internal server error";
     let details = "An unexpected error occurred";
-    
+
     if (errorMessage.includes("fetch")) {
       if (errorMessage.includes("ECONNREFUSED")) {
         userMessage = "Backend service unavailable";
@@ -217,7 +257,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
+      {
         error: userMessage,
         details: details,
         requestId,

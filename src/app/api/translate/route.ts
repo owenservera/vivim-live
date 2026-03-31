@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkDistributedRateLimit } from "@/lib/translation/rate-limit";
 import { fetchWithRetry } from "@/lib/translation/retry";
 import { withDeduplication } from "@/lib/translation/deduplication";
-import { 
-  getServerCachedBatch, 
-  setServerCachedBatch 
+import {
+  getServerCachedBatch,
+  setServerCachedBatch
 } from "@/lib/translation/server-cache";
+import { globalRateLimiter, RequestPriority } from "@/lib/rate-limiter";
 
 const ZAI_API_KEY = process.env.ZAI_API_KEY!;
 const ZAI_BASE_URL = process.env.ZAI_BASE_URL ?? "https://api.z.ai/api/coding/paas/v4";
@@ -50,43 +51,49 @@ Rules:
 - Do NOT add explanations, numbering, or any text outside the JSON array.`;
   const userPrompt = `Translate these ${strings.length} strings:\n${numbered}`;
 
-  const result = await fetchWithRetry(async () => {
-    const response = await fetch(`${ZAI_BASE_URL}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${ZAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        temperature: TEMPERATURE,
-        stream: false,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
+  // Use global rate limiter to enforce 2-second interval across all AI requests
+  const result = await globalRateLimiter.submit(
+    async () => {
+      return fetchWithRetry(async () => {
+        const response = await fetch(`${ZAI_BASE_URL}/chat/completions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${ZAI_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: MODEL,
+            temperature: TEMPERATURE,
+            stream: false,
+            response_format: { type: "json_object" },
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        });
 
-    if (response.status === 429) {
-      const retryAfter = response.headers.get("Retry-After");
-      const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : 2000;
-      throw new Error(`RATE_LIMIT:${waitTime}`);
-    }
+        if (response.status === 429) {
+          const retryAfter = response.headers.get("Retry-After");
+          const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : 2000;
+          throw new Error(`RATE_LIMIT:${waitTime}`);
+        }
 
-    if (!response.ok) {
-      throw new Error(`ZAI_API_ERROR:${response.status}`);
-    }
+        if (!response.ok) {
+          throw new Error(`ZAI_API_ERROR:${response.status}`);
+        }
 
-    return response.json();
-  }, { 
-    maxRetries: 5,
-    baseDelay: 2000,
-    maxDelay: 30000,
-    backoffMultiplier: 2,
-    retryableErrors: ["RATE_LIMIT", "429", "500", "502", "503", "504", "ECONNRESET", "ETIMEDOUT"],
-  });
+        return response.json();
+      }, {
+        maxRetries: 5,
+        baseDelay: 2000,
+        maxDelay: 30000,
+        backoffMultiplier: 2,
+        retryableErrors: ["RATE_LIMIT", "429", "500", "502", "503", "504", "ECONNRESET", "ETIMEDOUT"],
+      });
+    },
+    { priority: RequestPriority.NORMAL }
+  );
 
   if (!result.success || !result.data) {
     log("ERROR", "Translation failed after retries", { error: result.error });

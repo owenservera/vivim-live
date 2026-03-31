@@ -8,6 +8,7 @@
 import CircuitBreaker, { type CircuitBreakerOptions } from 'opossum';
 import type { IEmbeddingService, ILLMService } from '../types';
 import { logger } from '../../lib/logger.js';
+import { globalRateLimiter, RequestPriority } from '../../lib/global-rate-limiter.js';
 
 interface ZAIConfig {
   apiKey?: string;
@@ -87,90 +88,96 @@ export class ZAILLMService implements ILLMService {
       max_tokens: params.maxTokens ?? 4096,
     };
 
-    let lastError: Error | null = null;
+    // Use global rate limiter to enforce 2-second interval across all AI requests
+    return globalRateLimiter.submit(
+      async () => {
+        let lastError: Error | null = null;
 
-    for (let attempt = 0; attempt < this.maxRetries; attempt++) {
-      try {
-        const response = await fetch(`${this.baseUrl}/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.apiKey}`,
-          },
-          body: JSON.stringify(body),
-          signal: AbortSignal.timeout(this.timeout),
-        });
+        for (let attempt = 0; attempt < this.maxRetries; attempt++) {
+          try {
+            const response = await fetch(`${this.baseUrl}/chat/completions`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${this.apiKey}`,
+              },
+              body: JSON.stringify(body),
+              signal: AbortSignal.timeout(this.timeout),
+            });
 
-        if (!response.ok) {
-          const errorBody = await response.text();
-          logger.error(
-            {
-              status: response.status,
-              statusText: response.statusText,
-              error: errorBody,
-              attempt: attempt + 1,
-            },
-            'Z.AI API error'
-          );
+            if (!response.ok) {
+              const errorBody = await response.text();
+              logger.error(
+                {
+                  status: response.status,
+                  statusText: response.statusText,
+                  error: errorBody,
+                  attempt: attempt + 1,
+                },
+                'Z.AI API error'
+              );
 
-          // Don't retry on client errors (4xx)
-          if (response.status >= 400 && response.status < 500) {
-            throw new Error(`Z.AI API error: ${response.status} ${response.statusText}`);
+              // Don't retry on client errors (4xx)
+              if (response.status >= 400 && response.status < 500) {
+                throw new Error(`Z.AI API error: ${response.status} ${response.statusText}`);
+              }
+
+              lastError = new Error(`Z.AI API error: ${response.status}`);
+              continue;
+            }
+
+            const data: ChatCompletionResponse = await response.json();
+            const choice = data.choices?.[0];
+
+            if (!choice) {
+              throw new Error('No completion choice returned from Z.AI API');
+            }
+
+            logger.debug(
+              {
+                model: this.model,
+                promptTokens: data.usage?.prompt_tokens,
+                completionTokens: data.usage?.completion_tokens,
+                totalTokens: data.usage?.total_tokens,
+              },
+              'Z.AI chat completion successful'
+            );
+
+            return {
+              content: choice.message.content,
+              usage: {
+                promptTokens: data.usage?.prompt_tokens || 0,
+                completionTokens: data.usage?.completion_tokens || 0,
+                totalTokens: data.usage?.total_tokens || 0,
+              },
+            };
+          } catch (error: any) {
+            lastError = error;
+
+            if (error.name === 'TimeoutError') {
+              logger.warn(
+                { attempt: attempt + 1, maxRetries: this.maxRetries },
+                'Z.AI request timeout'
+              );
+            } else {
+              logger.error({ error: error.message, attempt: attempt + 1 }, 'Z.AI request failed');
+            }
+
+            // Don't retry on the last attempt
+            if (attempt >= this.maxRetries - 1) {
+              throw error;
+            }
+
+            // Wait before retry (exponential backoff)
+            const waitTime = Math.pow(2, attempt) * 1000;
+            await new Promise((resolve) => setTimeout(resolve, waitTime));
           }
-
-          lastError = new Error(`Z.AI API error: ${response.status}`);
-          continue;
         }
 
-        const data: ChatCompletionResponse = await response.json();
-        const choice = data.choices?.[0];
-
-        if (!choice) {
-          throw new Error('No completion choice returned from Z.AI API');
-        }
-
-        logger.debug(
-          {
-            model: this.model,
-            promptTokens: data.usage?.prompt_tokens,
-            completionTokens: data.usage?.completion_tokens,
-            totalTokens: data.usage?.total_tokens,
-          },
-          'Z.AI chat completion successful'
-        );
-
-        return {
-          content: choice.message.content,
-          usage: {
-            promptTokens: data.usage?.prompt_tokens || 0,
-            completionTokens: data.usage?.completion_tokens || 0,
-            totalTokens: data.usage?.total_tokens || 0,
-          },
-        };
-      } catch (error: any) {
-        lastError = error;
-
-        if (error.name === 'TimeoutError') {
-          logger.warn(
-            { attempt: attempt + 1, maxRetries: this.maxRetries },
-            'Z.AI request timeout'
-          );
-        } else {
-          logger.error({ error: error.message, attempt: attempt + 1 }, 'Z.AI request failed');
-        }
-
-        // Don't retry on the last attempt
-        if (attempt >= this.maxRetries - 1) {
-          throw error;
-        }
-
-        // Wait before retry (exponential backoff)
-        const waitTime = Math.pow(2, attempt) * 1000;
-        await new Promise((resolve) => setTimeout(resolve, waitTime));
-      }
-    }
-
-    throw lastError || new Error('Z.AI request failed after all retries');
+        throw lastError || new Error('Z.AI request failed after all retries');
+      },
+      { priority: RequestPriority.NORMAL }
+    );
   }
 
   /**
@@ -194,20 +201,28 @@ export class ZAILLMService implements ILLMService {
       stream: true,
     };
 
-    const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(this.timeout),
-    });
+    // Use global rate limiter for streaming requests
+    const response = await globalRateLimiter.submit(
+      async () => {
+        const res = await fetch(`${this.baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.apiKey}`,
+          },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(this.timeout),
+        });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Z.AI API error: ${response.status} ${response.statusText}: ${errorBody}`);
-    }
+        if (!res.ok) {
+          const errorBody = await res.text();
+          throw new Error(`Z.AI API error: ${res.status} ${res.statusText}: ${errorBody}`);
+        }
+
+        return res;
+      },
+      { priority: RequestPriority.HIGH, timeoutMs: 90000 }
+    );
 
     const reader = response.body?.getReader();
     if (!reader) {
@@ -288,25 +303,30 @@ export class ZAIEmbeddingService implements IEmbeddingService {
     }
 
     try {
-      // Use the LLM to generate a semantic embedding via chat
-      const response = await this.llm.chat({
-        messages: [
-          {
-            role: 'system',
-            content: `You are a semantic embedding generator. Convert the following text into a ${this.dimensions}-dimensional vector representation. 
-            
+      // Use global rate limiter for embedding generation (uses LLM under the hood)
+      const response = await globalRateLimiter.submit(
+        async () => {
+          return this.llm.chat({
+            messages: [
+              {
+                role: 'system',
+                content: `You are a semantic embedding generator. Convert the following text into a ${this.dimensions}-dimensional vector representation.
+
 Return ONLY a JSON array of ${this.dimensions} numbers between -1 and 1.
 The numbers should represent the semantic meaning of the input text.
 Do not include any explanation or markdown formatting.`,
-          },
-          {
-            role: 'user',
-            content: text,
-          },
-        ],
-        temperature: 0.1,
-        maxTokens: this.dimensions * 2,
-      });
+              },
+              {
+                role: 'user',
+                content: text,
+              },
+            ],
+            temperature: 0.1,
+            maxTokens: this.dimensions * 2,
+          });
+        },
+        { priority: RequestPriority.LOW }
+      );
 
       // Parse the response as JSON
       const embedding = this.parseEmbeddingResponse(response.content);

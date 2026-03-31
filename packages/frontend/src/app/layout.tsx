@@ -59,11 +59,27 @@ export const metadata: Metadata = {
     title: "VIVIM - The Living Memory for Your AI",
     description: "Sovereign, portable, personal AI memory that works with all providers",
     creator: "@vivim",
+    site: "@vivim",
     images: ["https://vivim.live/twitter-image.png"],
   },
   icons: {
     icon: "/favicon.png",
     apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "VIVIM",
+  },
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  manifest: "/manifest.json",
+  other: {
+    "theme-color": "#020617",
+    "mask-icon": "/mask-icon.svg",
   },
 };
 

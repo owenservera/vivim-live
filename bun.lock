@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "nextjs_tailwind_shadcn_ts",
+      "dependencies": {
+        "uuid": "^13.0.0",
+      },
       "devDependencies": {
         "concurrently": "^9.1.2",
         "next": "^15.0.0",

@@ -58,11 +58,15 @@ import contextEngineRouter from './routes/context-engine.ts';
 import docSearchRouter from './routes/doc-search.ts';
 import demoRouter from './routes/demo.js';
 import { bootContextSystem } from './services/context-startup.ts';
+import { initializeGlobalRateLimiter } from './lib/rate-limiter-init.js';
 
 // Validate configuration on startup
 try {
   validateConfig();
   logger.info('Configuration validated successfully');
+  
+  // Initialize global rate limiter for AI API requests
+  initializeGlobalRateLimiter();
 } catch (error) {
   logger.error('Configuration validation failed:', error);
   process.exit(1);
