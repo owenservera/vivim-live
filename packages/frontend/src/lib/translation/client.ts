@@ -56,8 +56,17 @@ async function fetchTranslations(
 
   if (!res.ok) {
     const errorText = await res.text();
-    log.error(`API error: ${res.status}`, { status: res.status, error: errorText });
-    throw new Error(`Translate API ${res.status}`);
+    const isAuthError = res.status === 401 || res.status === 403;
+    const isRateLimit = res.status === 429;
+    const isServerError = res.status >= 500;
+    
+    log.error(`API error: ${res.status}`, { 
+      status: res.status, 
+      error: errorText,
+      type: isAuthError ? "AUTH" : isRateLimit ? "RATE_LIMIT" : isServerError ? "SERVER" : "UNKNOWN"
+    });
+    
+    throw new Error(`Translate API ${res.status}: ${isAuthError ? "Authentication failed" : isRateLimit ? "Rate limit exceeded" : isServerError ? "Service temporarily unavailable" : errorText}`);
   }
 
   const data = await res.json();
@@ -88,6 +97,8 @@ async function processBatch(
     log.info(`Cache hits`, { count: cachedCount, missing: missingIdx.length });
   }
 
+  let batchError: Error | null = null;
+
   if (missingIdx.length > 0) {
     const missingStrings = missingIdx.map((i) => originals[i]);
     log.group("API Request");
@@ -99,9 +110,11 @@ async function processBatch(
       setCachedBatch(targetLang, missingStrings, fresh);
       log.success(`API translation complete`, { translated: fresh.length });
     } catch (err) {
-      log.error("API failed, using originals", { error: err });
+      batchError = err instanceof Error ? err : new Error(String(err));
+      log.error("API failed", { error: batchError.message });
+      // Don't use originals - let the user know translation failed
       missingIdx.forEach((i) => {
-        cached[i] = originals[i];
+        cached[i] = originals[i]; // Keep original, but error is logged
       });
     }
     log.groupEnd();
@@ -120,7 +133,17 @@ async function processBatch(
     }
   });
 
-  log.success(`Batch complete`, { patched: patchedCount, total: jobs.length });
+  if (batchError) {
+    log.warn(`Batch completed with errors`, { 
+      patched: patchedCount, 
+      total: jobs.length,
+      error: batchError.message 
+    });
+  } else {
+    log.success(`Batch complete`, { patched: patchedCount, total: jobs.length });
+  }
+  
+  return batchError ? Promise.reject(batchError) : Promise.resolve();
 }
 
 async function processBatchesParallel(
@@ -160,17 +183,85 @@ async function processBatchesSequential(
   }
 }
 
+// Circuit breaker state to prevent API spam during failures
+let circuitBreaker = {
+  failures: 0,
+  lastFailure: 0,
+  state: "CLOSED" as "CLOSED" | "OPEN" | "HALF_OPEN",
+  threshold: 3,
+  resetTimeout: 60000, // 1 minute
+};
+
+function shouldAllowRequest(): boolean {
+  const now = Date.now();
+  
+  if (circuitBreaker.state === "CLOSED") {
+    return true;
+  }
+  
+  if (circuitBreaker.state === "OPEN") {
+    if (now - circuitBreaker.lastFailure > circuitBreaker.resetTimeout) {
+      circuitBreaker.state = "HALF_OPEN";
+      return true;
+    }
+    return false;
+  }
+  
+  // HALF_OPEN - allow one request to test
+  return true;
+}
+
+function recordSuccess(): void {
+  circuitBreaker.failures = 0;
+  circuitBreaker.state = "CLOSED";
+}
+
+function recordFailure(): void {
+  circuitBreaker.failures++;
+  circuitBreaker.lastFailure = Date.now();
+  
+  if (circuitBreaker.failures >= circuitBreaker.threshold) {
+    circuitBreaker.state = "OPEN";
+    log.error("Circuit breaker OPENED", { 
+      failures: circuitBreaker.failures,
+      resetIn: `${Math.ceil(circuitBreaker.resetTimeout / 1000)}s`
+    });
+  }
+}
+
+function resetCircuitBreaker(): void {
+  circuitBreaker = {
+    failures: 0,
+    lastFailure: 0,
+    state: "CLOSED",
+    threshold: 3,
+    resetTimeout: 60000,
+  };
+}
+
 export async function translatePage(
   targetLang: string,
   root: HTMLElement = document.body,
   context?: string
-): Promise<void> {
+): Promise<{ success: boolean; error?: string }> {
   const startTime = performance.now();
 
   if (targetLang === "en") {
     log.info("Skipping translation (English)");
     revertPage(root);
-    return;
+    return { success: true };
+  }
+
+  // Check circuit breaker before starting
+  if (!shouldAllowRequest()) {
+    log.error("Translation blocked by circuit breaker", { 
+      state: circuitBreaker.state,
+      failures: circuitBreaker.failures
+    });
+    return { 
+      success: false, 
+      error: "Translation service temporarily unavailable. Please try again in a minute." 
+    };
   }
 
   log.group(`Translate Page → ${targetLang.toUpperCase()}`);
@@ -182,31 +273,58 @@ export async function translatePage(
   if (jobs.length === 0) {
     log.warn("No translatable text found");
     log.groupEnd();
-    return;
+    return { success: true };
   }
 
   const { aboveFold, belowFold } = computeSmartStrategy(jobs);
-  log.info("Smart strategy computed", { 
-    aboveFold: aboveFold.length, 
-    belowFold: belowFold.length 
+  log.info("Smart strategy computed", {
+    aboveFold: aboveFold.length,
+    belowFold: belowFold.length
   });
+
+  let hasErrors = false;
+  let errorMessage: string | undefined;
 
   if (aboveFold.length > 0) {
     log.info("Processing above-fold (parallel)");
-    await processBatchesParallel(aboveFold, targetLang, context);
+    try {
+      await processBatchesParallel(aboveFold, targetLang, context);
+    } catch (err) {
+      hasErrors = true;
+      errorMessage = err instanceof Error ? err.message : "Translation failed";
+    }
   }
 
-  if (belowFold.length > 0) {
+  if (belowFold.length > 0 && !hasErrors) {
     log.info("Processing below-fold (sequential)");
-    await processBatchesSequential(belowFold, targetLang, context);
+    try {
+      await processBatchesSequential(belowFold, targetLang, context);
+    } catch (err) {
+      hasErrors = true;
+      errorMessage = err instanceof Error ? err.message : "Translation failed";
+    }
   }
 
   const duration = performance.now() - startTime;
-  log.success(`Page translation complete`, { 
-    totalTranslated: jobs.length, 
-    duration: `${duration.toFixed(0)}ms` 
-  });
-  log.groupEnd();
+  
+  if (hasErrors) {
+    recordFailure();
+    log.warn(`Page translation completed with errors`, {
+      totalTranslated: jobs.length,
+      duration: `${duration.toFixed(0)}ms`,
+      error: errorMessage
+    });
+    log.groupEnd();
+    return { success: false, error: errorMessage };
+  } else {
+    recordSuccess();
+    log.success(`Page translation complete`, {
+      totalTranslated: jobs.length,
+      duration: `${duration.toFixed(0)}ms`
+    });
+    log.groupEnd();
+    return { success: true };
+  }
 }
 
 export function revertPage(root: HTMLElement = document.body): void {
@@ -223,32 +341,7 @@ export function revertPage(root: HTMLElement = document.body): void {
   log.success(`Reverted ${reverted.length} elements`);
 }
 
-let _observer: MutationObserver | null = null;
-let _currentLang = "en";
-
-export function startObserver(getLang: () => string): void {
-  _observer?.disconnect();
-
-  _observer = new MutationObserver((mutations) => {
-    const lang = getLang();
-    if (lang === _currentLang || lang === "en") return;
-
-    _currentLang = lang;
-    log.info(`Mutation detected, re-translating`, { lang, mutationsCount: mutations.length });
-
-    mutations.forEach((m) => {
-      m.addedNodes.forEach((node) => {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          translatePage(lang, node as HTMLElement, undefined);
-        }
-      });
-    });
-  });
-
-  _observer.observe(document.body, { childList: true, subtree: true });
-  log.success("MutationObserver started");
-}
-
+// Prefetch state
 let _prefetchAbort: AbortController | null = null;
 
 export async function prefetchTranslations(
@@ -257,36 +350,50 @@ export async function prefetchTranslations(
   context?: string
 ): Promise<void> {
   if (targetLang === "en") return;
-  
+
+  // Check circuit breaker
+  if (!shouldAllowRequest()) {
+    log.warn(`Pre-fetch blocked by circuit breaker`);
+    return;
+  }
+
   _prefetchAbort?.abort();
   _prefetchAbort = new AbortController();
-  
+
   log.info(`Pre-fetching translations for ${targetLang}`);
-  
+
   const jobs = harvestTextNodesWithPriority(root);
   const { aboveFold } = computeSmartStrategy(jobs);
-  
+
   const originals = aboveFold.map(j => j.original);
   const cached = getCachedBatch(targetLang, originals);
   const missingIdx = cached.map((v, i) => (v === null ? i : -1)).filter((i) => i !== -1);
-  
+
   if (missingIdx.length === 0) {
     log.info(`Pre-fetch: all above-fold already cached`);
     return;
   }
-  
+
   const missingStrings = missingIdx.map((i) => originals[i]);
-  
+
   try {
     const fresh = await fetchTranslations(missingStrings, targetLang, context);
     setCachedBatch(targetLang, missingStrings, fresh);
     log.success(`Pre-fetch complete`, { cached: fresh.length });
-  } catch {
-    log.warn(`Pre-fetch failed or aborted`);
+  } catch (err) {
+    log.warn(`Pre-fetch failed`, { error: err instanceof Error ? err.message : String(err) });
   }
 }
 
 export function clearPrefetch(): void {
   _prefetchAbort?.abort();
   _prefetchAbort = null;
+}
+
+/**
+ * Reset the circuit breaker (useful for debugging or manual recovery)
+ */
+export function resetTranslationService(): void {
+  resetCircuitBreaker();
+  log.success("Translation service reset");
 }

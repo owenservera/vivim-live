@@ -7,22 +7,24 @@
  * Usage: bun run scripts/seed-corpus-from-md.ts
  */
 
-import { PrismaClient } from '@prisma/client';
 import { readdir, readFile } from 'fs/promises';
-import { join, relative } from 'path';
+import { join, relative, sep } from 'path';
 import { createEmbeddingService } from '../src/context/utils/zai-service.js';
 import { logger } from '../src/lib/logger.js';
+import { getPrismaClient } from '../src/lib/database.js';
 
-const prisma = new PrismaClient();
+const prisma = getPrismaClient();
 
 // Directories to scan for MD files
 const CORPUS_DIRS = [
   { path: 'migration-design/knowledge', category: 'architecture' },
   { path: 'chain-of-trust/docs-output', category: 'technical' },
   { path: 'cinematic-platform', category: 'platform' },
+  { path: 'INTEGRATION_PLAN', category: 'integration' },
+  { path: 'docs', category: 'docs' },
 ];
 
-const ROOT_DIR = process.cwd();
+const ROOT_DIR = process.cwd().replace('packages' + sep + 'backend', '');
 
 // Chunking configuration
 const CHUNK_SIZE = 800; // characters

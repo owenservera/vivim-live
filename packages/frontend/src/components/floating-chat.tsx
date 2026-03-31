@@ -16,6 +16,13 @@ function createMessageId() {
   return `msg_${++messageId}_${Date.now()}`;
 }
 
+type ErrorInfo = {
+  message: string;
+  status?: number;
+  details?: string;
+  timestamp: string;
+};
+
 export function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -23,6 +30,7 @@ export function FloatingChat() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<ErrorInfo | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
@@ -54,7 +62,18 @@ export function FloatingChat() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `API error: ${response.status}`);
+        const errorMessage = errorData.error || `API error: ${response.status}`;
+        const errorDetails = errorData.details || "";
+        const debugInfo = errorData.debug || {};
+        
+        console.error("[Chat API Error]", {
+          status: response.status,
+          error: errorMessage,
+          details: errorDetails,
+          debug: debugInfo,
+        });
+        
+        throw new Error(errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage);
       }
 
       const reader = response.body?.getReader();
@@ -97,10 +116,39 @@ export function FloatingChat() {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
+      let errorMessage = "An unexpected error occurred";
+      let errorStatus: number | undefined;
+      let errorDetails = "Request to /api/chat failed. Check console for details.";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        const statusMatch = error.message.match(/API error: (\d+)/);
+        if (statusMatch) {
+          errorStatus = parseInt(statusMatch[1], 10);
+        }
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      }
+
+      if (errorDetails) {
+        const errorInfo: ErrorInfo = {
+          message: errorMessage,
+          status: errorStatus,
+          details: errorDetails,
+          timestamp: new Date().toLocaleTimeString(),
+        };
+        setError(errorInfo);
+        console.error("[Chat Error]", errorInfo);
+      }
+
       setMessages((prev) => [
         ...prev,
-        { id: createMessageId(), role: "assistant", content: `Sorry, I encountered an error. Please try again.` },
+        { 
+          id: createMessageId(), 
+          role: "assistant", 
+          content: `❌ Error: ${errorMessage}${errorStatus ? ` (Status: ${errorStatus})` : ''}\n\n📋 Details: ${errorDetails}\n\n💡 Check browser console (F12) for full debug info.` 
+        },
       ]);
     } finally {
       setIsLoading(false);

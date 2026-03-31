@@ -99,26 +99,58 @@ export async function searchDocsCorpus(query: string): Promise<string[]> {
 export function buildSystemPrompt(context: DualContext): string {
   const { user, docs } = context;
 
+  // Defensive null checks
+  if (!user) {
+    console.warn("[buildSystemPrompt] Missing user context, using defaults");
+    return buildDefaultSystemPrompt();
+  }
+
+  if (!docs) {
+    console.warn("[buildSystemPrompt] Missing docs context, using defaults");
+  }
+
   return `You are VIVIM Assistant, an intelligent memory companion.
 
 ## USER CONTEXT
-- User ID: ${user.id}
-- Language: ${user.preferences.language}
-- Expertise Level: ${user.preferences.expertise}
-- Response Style: ${user.preferences.responseStyle}
-- Current Page: ${user.sessionContext.currentPage}
-- Time Zone: ${user.sessionContext.timeZone}
+- User ID: ${user.id ?? "anonymous"}
+- Language: ${user.preferences?.language ?? "en"}
+- Expertise Level: ${user.preferences?.expertise ?? "intermediate"}
+- Response Style: ${user.preferences?.responseStyle ?? "balanced"}
+- Current Page: ${user.sessionContext?.currentPage ?? "/chat"}
+- Time Zone: ${user.sessionContext?.timeZone ?? "UTC"}
 ${user.memory?.recentTopics?.length ? `- Recent Topics: ${user.memory.recentTopics.join(", ")}` : ""}
 
 ## KNOWLEDGE BASE
-${docs.relevantDocs.map((doc, i) => `${i + 1}. ${doc}`).join("\n")}
+${docs?.relevantDocs?.length ? docs.relevantDocs.map((doc, i) => `${i + 1}. ${doc}`).join("\n") : "No knowledge base documents available."}
 
 ## INSTRUCTIONS
 - Be helpful, accurate, and friendly
-- Adapt your responses to the user's expertise level (${user.preferences.expertise})
-- Match the user's preferred response style (${user.preferences.responseStyle})
+- Adapt your responses to the user's expertise level (${user.preferences?.expertise ?? "intermediate"})
+- Match the user's preferred response style (${user.preferences?.responseStyle ?? "balanced"})
 - Reference the knowledge base when relevant
 - Use markdown formatting for clarity when appropriate
+- If you don't know something, say so honestly
+- Keep responses focused and actionable`;
+}
+
+/**
+ * Build a default system prompt when context is unavailable
+ */
+function buildDefaultSystemPrompt(): string {
+  return `You are VIVIM Assistant, an intelligent memory companion.
+
+## USER CONTEXT
+- User ID: anonymous
+- Language: en
+- Expertise Level: intermediate
+- Response Style: balanced
+
+## KNOWLEDGE BASE
+No knowledge base available.
+
+## INSTRUCTIONS
+- Be helpful, accurate, and friendly
+- Use clear, concise language
 - If you don't know something, say so honestly
 - Keep responses focused and actionable`;
 }

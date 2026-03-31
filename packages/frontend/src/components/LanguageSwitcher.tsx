@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { translatePage, revertPage, startObserver, prefetchTranslations, clearPrefetch } from "@/lib/translation/client";
+import { translatePage, revertPage, prefetchTranslations, clearPrefetch, resetTranslationService } from "@/lib/translation/client";
 import { detectLanguage, setLanguagePreference } from "@/lib/translation/langDetect";
 import { suggestLanguageFromLocation, detectLocation } from "@/lib/translation/geolocation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,9 +29,8 @@ export default function LanguageSwitcher() {
   const [locationHint, setLocationHint] = useState<LocationHint | null>(null);
   const [showLocationBanner, setShowLocationBanner] = useState(false);
   const [userCountry, setUserCountry] = useState<string | null>(null);
-  const [prefetchedLang, setPrefetchedLang] = useState<string | null>(null);
+  const [translationError, setTranslationError] = useState<string | null>(null);
   const langRef = useRef(lang);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     langRef.current = lang;
@@ -53,39 +52,11 @@ export default function LanguageSwitcher() {
         }
       });
     });
-
-    if (detected !== "en") {
-      translatePage(detected);
-    }
-    startObserver(() => langRef.current);
+    // NOTE: No auto-translation on load - user must explicitly select a language
   }, []);
 
   const handleDropdownOpen = () => {
     setIsOpen(true);
-    
-    if (locationHint?.recommendedLang && locationHint.recommendedLang !== "en") {
-      prefetchTranslations(locationHint.recommendedLang, document.body, "vivim landing page");
-      setPrefetchedLang(locationHint.recommendedLang);
-    }
-  };
-
-  const handleLanguageHover = (code: string) => {
-    if (code === "en" || code === prefetchedLang || loading) return;
-    
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    
-    hoverTimeoutRef.current = setTimeout(() => {
-      prefetchTranslations(code, document.body, "vivim landing page");
-      setPrefetchedLang(code);
-    }, 150);
-  };
-
-  const handleMouseLeave = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
   };
 
   const handleChange = async (code: string) => {
@@ -94,15 +65,25 @@ export default function LanguageSwitcher() {
     setLanguagePreference(code);
     setIsOpen(false);
     setShowLocationBanner(false);
-    clearPrefetch();
+    setTranslationError(null);
 
     if (code === "en") {
       revertPage();
     } else {
       revertPage();
-      await translatePage(code, document.body, "vivim landing page");
+      const result = await translatePage(code, document.body, "vivim landing page");
+      if (!result.success) {
+        setTranslationError(result.error ?? "Translation failed");
+        // Reset to English on failure
+        setLang("en");
+      }
     }
     setLoading(false);
+  };
+
+  const dismissError = () => {
+    setTranslationError(null);
+    resetTranslationService();
   };
 
   const acceptRecommendation = () => {
@@ -166,6 +147,36 @@ export default function LanguageSwitcher() {
         )}
       </AnimatePresence>
 
+      {/* Translation Error Toast */}
+      <AnimatePresence>
+        {translationError && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute right-0 top-full mt-2 z-50 bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 min-w-[300px] shadow-2xl backdrop-blur-sm"
+          >
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 mt-0.5">
+                <Globe className="w-4 h-4 text-red-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-white">Translation unavailable</p>
+                <p className="text-xs text-slate-300 mt-1">{translationError}</p>
+                <button
+                  type="button"
+                  onClick={dismissError}
+                  className="text-xs text-slate-400 hover:text-white transition-colors mt-2"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="relative">
         <button
           type="button"
@@ -207,7 +218,6 @@ export default function LanguageSwitcher() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.15 }}
-                onMouseLeave={handleMouseLeave}
                 className="absolute right-0 top-full mt-2 z-50 bg-slate-900 border border-white/10 rounded-xl p-1 min-w-[200px] shadow-xl"
               >
                 {locationHint?.recommendedLang && (
@@ -224,7 +234,6 @@ export default function LanguageSwitcher() {
                     key={language.code}
                     type="button"
                     onClick={() => handleChange(language.code)}
-                    onMouseEnter={() => handleLanguageHover(language.code)}
                     disabled={loading}
                     className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
                       lang === language.code
@@ -236,9 +245,6 @@ export default function LanguageSwitcher() {
                     <span className="flex-1 text-left">{language.label}</span>
                     {locationHint?.recommendedLang === language.code && (
                       <span className="text-xs bg-violet-500/20 text-violet-400 px-1.5 py-0.5 rounded">Auto-suggested</span>
-                    )}
-                    {prefetchedLang === language.code && lang !== language.code && (
-                      <span className="text-xs text-emerald-400">✓</span>
                     )}
                   </button>
                 ))}

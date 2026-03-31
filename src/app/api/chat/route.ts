@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildSystemPrompt } from "@/lib/chat/context";
 import type { ChatRequest } from "@/types/chat";
 
-const ZAI_API_KEY = process.env.ZAI_API_KEY!;
+const ZAI_API_KEY = process.env.ZAI_API_KEY;
 const ZAI_BASE_URL = process.env.ZAI_BASE_URL ?? "https://api.z.ai/api/coding/paas/v4";
-const ZAI_CHAT_MODEL = process.env.ZAI_TRANSLATE_MODEL ?? "glm-4.7-flash";
-const ZAI_CHAT_TEMPERATURE = parseFloat(process.env.TRANSLATE_TEMPERATURE ?? "0.1");
+const ZAI_CHAT_MODEL = process.env.ZAI_CHAT_MODEL ?? process.env.ZAI_TRANSLATE_MODEL ?? "glm-4.7-flash";
+const ZAI_CHAT_TEMPERATURE = parseFloat(process.env.ZAI_CHAT_TEMPERATURE ?? process.env.TRANSLATE_TEMPERATURE ?? "0.1");
 const ZAI_MAX_TOKENS = parseInt(process.env.ZAI_MAX_TOKENS ?? "4096");
 
 const DEBUG = process.env.DEBUG_CHAT === "true";
@@ -26,9 +26,18 @@ export async function POST(req: NextRequest) {
     log("INFO", `Request ${requestId} started`);
 
   if (!ZAI_API_KEY) {
-      log("ERROR", "ZAI_API_KEY not configured");
+      log("ERROR", "ZAI_API_KEY not configured - check environment variables");
       return NextResponse.json(
-        { error: "Chat API not configured" },
+        { 
+          error: "Chat API not configured",
+          details: "ZAI_API_KEY environment variable is not set. Please configure your API key.",
+          debug: {
+            apiKeyConfigured: false,
+            model: ZAI_CHAT_MODEL,
+            baseUrl: ZAI_BASE_URL,
+            envVars: Object.keys(process.env).filter(k => k.startsWith('ZAI')),
+          }
+        },
         { status: 503 }
       );
     }
@@ -88,8 +97,26 @@ export async function POST(req: NextRequest) {
         status: zaiResponse.status,
         error: errorText.substring(0, 500),
       });
+      
+      let errorDetail = `Z.AI API error: ${zaiResponse.status}`;
+      if (zaiResponse.status === 401) {
+        errorDetail = "Invalid or missing ZAI_API_KEY. Please check your API key.";
+      } else if (zaiResponse.status === 403) {
+        errorDetail = "Access forbidden. Check your ZAI_API_KEY permissions.";
+      } else if (zaiResponse.status === 429) {
+        errorDetail = "Rate limit exceeded. Please try again later.";
+      }
+
       return NextResponse.json(
-        { error: `Z.AI API error: ${zaiResponse.status}` },
+        { 
+          error: errorDetail,
+          details: errorText.substring(0, 500),
+          debug: {
+            model: ZAI_CHAT_MODEL,
+            apiKeyConfigured: !!ZAI_API_KEY,
+            baseUrl: ZAI_BASE_URL,
+          }
+        },
         { status: zaiResponse.status }
       );
     }
@@ -109,13 +136,42 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     const duration = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     log("ERROR", "Unhandled error", {
       requestId,
       duration: `${duration}ms`,
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
+      stack: errorStack,
     });
+
+    let userMessage = "Internal server error";
+    let details = "An unexpected error occurred";
+
+    if (errorMessage.includes("fetch")) {
+      if (errorMessage.includes("ECONNREFUSED")) {
+        userMessage = "Backend service unavailable";
+        details = "Cannot connect to backend. Please ensure the backend service is running.";
+      } else if (errorMessage.includes("ENOTFOUND")) {
+        userMessage = "Backend not found";
+        details = "Cannot resolve backend URL. Check configuration.";
+      } else {
+        userMessage = "Network error";
+        details = `Network error: ${errorMessage}`;
+      }
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { 
+        error: userMessage,
+        details: details,
+        requestId,
+        debug: {
+          apiKeyConfigured: !!ZAI_API_KEY,
+          model: ZAI_CHAT_MODEL,
+        }
+      },
       { status: 500 }
     );
   }

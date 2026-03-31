@@ -27,6 +27,12 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# Vercel setup helpers (optional to commit)
+setup-vercel-env.bat
+setup-vercel-env.ps1
+setup-vercel-env.js
+VERCEL_ENV_SETUP.md
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

@@ -84,14 +84,29 @@ export async function POST(req: NextRequest) {
       } else {
         log("WARN", "Backend context failed, using fallback");
         // Fallback to local context builder
-        const { buildSystemPrompt } = await import("@/lib/chat/context");
-        systemPrompt = buildSystemPrompt(context);
+        try {
+          const { buildDualContext, buildSystemPrompt } = await import("@/lib/chat/context");
+          const fallbackContext = await buildDualContext(userId);
+          systemPrompt = buildSystemPrompt(fallbackContext);
+          log("SUCCESS", "Fallback context generated", { userId, promptLength: systemPrompt.length });
+        } catch (fallbackError: any) {
+          log("ERROR", "Fallback context failed", { error: fallbackError.message });
+          systemPrompt = `You are VIVIM Assistant. Be helpful and friendly.`;
+        }
       }
     } catch (error: any) {
       log("ERROR", "Context assembly error", { error: error.message });
       // Fallback to local context builder
-      const { buildSystemPrompt } = await import("@/lib/chat/context");
-      systemPrompt = buildSystemPrompt(context);
+      try {
+        const { buildDualContext, buildSystemPrompt } = await import("@/lib/chat/context");
+        const fallbackContext = await buildDualContext(userId);
+        systemPrompt = buildSystemPrompt(fallbackContext);
+        log("SUCCESS", "Fallback context generated", { userId, promptLength: systemPrompt.length });
+      } catch (fallbackError: any) {
+        log("ERROR", "Fallback context also failed", { error: fallbackError.message });
+        // Last resort: use minimal default prompt
+        systemPrompt = `You are VIVIM Assistant. Be helpful and friendly.`;
+      }
     }
 
     // Step 2: Build messages for Z.AI
@@ -131,8 +146,26 @@ export async function POST(req: NextRequest) {
         status: zaiResponse.status,
         error: errorText.substring(0, 500),
       });
+      
+      let errorDetail = `Z.AI API error: ${zaiResponse.status}`;
+      if (zaiResponse.status === 401) {
+        errorDetail = "Invalid or missing ZAI_API_KEY. Please check your API key configuration.";
+      } else if (zaiResponse.status === 403) {
+        errorDetail = "Access forbidden. Check your ZAI_API_KEY permissions.";
+      } else if (zaiResponse.status === 429) {
+        errorDetail = "Rate limit exceeded. Please try again later.";
+      }
+
       return NextResponse.json(
-        { error: `Z.AI API error: ${zaiResponse.status}` },
+        { 
+          error: errorDetail,
+          details: errorText.substring(0, 500),
+          debug: {
+            model: ZAI_CHAT_MODEL,
+            apiKeyConfigured: !!ZAI_API_KEY,
+            baseUrl: ZAI_BASE_URL,
+          }
+        },
         { status: zaiResponse.status }
       );
     }
@@ -154,13 +187,46 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     const duration = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    
     log("ERROR", "Unhandled error", {
       requestId,
       duration: `${duration}ms`,
-      error: error instanceof Error ? error.message : String(error),
+      error: errorMessage,
+      stack: errorStack,
     });
+
+    let userMessage = "Internal server error";
+    let details = "An unexpected error occurred";
+    
+    if (errorMessage.includes("fetch")) {
+      if (errorMessage.includes("ECONNREFUSED")) {
+        userMessage = "Backend service unavailable";
+        details = `Cannot connect to backend at ${BACKEND_URL}. Please ensure the backend service is running on port 3001.`;
+      } else if (errorMessage.includes("ENOTFOUND")) {
+        userMessage = "Backend not found";
+        details = `Cannot resolve ${BACKEND_URL}. Check backend URL configuration.`;
+      } else {
+        userMessage = "Network error";
+        details = `Failed to connect to backend: ${errorMessage}`;
+      }
+    } else if (errorMessage.includes("ZAI_API_KEY")) {
+      userMessage = "API key not configured";
+      details = "ZAI_API_KEY environment variable is not set. Please configure your API key.";
+    }
+
     return NextResponse.json(
-      { error: "Internal server error" },
+      { 
+        error: userMessage,
+        details: details,
+        requestId,
+        debug: {
+          backendUrl: BACKEND_URL,
+          apiKeyConfigured: !!ZAI_API_KEY,
+          model: ZAI_CHAT_MODEL,
+        }
+      },
       { status: 500 }
     );
   }
