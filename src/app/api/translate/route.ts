@@ -16,7 +16,7 @@ const MODEL = process.env.ZAI_TRANSLATE_MODEL ?? "glm-4.7-flash";
 const TEMPERATURE = parseFloat(process.env.TRANSLATE_TEMPERATURE ?? "0.1");
 const MAX_STRINGS_PER_REQUEST = 30;
 
-const RATE_LIMIT_MAX = 20;
+const RATE_LIMIT_MAX = 100;
 const RATE_LIMIT_WINDOW = 60;
 
 interface TranslateRequest {
@@ -130,9 +130,11 @@ async function performTranslation(
 ): Promise<{ translations: string[]; source: TranslationSource }> {
   if (isLingvaEnabled()) {
     const lingvaResults = await lingvaTranslate(strings, sourceLang, targetLang);
-    const allSucceeded = lingvaResults.every((r) => r !== null);
+    const successCount = lingvaResults.filter((r) => r !== null).length;
+    const failureCount = strings.length - successCount;
 
-    if (allSucceeded) {
+    // All Lingva translations succeeded
+    if (failureCount === 0) {
       log("INFO", "Lingva translation complete", { count: strings.length });
       return {
         translations: lingvaResults as string[],
@@ -140,12 +142,20 @@ async function performTranslation(
       };
     }
 
-    const failedIndices = lingvaResults
-      .map((r, i) => (r === null ? i : -1))
-      .filter((i) => i !== -1);
-
-    if (failedIndices.length < strings.length) {
+    // Lingva partial failure - only call LLM if >50% failed (true last resort)
+    const failureRate = failureCount / strings.length;
+    if (failureRate > 0.5 && ZAI_API_KEY) {
+      log("WARN", "Lingva mostly failed, attempting LLM fallback", { 
+        total: strings.length, 
+        failed: failureCount,
+        rate: failureRate 
+      });
+      
+      const failedIndices = lingvaResults
+        .map((r, i) => (r === null ? i : -1))
+        .filter((i) => i !== -1);
       const failedStrings = failedIndices.map((i) => strings[i]);
+      
       const llmResults = await callLLM(failedStrings, targetLang, sourceLang, context);
 
       const merged = [...lingvaResults] as string[];
@@ -153,11 +163,27 @@ async function performTranslation(
         merged[originalIdx] = llmResults[llmIdx] ?? strings[originalIdx];
       });
 
-      log("INFO", "Lingva partial + LLM fallback", { total: strings.length, failed: failedIndices.length });
+      return { translations: merged, source: "lingva" };
+    }
+
+    // Lingva mostly worked - return what we have, leave failed as original
+    if (successCount > 0) {
+      const merged = strings.map((s, i) => lingvaResults[i] ?? s);
+      log("INFO", "Lingva partial, returning originals for failed", { 
+        total: strings.length, 
+        succeeded: successCount,
+        failed: failureCount 
+      });
       return { translations: merged, source: "lingva" };
     }
   }
 
+  // True last resort - all Lingva failed AND no ZAI key or Lingva disabled
+  if (!ZAI_API_KEY) {
+    return { translations: strings, source: "original" };
+  }
+
+  // Final fallback to LLM
   try {
     const llmResults = await callLLM(strings, targetLang, sourceLang, context);
     return { translations: llmResults, source: "llm" };

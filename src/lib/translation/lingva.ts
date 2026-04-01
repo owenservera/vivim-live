@@ -2,6 +2,8 @@ const DEFAULT_INSTANCES = [
   "https://lingva.ml",
   "https://lingva.thedaviddelta.com",
   "https://translate.plausibility.cloud",
+  "https://translate.terraprint.co",
+  "https://translate.projectsegfau.lt",
 ];
 
 const failureCounts = new Map<string, number>();

@@ -48,3 +48,6 @@ VIVIM.docs/
 
 
 .vercel
+
+.vercel
+.env*.local
