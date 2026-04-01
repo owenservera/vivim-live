@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "github": "GitHub",
+    "discord": "Discord",
+    "docs": "Docs"
+  },
+  "cta": {
+    "tryLiveDemo": "Try Live Demo",
+    "viewOnGithub": "View on GitHub"
+  },
+  "footer": {
+    "tagline": "Your memory. Your rules. Everywhere.",
+    "philosophy": "The philosophy that guides everything we build.",
+    "copyright": "© 2026 VIVIM • AGPL v3 • Open Source"
+  },
+  "errors": {
+    "somethingWrong": "Something went wrong",
+    "tryAgain": "Try again"
+  },
+  "misc": {
+    "comingSoon": "Coming soon",
+    "learnMore": "Learn more",
+    "viewAll": "View all"
+  }
+}

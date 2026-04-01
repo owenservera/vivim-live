@@ -1,0 +1,424 @@
+{
+  "common": {
+    "nav": {
+      "github": "GitHub",
+      "discord": "Discord",
+      "docs": "Docs"
+    },
+    "demos": "Demos",
+    "navbar": {
+      "sections": {
+        "overview": "Overview",
+        "problem": "Problem",
+        "solution": "Solution",
+        "acus": "ACUs",
+        "principles": "Principles",
+        "developers": "Developers"
+      },
+      "github": {
+        "backend": "Backend",
+        "app": "App",
+        "network": "Network",
+        "sdk": "SDK"
+      },
+      "mobile": {
+        "liveMemoryDemo": "Live Memory Demo",
+        "contextEngineDemo": "Context Engine Demo"
+      },
+      "demoDropdown": {
+        "liveMemory": { "label": "Live Memory", "desc": "See extraction in action" },
+        "contextEngine": { "label": "Context Engine", "desc": "Watch memory assembly live" },
+        "zeroKnowledgePrivacy": { "label": "Zero-Knowledge Privacy", "desc": "Your keys never leave your device" },
+        "sovereignHistory": { "label": "Sovereign History", "desc": "Complete ownership of your data" },
+        "decentralizedNetwork": { "label": "Decentralized Network", "desc": "Peer-to-peer sync without servers" },
+        "secureCollaboration": { "label": "Secure Collaboration", "desc": "Team sharing with sovereignty" },
+        "dynamicIntelligence": { "label": "Dynamic Intelligence", "desc": "Adaptive context evolution" }
+      }
+    },
+    "cta": {
+      "tryLiveDemo": "Try Live Demo",
+      "viewOnGithub": "View on GitHub"
+    },
+    "footer": {
+      "tagline": "Your memory. Your rules. Everywhere.",
+      "philosophy": "The philosophy that guides everything we build.",
+      "copyright": "© 2026 VIVIM • AGPL v3 • Open Source"
+    },
+    "errors": {
+      "somethingWrong": "Something went wrong",
+      "tryAgain": "Try again"
+    },
+    "misc": {
+      "comingSoon": "Coming soon",
+      "learnMore": "Learn more",
+      "viewAll": "View all",
+      "rank": "Rank #"
+    }
+  },
+  "hero": {
+    "tagline": "Sovereign • Portable • Personal",
+    "title": "The Living Memory",
+    "titleHighlight": "for Your AI",
+    "description": "A memory layer that you own, that works with any AI provider, and goes wherever you go.",
+    "quote": "It's not just technology — it's a philosophy about who owns your AI memory.",
+    "descriptionExtended": "A sovereign, portable, personal memory and dynamic context engine that works with all AI providers — your single, AI-native database."
+  },
+  "providers": {
+    "title": "Works with {highlight}",
+    "highlight": "Any AI Provider",
+    "description": "VIVIM is provider-agnostic. Connect your favorite models instantly.",
+    "logos": {
+      "openai": "OpenAI",
+      "googleGemini": "Google Gemini",
+      "claude": "Claude",
+      "grok": "Grok",
+      "zai": "Z.ai",
+      "qwen": "Qwen",
+      "kimi": "Kimi"
+    }
+  },
+  "problem": {
+    "title": "The Problem",
+    "heading": "Every AI Conversation",
+    "highlight": "Starts Broken",
+    "description": "The context window isn't just limited — it's actively working against you. And most 'solutions' make it worse.",
+    "viewScores": "View scores →",
+    "openFullScorecard": "Open Full Scorecard",
+    "stats": {
+      "accuracyDrop": "Accuracy drop as context grows",
+      "frontierModels": "Frontier models degrade with context",
+      "vectorMarket": "Vector DB market validates the problem"
+    },
+    "cards": {
+      "contextWipe": {
+        "title": "The Context Wipe",
+        "hook": "AI forgets everything, every session",
+        "stat": "Conversations degrade after 15–20 messages, even with 1M token windows.",
+        "desc": "Users rebuild context from scratch on every conversation. 3 years of domain knowledge, preferences, and decisions vanish the moment a tab closes."
+      },
+      "providerLockIn": {
+        "title": "The Provider Lock-in Trap",
+        "hook": "Your memory belongs to ChatGPT, not you",
+        "stat": "Switching AI providers means losing all accumulated context.",
+        "desc": "Switching AI providers means losing all accumulated context. Users are held hostage by memory moats that providers built intentionally."
+      },
+      "copyPasteTax": {
+        "title": "The Copy-Paste Tax",
+        "hook": "Hours lost rebuilding context weekly",
+        "stat": "Hours every week rebuilding context from scratch.",
+        "desc": "Knowledge workers spend 5–10 hours/week re-explaining their stack, preferences, team structure, and project history to AI tools that forgot everything overnight."
+      },
+      "middleBlackHole": {
+        "title": "The Middle Black Hole",
+        "hook": "AI ignores context you explicitly provided",
+        "stat": "20+ percentage points worse accuracy for information in the middle of context.",
+        "desc": "Stanford/Google/Anthropic research confirms 20+ percentage point accuracy drop for information in the middle of long context windows. Users unknowingly provide context the model never reads."
+      },
+      "dataHostage": {
+        "title": "The Data Hostage",
+        "hook": "You can't export what you built",
+        "stat": "Platforms lock your data in proprietary formats.",
+        "desc": "Full ACU export to JSON, SQLite, or IPFS in documented open formats — readable without VIVIM."
+      },
+      "enterpriseCompliance": {
+        "title": "The Enterprise Compliance Wall",
+        "hook": "AI memory with no audit trail",
+        "stat": "Enterprise needs audit trails that most platforms don't provide.",
+        "desc": "Audit logging service + RBAC on memory collections + access grant manager. Enterprise tier adds compliance-grade audit log delivery."
+      },
+      "aiMemorySurveillance": {
+        "title": "The AI Memory Surveillance Problem",
+        "hook": "Org memory vs individual privacy",
+        "stat": "Companies want to own their employees' AI context.",
+        "desc": "VIVIM Teams preserves individual sovereignty by design — per-seat memory, selective opt-in sharing only."
+      },
+      "localModelGap": {
+        "title": "The Local Model Gap",
+        "hook": "Self-hosted AI has no persistent memory layer",
+        "stat": "Local models lose all context between sessions.",
+        "desc": "Provider-agnostic SDK with local SQLite + IPFS adapters. Self-hostable full stack in docker-compose."
+      },
+      "identityCollapse": {
+        "title": "The Identity Collapse",
+        "hook": "AI has no persistent model of who you are",
+        "stat": "Every conversation starts with a blank slate.",
+        "desc": "L0 Identity Core + DID-anchored user profile. Who you are is always loaded first."
+      },
+      "developerInfrastructureGap": {
+        "title": "The Developer Infrastructure Gap",
+        "hook": "No open standard for AI memory",
+        "stat": "Everyone builds their own memory layer from scratch.",
+        "desc": "ACU specification is an open standard anyone can implement. @vivim/sdk drops into LangChain/LlamaIndex as a memory backend."
+      },
+      "multiAiFragmentation": {
+        "title": "The Multi-AI Fragmentation Problem",
+        "hook": "Memory siloed per tool",
+        "stat": "Each AI tool has its own isolated memory.",
+        "desc": "Single portable ACU database spans all providers. Import from every major platform."
+      },
+      "contextDecay": {
+        "title": "The Conversation Context Decay",
+        "hook": "Accuracy drops as threads grow",
+        "stat": "Long conversations lose coherence.",
+        "desc": "Context thermodynamics + memory compression in the Cortex system. ACU decay model promotes reinforced memories."
+      }
+    },
+    "exploreAll": "Explore all 12 problems",
+    "howVivimSolves": "How VIVIM solves this",
+    "viewScores": "View scores",
+    "openScorecard": "Open Full Scorecard",
+    "categories": {
+      "all": "All problems",
+      "memory": "🧠 Memory",
+      "portability": "🔄 Portability",
+      "trust": "🛡️ Trust",
+      "developer": "⚙️ Developer"
+    }
+  },
+  "solution": {
+    "title": "The Solution",
+    "heading": "What If AI Could",
+    "highlight": "Truly Remember?",
+    "description": "Not just store — but understand, connect, and retrieve what matters — across every conversation, with every AI.",
+    "cta": "See the Context Engine",
+    "features": {
+      "remembersEverything": {
+        "title": "Remembers Everything",
+        "desc": "Every conversation, preference, and detail is stored and organized intelligently."
+      },
+      "intelligentRetrieval": {
+        "title": "Intelligent Retrieval",
+        "desc": "Finds exactly what's relevant using semantic search — no more repeating yourself."
+      },
+      "worksWithAnyAi": {
+        "title": "Works with Any AI",
+        "desc": "Model-agnostic design means you can switch providers without losing your memory."
+      }
+    }
+  },
+  "demos": {
+    "title": "Interactive Demos",
+    "description": "Explore VIVIM's capabilities through these live, interactive demonstrations",
+    "items": {
+      "liveMemory": {
+        "title": "Live Memory",
+        "desc": "Watch your memory get extracted from real conversations in real-time"
+      },
+      "contextEngine": {
+        "title": "Context Engine",
+        "desc": "See the 8-layer context assembly system build context from scratch"
+      },
+      "zeroKnowledgePrivacy": {
+        "title": "Zero-Knowledge Privacy",
+        "desc": "Your encryption keys never leave your device — even we can't see your data"
+      },
+      "sovereignHistory": {
+        "title": "Sovereign History",
+        "desc": "Complete ownership of your conversation history with portable exports"
+      },
+      "decentralizedNetwork": {
+        "title": "Decentralized Network",
+        "desc": "Peer-to-peer memory sync without central servers or lock-in"
+      },
+      "secureCollaboration": {
+        "title": "Secure Collaboration",
+        "desc": "Share memory context with your team while preserving individual sovereignty"
+      },
+      "dynamicIntelligence": {
+        "title": "Dynamic Intelligence",
+        "desc": "Adaptive context that evolves based on your usage patterns"
+      },
+      "rightsLayer": {
+        "title": "Rights Layer",
+        "desc": "Granular ownership tiers with co-governance for your data"
+      },
+      "sentinelDetection": {
+        "title": "Sentinel Detection",
+        "desc": "13 algorithms that detect if your data was used without permission"
+      },
+      "marketplace": {
+        "title": "Marketplace",
+        "desc": "Monetize your intelligence on your terms"
+      }
+    }
+  },
+  "acus": {
+    "title": "Atomic Chat Units",
+    "description": "The fundamental building block that makes persistent, multi-scenario AI context possible",
+    "descriptionExtended": "Each conversation is broken into individually searchable, shareable units — giving you granular control over what your AI remembers and how it connects knowledge.",
+    "problem": {
+      "title": "The Message Monolith Problem",
+      "items": [
+        "Messages stored as giant blocks — like a whole chapter in one piece",
+        "Search for code, get entire 500-line response",
+        "Can't share just the solution without losing context",
+        "Insights buried in thousands of messages"
+      ]
+    },
+    "solution": {
+      "title": "VIVIM Atomic Chat Units",
+      "items": [
+        "Each thought is individually searchable & shareable",
+        "Find exactly the code snippet you need",
+        "Share granular insights with full context preserved",
+        "Knowledge connected, organized, and always accessible"
+      ]
+    },
+    "totalContext": "Total Context Window"
+  },
+  "rightsLayer": {
+    "title": "The Rights Layer",
+    "heading": "Your Data,",
+    "highlight": "Your Rules",
+    "description": "Granular ownership tiers that adapt to context — personal, shared, or co-governed. Your AI memory, classified by you.",
+    "tiers": {
+      "t0": { "label": "Personal Only", "desc": "You own it completely. No sharing, no governance." },
+      "t1": { "label": "Personal-Likely", "desc": "Probably personal, but open to classification review." },
+      "t2": { "label": "Shared-Possibly", "desc": "Could be shared — ready for co-governance setup." },
+      "t3": { "label": "Co-Governed", "desc": "Company gets governance. Dual-key required for exports." },
+      "t4": { "label": "Restricted", "desc": "Enhanced protection. Limited access even for you." },
+      "t5": { "label": "Regulated", "desc": "Never exports. Medical, legal, financial lockbox." }
+    },
+    "features": {
+      "tdass": {
+        "title": "TDASS Co-Governance",
+        "desc": "Companies get governance without custody. Your data stays in your vault — they only get a key share for designated scopes.",
+        "activePeriod": "Active Period: Both keys required",
+        "sunset": "Sunset: Company share fades over time",
+        "postSunset": "Post-Sunset: You keep full control"
+      },
+      "tpdi": {
+        "title": "TPDI Classifier",
+        "desc": "ML-powered content classification that learns from your corrections. Gets smarter the more you use it.",
+        "flow": "Input → Feature Extraction → ML → Tier + Confidence"
+      }
+    },
+    "cta": "Try the Rights Layer"
+  },
+  "sentinel": {
+    "title": "The Sentinel",
+    "heading": "Know If Your Data",
+    "highlight": "Was Used",
+    "description": "13 detection algorithms verify your data sovereignty — with cryptographic proof you can take to court.",
+    "algorithms": [
+      "Spectral Membership Inference",
+      "Mutual Information Estimation",
+      "Kolmogorov Uniqueness",
+      "Photon Counting",
+      "Interference Pattern",
+      "Canary Wave Function",
+      "Boltzmann Calibration",
+      "Holographic Watermarking",
+      "Thermodynamic Flow",
+      "Fisher Fingerprinting",
+      "Entanglement Testing",
+      "Diffraction Grating",
+      "Conservation Law"
+    ],
+    "features": {
+      "canary": {
+        "title": "Canary System",
+        "desc": "Plant unique tokens in your conversations. When AI models reference them without authorization — detection confirmed.",
+        "ready": "Ready"
+      },
+      "evidence": {
+        "title": "Evidence Package",
+        "desc": "Cryptographic proof package ready for legal action. Timestamps, Merkle proofs, model response evidence.",
+        "formats": "Export Format"
+      }
+    },
+    "cta": "Try Sentinel Detection"
+  },
+  "marketplace": {
+    "title": "The Marketplace",
+    "heading": "Monetize Your",
+    "highlight": "Intelligence",
+    "description": "Sell your data on your terms — or keep it private. Zero-knowledge proofs let buyers verify without seeing.",
+    "steps": {
+      "step1": { "label": "List", "desc": "Select ACUs, set price, generate ZK proof" },
+      "step2": { "label": "Discover", "desc": "Buyers browse verified listings" },
+      "step3": { "label": "Purchase", "desc": "Escrow payment secures transaction" },
+      "step4": { "label": "Exchange", "desc": "Encrypted delivery via ECDH" },
+      "step5": { "label": "Verify", "desc": "ZK proof validation" }
+    },
+    "features": {
+      "revenue": {
+        "title": "Revenue Split",
+        "desc": "Fair distribution for co-governed data sales:"
+      },
+      "zkProofs": {
+        "title": "Zero-Knowledge Proofs",
+        "desc": "Prove data properties without revealing content:",
+        "items": [
+          "Ownership proof",
+          "Consent validity",
+          "Data property attestation",
+          "Aggregate statistics"
+        ]
+      }
+    },
+    "cta": "Join the Marketplace Waitlist",
+    "comingSoon": "Coming in v3.0 (Month 15)"
+  },
+  "principles": {
+    "title": "Our Philosophy",
+    "heading": "Sovereign AI Memory",
+    "highlight": "Belongs to You",
+    "description": "VIVIM isn't just technology — it's a philosophy about who owns your AI memory.",
+    "descriptionExtended": "We believe your memories, preferences, and context should never be locked to a single provider. You should always have full control, visibility, and portability.",
+    "items": {
+      "sovereign": { "title": "Sovereign", "desc": "You own your memory data completely. VIVIM never claims ownership — your AI memory belongs to you, not the platform." },
+      "personal": { "title": "Personal", "desc": "Your memory is yours alone. Unlike shared databases, VIVIM creates an individual memory layer unique to each user." },
+      "providerAgnostic": { "title": "Provider Agnostic", "desc": "Switch between GPT-4, Claude, Gemini, or any AI model — your memory stays intact. No vendor lock-in, ever." },
+      "portable": { "title": "Portable", "desc": "Export your entire memory at any time in standard formats. Take your AI memory wherever you go." },
+      "useCaseAgnostic": { "title": "Use-Case Agnostic", "desc": "Works for coding assistants, customer support, education, healthcare — any application that benefits from memory." },
+      "dynamicallyGenerated": { "title": "Dynamically Generated", "desc": "Context isn't static — it's built fresh for each interaction based on what you're doing right now." }
+    }
+  },
+  "contextLayers": {
+    "title": "The 8-Layer System",
+    "heading": "Intelligent Context Assembly",
+    "description": "Like CPU cache levels — each layer has different latency, specificity, and refresh rates.",
+    "layers": {
+      "l0": { "label": "Identity Core", "desc": "Who you are — permanent context", "tokens": "~300" },
+      "l1": { "label": "Global Preferences", "desc": "How AI should respond to you", "tokens": "~500" },
+      "l2": { "label": "Topic Context", "desc": "Deep knowledge about current topics", "tokens": "~1,500" },
+      "l3": { "label": "Entity Context", "desc": "People, projects, and tools you discuss", "tokens": "~1,000" },
+      "l4": { "label": "Conversation Arc", "desc": "Thread of current discussion", "tokens": "~2,000" },
+      "l5": { "label": "JIT Retrieval", "desc": "Real-time relevant knowledge", "tokens": "~2,500" },
+      "l6": { "label": "Message History", "desc": "Recent conversation messages", "tokens": "~3,500" },
+      "l7": { "label": "User Message", "desc": "Your current input", "tokens": "Variable" }
+    },
+    "total": "Total Context Window: ~12,300 tokens"
+  },
+  "memoryTypes": {
+    "title": "9 Types of",
+    "highlight": "Human-Like Memory",
+    "description": "Hover to see examples of each memory type",
+    "types": {
+      "episodic": { "name": "Episodic", "example": "\"Last week we discussed...\"" },
+      "semantic": { "name": "Semantic", "example": "\"Python is your primary language\"" },
+      "procedural": { "name": "Procedural", "example": "\"You prefer TDD methodology\"" },
+      "factual": { "name": "Factual", "example": "\"You work as a senior engineer\"" },
+      "preference": { "name": "Preference", "example": "\"Prefers dark mode interface\"" },
+      "identity": { "name": "Identity", "example": "\"Full-stack developer\"" },
+      "relationship": { "name": "Relationship", "example": "\"John is your tech lead\"" },
+      "goal": { "name": "Goal", "example": "\"Launch MVP by Q2\"" },
+      "project": { "name": "Project", "example": "\"E-commerce uses Next.js\"" }
+    }
+  },
+  "developers": {
+    "title": "For Developers",
+    "heading": "Build with",
+    "highlight": "@vivim/sdk",
+    "description": "Everything you need to create sovereign, privacy-first AI experiences",
+    "descriptionExtended": "Because your users deserve memory that they own, not memory that's locked to your platform.",
+    "features": {
+      "identity": { "title": "Identity & DIDs", "desc": "Decentralized identifiers with cryptographic key management" },
+      "contextEngine": { "title": "Context Engine", "desc": "8-layer dynamic context assembly powered by ACUs" },
+      "storage": { "title": "Storage Options", "desc": "Local, SQLite, or IPFS with end-to-end encryption" },
+      "zeroKnowledge": { "title": "Zero-Knowledge", "desc": "Encryption keys never leave the user's device" }
+    },
+    "codeExample": "npm install @vivim/sdk"
+  }
+}

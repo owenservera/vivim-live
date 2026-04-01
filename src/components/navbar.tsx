@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Github, Menu, X, BookOpen, Cpu, Brain, Lock, History, Network, Users, Zap } from "lucide-react";
+import { useTranslations } from 'next-intl';
 import LanguageSwitcher from "./LanguageSwitcher";
 import { SocialShare } from "./SocialShare";
 
@@ -210,14 +211,15 @@ function MobileMenu({
 }
 
 function DemosDropdown() {
+  const t = useTranslations('common.navbar.demoDropdown');
   const demos = [
-    { href: "/demos/live-memory", label: "Live Memory", desc: "See extraction in action", icon: Brain, iconColor: "text-cyan-400" },
-    { href: "/demos/context-engine", label: "Context Engine", desc: "Watch memory assembly live", icon: Cpu, iconColor: "text-violet-400" },
-    { href: "/demos/zero-knowledge-privacy", label: "Zero-Knowledge Privacy", desc: "Your keys never leave your device", icon: Lock, iconColor: "text-emerald-400" },
-    { href: "/demos/sovereign-history", label: "Sovereign History", desc: "Complete ownership of your data", icon: History, iconColor: "text-amber-400" },
-    { href: "/demos/decentralized-network", label: "Decentralized Network", desc: "Peer-to-peer sync without servers", icon: Network, iconColor: "text-blue-400" },
-    { href: "/demos/secure-collaboration", label: "Secure Collaboration", desc: "Team sharing with sovereignty", icon: Users, iconColor: "text-rose-400" },
-    { href: "/demos/dynamic-intelligence", label: "Dynamic Intelligence", desc: "Adaptive context evolution", icon: Zap, iconColor: "text-lime-400" },
+    { href: "/demos/live-memory", key: "liveMemory", icon: Brain, iconColor: "text-cyan-400" },
+    { href: "/demos/context-engine", key: "contextEngine", icon: Cpu, iconColor: "text-violet-400" },
+    { href: "/demos/zero-knowledge-privacy", key: "zeroKnowledgePrivacy", icon: Lock, iconColor: "text-emerald-400" },
+    { href: "/demos/sovereign-history", key: "sovereignHistory", icon: History, iconColor: "text-amber-400" },
+    { href: "/demos/decentralized-network", key: "decentralizedNetwork", icon: Network, iconColor: "text-blue-400" },
+    { href: "/demos/secure-collaboration", key: "secureCollaboration", icon: Users, iconColor: "text-rose-400" },
+    { href: "/demos/dynamic-intelligence", key: "dynamicIntelligence", icon: Zap, iconColor: "text-lime-400" },
   ];
 
   return (
@@ -242,8 +244,8 @@ function DemosDropdown() {
               >
                 <Icon className={`w-4 h-4 ${demo.iconColor}`} />
                 <div>
-                  <p className="text-sm text-white">{demo.label}</p>
-                  <p className="text-xs text-slate-500">{demo.desc}</p>
+                  <p className="text-sm text-white">{t(`${demo.key}.label`)}</p>
+                  <p className="text-xs text-slate-500">{t(`${demo.key}.desc`)}</p>
                 </div>
               </Link>
             );
@@ -255,20 +257,21 @@ function DemosDropdown() {
 }
 
 export function Navbar() {
+  const t = useTranslations('common.navbar');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
   const sections = useMemo(
     () => [
-      { label: "Overview", id: "overview" },
-      { label: "Problem", id: "the-problem" },
-      { label: "Solution", id: "the-solution" },
-      { label: "ACUs", id: "acus" },
-      { label: "Principles", id: "principles" },
-      { label: "Developers", id: "developers" },
+      { label: t('sections.overview'), id: "overview" },
+      { label: t('sections.problem'), id: "the-problem" },
+      { label: t('sections.solution'), id: "the-solution" },
+      { label: t('sections.acus'), id: "acus" },
+      { label: t('sections.principles'), id: "principles" },
+      { label: t('sections.developers'), id: "developers" },
     ],
-    []
+    [t]
   );
 
   const scrollToSection = useCallback((id: string) => {

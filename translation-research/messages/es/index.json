@@ -1,0 +1,364 @@
+{
+  "common": {
+    "tryLiveDemo": "Prueba la Demo en Vivo",
+    "viewOnGitHub": "Ver en GitHub",
+    "github": "GitHub",
+    "discord": "Discord",
+    "docs": "Documentación",
+    "footerTagline": "Tu memoria. Tus reglas. En todas partes.",
+    "footerPhilosophy": "La filosofía que guía todo lo que construimos.",
+    "copyright": "© 2026 VIVIM • AGPL v3 • Código Abierto"
+  },
+  "hero": {
+    "tagline": "Soberano • Portátil • Personal",
+    "title": "La Memoria Viva",
+    "subtitle": "para tu IA",
+    "description": "Una capa de memoria que es tuya, que funciona con cualquier proveedor de IA, y va a donde quieras.",
+    "quote": "No es solo tecnología — es una filosofía sobre quién posee tu memoria de IA.",
+    "descriptionExtended": "Una memoria soberana, portátil y personal y un motor de contexto dinámico que funciona con todos los proveedores de IA — tu única base de datos nativa para IA."
+  },
+  "providers": {
+    "title": "Funciona con",
+    "highlight": "Cualquier Proveedor de IA",
+    "description": "VIVIM es agnóstico al proveedor. Conecta tus modelos favoritos al instante."
+  },
+  "providersList": {
+    "openAI": "OpenAI",
+    "googleGemini": "Google Gemini",
+    "claude": "Claude",
+    "grok": "Grok",
+    "zai": "Z.ai",
+    "qwen": "Qwen",
+    "kimi": "Kimi"
+  },
+  "problem": {
+    "title": "El Problema",
+    "heading": "Cada Conversación de IA",
+    "highlight": "Comienza Rotta",
+    "description": "La ventana de contexto no solo está limitada — está trabajando activamente contra ti. Y la mayoría de las 'soluciones' lo empeoran.",
+    "stats": {
+      "accuracyDrop": "Caída de precisión a medida que crece el contexto",
+      "frontierModels": "Modelos frontier se degradan con el contexto",
+      "vectorMarket": "El mercado de BD vectoriales valida el problema"
+    },
+    "cards": {
+      "contextWipe": {
+        "title": "La Limpieza de Contexto",
+        "hook": "La IA forgets everything, every session",
+        "stat": "Las conversaciones se degradan después de 15–20 mensajes, incluso con ventanas de contexto de 1M tokens.",
+        "desc": "Los usuarios reconstruyen el contexto desde cero en cada conversación. 3 años de conocimiento del dominio, preferencias y decisiones desaparecen en el momento en que se cierra una pestaña."
+      },
+      "providerLockIn": {
+        "title": "La Trampa del Lock-in del Proveedor",
+        "hook": "Tu memoria pertenece a ChatGPT, no a ti",
+        "stat": "Cambiar de proveedor de IA significa perder todo el contexto acumulado.",
+        "desc": "Cambiar de proveedor de IA significa perder todo el contexto acumulado. Los usuarios son rehenes de的记忆 moats que los proveedores construyeron intencionalmente."
+      },
+      "copyPasteTax": {
+        "title": "El Impuesto del Copiar y Pegar",
+        "hook": "Horas perdidas rebuild contexto semanalmente",
+        "stat": "Horas cada semana rebuild contexto desde cero.",
+        "desc": "Los trabajadores del conocimiento pasan 5–10 horas/semana re-explicando su stack, preferencias, estructura de equipo e historia del proyecto a herramientas de IA que lo olvidan todo durante la noche."
+      },
+      "middleBlackHole": {
+        "title": "El Agujero Negro del Medio",
+        "hook": "La IA ignora el contexto que proporcionaste explícitamente",
+        "stat": "20+ puntos porcentuales peor precisión para información en el medio del contexto.",
+        "desc": "Investigación de Stanford/Google/Anthropic confirma una caída de 20+ puntos porcentuales en precisión para información en el medio de ventanas de contexto largas. Los usuarios proporcionan contexto sin saber que la IA nunca lo lee."
+      }
+    },
+    "exploreAll": "Explorar los 12 problemas",
+    "categories": {
+      "all": "Todos los problemas",
+      "memory": "Memoria",
+      "portability": "Portabilidad",
+      "trust": "Confianza y Soberanía",
+      "developer": "Desarrollador"
+    },
+    "viewScores": "Ver puntuaciones",
+    "openScorecard": "Abrir Tarjeta de Puntuación Completa"
+  },
+  "solution": {
+    "title": "La Solución",
+    "heading": "¿Y Si la IA Pudiera",
+    "highlight": "Realmente Recordar?",
+    "description": "No solo almacenar — pero entender, conectar y recuperar lo que importa — en cada conversación, con cada IA.",
+    "features": {
+      "remembersEverything": {
+        "title": "Lo Recuerda Todo",
+        "desc": "Cada conversación, preferencia y detalle se almacena y organiza inteligentemente."
+      },
+      "intelligentRetrieval": {
+        "title": "Recuperación Inteligente",
+        "desc": "Encuentra exactamente lo relevante usando búsqueda semántica — no más repetirte."
+      },
+      "worksWithAnyAI": {
+        "title": "Funciona con Cualquier IA",
+        "desc": "El diseño agnóstico al modelo significa que puedes cambiar de proveedor sin perder tu memoria."
+      }
+    },
+    "cta": "Ver el Motor de Contexto"
+  },
+  "demos": {
+    "title": "Demos Interactivas",
+    "description": "Explora las capacidades de VIVIM a través de estas demostraciones en vivo",
+    "items": {
+      "liveMemory": {
+        "title": "Memoria en Vivo",
+        "desc": "Observa cómo tu memoria se extrae de conversaciones reales en tiempo real"
+      },
+      "contextEngine": {
+        "title": "Motor de Contexto",
+        "desc": "Observa el sistema de ensamblaje de contexto de 8 capas construir contexto desde cero"
+      },
+      "zeroKnowledgePrivacy": {
+        "title": "Privacidad de Conocimiento Cero",
+        "desc": "Tus claves de encriptación nunca salen de tu dispositivo — ni siquiera nosotros podemos ver tus datos"
+      },
+      "sovereignHistory": {
+        "title": "Historia Soberana",
+        "desc": "Propiedad completa de tu historial de conversación con exportaciones portátiles"
+      },
+      "decentralizedNetwork": {
+        "title": "Red Descentralizada",
+        "desc": "Sincronización de memoria peer-to-peer sin servidores centrales o lock-in"
+      },
+      "secureCollaboration": {
+        "title": "Colaboración Segura",
+        "desc": "Comparte contexto de memoria con tu equipo mientras preservas la soberanía individual"
+      },
+      "dynamicIntelligence": {
+        "title": "Inteligencia Dinámica",
+        "desc": "Contexto adaptativo que evoluciona basado en tus patrones de uso"
+      },
+      "rightsLayer": {
+        "title": "Capa de Derechos",
+        "desc": "Niveles de propiedad granular con co-gobernanza para tus datos"
+      },
+      "sentinelDetection": {
+        "title": "Detección Sentinel",
+        "desc": "13 algoritmos que detectan si tus datos fueron usados sin permiso"
+      },
+      "marketplace": {
+        "title": "Mercado",
+        "desc": "Monetiza tu inteligencia en tus términos"
+      }
+    }
+  },
+  "acus": {
+    "title": "Unidades Atómicas de Chat",
+    "description": "El bloque fundamental de construcción que hace posible la memoria persistente multi-escenario",
+    "descriptionExtended": "Cada conversación se divide en unidades buscables y compartibles individualmente — dándote control granular sobre lo que tu IA recuerda y cómo conecta el conocimiento.",
+    "problem": {
+      "title": "El Problema del Monolito de Mensajes",
+      "items": [
+        "Mensajes almacenados como bloques gigantes — como un capítulo entero en una pieza",
+        "Buscar código, obtener toda la respuesta de 500 líneas",
+        "No se puede compartir solo la solución sin perder contexto",
+        "Ideas enterradas en miles de mensajes"
+      ]
+    },
+    "solution": {
+      "title": "Unidades Atómicas de Chat VIVIM",
+      "items": [
+        "Cada pensamiento es individualmente buscable y compartible",
+        "Encuentra exactamente el fragmento de código que necesitas",
+        "Compartir ideas granulares con contexto completo preservado",
+        "Conocimiento conectado, organizado y siempre accesible"
+      ]
+    },
+    "totalContext": "Ventana de Contexto Total"
+  },
+  "rightsLayer": {
+    "title": "La Capa de Derechos",
+    "heading": "Tus Datos,",
+    "highlight": "Tus Reglas",
+    "description": "Niveles de propiedad granular que se adaptan al contexto — personal, compartido o co-gobernado. Tu memoria de IA, clasificada por ti.",
+    "tiers": {
+      "t0": {
+        "label": "Solo Personal",
+        "desc": "Lo posees completamente. Sin compartir, sin gobernanza."
+      },
+      "t1": {
+        "label": "Probablemente Personal",
+        "desc": "Probablemente personal, pero abierto a revisión de clasificación."
+      },
+      "t2": {
+        "label": "Posiblemente Compartido",
+        "desc": "Podría ser compartido — listo para configuración de co-gobernanza."
+      },
+      "t3": {
+        "label": "Co-Governado",
+        "desc": "La empresa obtiene gobernanza. Clave dual requerida para exportaciones."
+      },
+      "t4": {
+        "label": "Restringido",
+        "desc": "Protección mejorada. Acceso limitado incluso para ti."
+      },
+      "t5": {
+        "label": "Regulado",
+        "desc": "Nunca exporta. Caja fuerte médica, legal, financiera."
+      }
+    },
+    "features": {
+      "tdass": {
+        "title": "Co-gobernanza TDASS",
+        "desc": "Las empresas obtienen gobernanza sin custodia. Tus datos permanecen en tu bóveda — solo obtienen una clave compartida para alcances designados.",
+        "activePeriod": "Período Activo: Ambas claves requeridas",
+        "sunset": "Atardecer: La participación de la empresa se desvanece con el tiempo",
+        "postSunset": "Post-Atardecer: Mantienes control completo"
+      },
+      "tpdi": {
+        "title": "Clasificador TPDI",
+        "desc": "Clasificación de contenido con ML que aprende de tus correcciones. Se vuelve más inteligente cuanto más lo usas.",
+        "flow": "Entrada → Extracción de Características → ML → Nivel + Confianza"
+      }
+    },
+    "cta": "Prueba la Capa de Derechos"
+  },
+  "sentinel": {
+    "title": "El Sentinel",
+    "heading": "Saber Si Tu Datos",
+    "highlight": "Fueron Usados",
+    "description": "13 algoritmos de verificación verifican tu soberania de datos — con prueba criptográfica que puedes llevar a tribunal.",
+    "algorithms": [
+      "Inferencia de Membresía Espectral",
+      "Estimación de Información Mutua",
+      "Unicidad de Kolmogorov",
+      "Conteo de Fotones",
+      "Patrón de Interferencia",
+      "Función de Canary",
+      "Calibración de Boltzmann",
+      "Filigrana Holográfica",
+      "Flujo Termodinámico",
+      "Fingerprinting de Fisher",
+      "Prueba de Entrelazamiento",
+      "Red de Difracción",
+      "Ley de Conservación"
+    ],
+    "features": {
+      "canary": {
+        "title": "Sistema Canary",
+        "desc": "Planta tokens únicos en tus conversaciones. Cuando los modelos de IA los referencian sin autorización — detección confirmada.",
+        "ready": "Listo",
+        "formula": "|canary⟩ = α|undetected⟩ + β|detected⟩"
+      },
+      "evidence": {
+        "title": "Paquete de Evidencia",
+        "desc": "Paquete de prueba criptográfico listo para acción legal. Timestamps, pruebas de Merkle, evidencia de respuesta del modelo.",
+        "formats": "Formato de Exportación"
+      }
+    },
+    "cta": "Prueba la Detección Sentinel"
+  },
+  "marketplace": {
+    "title": "El Mercado",
+    "heading": "Monetiza Tu",
+    "highlight": "Inteligencia",
+    "description": "Vende tus datos en tus términos — o mantenlo privado. Las pruebas de conocimiento cero permiten a los compradores verificar sin ver.",
+    "steps": {
+      "step1": { "label": "Publicar", "desc": "Selecciona ACUs, establece precio, genera prueba ZK" },
+      "step2": { "label": "Descubrir", "desc": "Los compradores exploran listados verificados" },
+      "step3": { "label": "Comprar", "desc": "El pago en custodia asegura la transacción" },
+      "step4": { "label": "Intercambiar", "desc": "Entrega encriptada vía ECDH" },
+      "step5": { "label": "Verificar", "desc": "Validación de prueba ZK" }
+    },
+    "features": {
+      "revenue": {
+        "title": "División de Ingresos",
+        "desc": "Distribución justa para ventas de datos co-gobernados:"
+      },
+      "zkProofs": {
+        "title": "Pruebas de Conocimiento Cero",
+        "desc": "Propiedades de datos de prueba sin revelar contenido:",
+        "items": [
+          "Prueba de propiedad",
+          "Validez de consentimiento",
+          "Atestación de propiedades de datos",
+          "Estadísticas agregadas"
+        ]
+      }
+    },
+    "cta": "Únete a la Lista de Espera del Mercado",
+    "comingSoon": "Llegando en v3.0 (Mes 15)"
+  },
+  "principles": {
+    "title": "Nuestra Filosofía",
+    "heading": "Memoria de IA Soberana",
+    "highlight": "Te Pertenece",
+    "description": "VIVIM no es solo tecnología — es una filosofía sobre quién posee tu memoria de IA.",
+    "descriptionExtended": "Creemos que tus memorias, preferencias y contexto nunca deben estar bloqueadas a un solo proveedor. Siempre debes tener control completo, visibilidad y portabilidad.",
+    "items": {
+      "sovereign": {
+        "title": "Soberano",
+        "desc": "Posees completamente tus datos de memoria. VIVIM nunca reclama propiedad — tu memoria de IA te pertenece a ti, no a la plataforma."
+      },
+      "personal": {
+        "title": "Personal",
+        "desc": "Tu memoria es solo tuya. A diferencia de bases de datos compartidas, VIVIM crea una capa de memoria individual única para cada usuario."
+      },
+      "providerAgnostic": {
+        "title": "Agnóstico al Proveedor",
+        "desc": "Cambia entre GPT-4, Claude, Gemini o cualquier modelo de IA — tu memoria permanece intacta. Nunca más lock-in de proveedor."
+      },
+      "portable": {
+        "title": "Portátil",
+        "desc": "Exporta tu memoria completa en cualquier momento en formatos estándar. Llévate tu memoria de IA a donde quieras."
+      },
+      "useCaseAgnostic": {
+        "title": "Agnóstico al Caso de Uso",
+        "desc": "Funciona para asistentes de código, soporte al cliente, educación, salud — cualquier aplicación que se beneficie de la memoria."
+      },
+      "dynamicallyGenerated": {
+        "title": "Generado Dinámicamente",
+        "desc": "El contexto no es estático — se construye fresco para cada interacción basado en lo que estás haciendo ahora."
+      }
+    }
+  },
+  "contextLayers": {
+    "title": "El Sistema de 8 Capas",
+    "heading": "Ensamblaje Inteligente de Contexto",
+    "description": "Como niveles de caché de CPU — cada capa tiene diferente latencia, especificidad y tasas de actualización.",
+    "layers": {
+      "l0": { "label": "Núcleo de Identidad", "desc": "Quién eres — contexto permanente", "tokens": "~300" },
+      "l1": { "label": "Preferencias Globales", "desc": "Cómo la IA debe responderte", "tokens": "~500" },
+      "l2": "Contexto de Temas",
+      "l3": "Contexto de Entidades",
+      "l4": "Arco de Conversación",
+      "l5": "Recuperación JIT",
+      "l6": "Historial de Mensajes",
+      "l7": "Mensaje del Usuario"
+    },
+    "total": "Ventana de Contexto Total: ~12,300 tokens"
+  },
+  "memoryTypes": {
+    "title": "9 Tipos de",
+    "highlight": "Memoria Humana",
+    "description": "Pasa el cursor para ver ejemplos de cada tipo de memoria",
+    "types": {
+      "episodic": { "name": "Episódica", "example": "\"La semana pasada discutimos...\"" },
+      "semantic": { "name": "Semántica", "example": "\"Python es tu lenguaje principal\"" },
+      "procedural": { "name": "Procedural", "example": "\"Prefieres metodología TDD\"" },
+      "factual": { "name": "Fáctica", "example": "\"Trabajas como ingeniero senior\"" },
+      "preference": { "name": "Preferencia", "example": "\"Prefiere interfaz de modo oscuro\"" },
+      "identity": { "name": "Identidad", "example": "\"Desarrollador full-stack\"" },
+      "relationship": { "name": "Relación", "example": "\"John es tu lead técnico\"" },
+      "goal": { "name": "Meta", "example": "\"Lanzar MVP para Q2\"" },
+      "project": { "name": "Proyecto", "example": "\"E-commerce usa Next.js\"" }
+    }
+  },
+  "developers": {
+    "title": "Para Desarrolladores",
+    "heading": "Construye con",
+    "highlight": "@vivim/sdk",
+    "description": "Todo lo que necesitas para crear experiencias de IA soberanas y privacidad-primero",
+    "descriptionExtended": "Porque tus usuarios merecen memoria que es suya, no memoria bloqueada a tu plataforma.",
+    "features": {
+      "identity": { "title": "Identidad y DIDs", "desc": "Identificadores descentralizados con gestión de claves criptográficas" },
+      "contextEngine": { "title": "Motor de Contexto", "desc": "Ensamblaje dinámico de contexto de 8 capas alimentado por ACUs" },
+      "storage": { "title": "Opciones de Almacenamiento", "desc": "Local, SQLite, o IPFS con encriptación de extremo a extremo" },
+      "zeroKnowledge": { "title": "Conocimiento Cero", "desc": "Las claves de encriptación nunca salen del dispositivo del usuario" }
+    },
+    "codeExample": "npm install @vivim/sdk"
+  }
+}
