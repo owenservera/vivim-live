@@ -4,9 +4,11 @@ import { fetchWithRetry } from "@/lib/translation/retry";
 import { withDeduplication } from "@/lib/translation/deduplication";
 import {
   getServerCachedBatch,
-  setServerCachedBatch
+  setServerCachedBatch,
+  TranslationSource,
 } from "@/lib/translation/server-cache";
 import { globalRateLimiter, RequestPriority } from "@/lib/rate-limiter";
+import { lingvaTranslate, isLingvaEnabled } from "@/lib/translation/lingva";
 
 const ZAI_API_KEY = process.env.ZAI_API_KEY!;
 const ZAI_BASE_URL = process.env.ZAI_BASE_URL ?? "https://api.z.ai/api/coding/paas/v4";
@@ -33,10 +35,10 @@ function log(level: string, message: string, data?: unknown) {
   }
 }
 
-async function performTranslation(
+async function callLLM(
   strings: string[],
-  sourceLang: string,
   targetLang: string,
+  sourceLang: string,
   context?: string
 ): Promise<string[]> {
   const numbered = strings.map((s, i) => `${i + 1}. ${s}`).join("\n");
@@ -51,7 +53,6 @@ Rules:
 - Do NOT add explanations, numbering, or any text outside the JSON array.`;
   const userPrompt = `Translate these ${strings.length} strings:\n${numbered}`;
 
-  // Use global rate limiter to enforce 2-second interval across all AI requests
   const result = await globalRateLimiter.submit(
     async () => {
       return fetchWithRetry(async () => {
@@ -96,7 +97,7 @@ Rules:
   );
 
   if (!result.success || !result.data) {
-    log("ERROR", "Translation failed after retries", { error: result.error });
+    log("ERROR", "LLM translation failed after retries", { error: result.error });
     return strings;
   }
 
@@ -121,6 +122,50 @@ Rules:
   }
 }
 
+async function performTranslation(
+  strings: string[],
+  targetLang: string,
+  sourceLang: string = "en",
+  context?: string
+): Promise<{ translations: string[]; source: TranslationSource }> {
+  if (isLingvaEnabled()) {
+    const lingvaResults = await lingvaTranslate(strings, sourceLang, targetLang);
+    const allSucceeded = lingvaResults.every((r) => r !== null);
+
+    if (allSucceeded) {
+      log("INFO", "Lingva translation complete", { count: strings.length });
+      return {
+        translations: lingvaResults as string[],
+        source: "lingva",
+      };
+    }
+
+    const failedIndices = lingvaResults
+      .map((r, i) => (r === null ? i : -1))
+      .filter((i) => i !== -1);
+
+    if (failedIndices.length < strings.length) {
+      const failedStrings = failedIndices.map((i) => strings[i]);
+      const llmResults = await callLLM(failedStrings, targetLang, sourceLang, context);
+
+      const merged = [...lingvaResults] as string[];
+      failedIndices.forEach((originalIdx, llmIdx) => {
+        merged[originalIdx] = llmResults[llmIdx] ?? strings[originalIdx];
+      });
+
+      log("INFO", "Lingva partial + LLM fallback", { total: strings.length, failed: failedIndices.length });
+      return { translations: merged, source: "lingva" };
+    }
+  }
+
+  try {
+    const llmResults = await callLLM(strings, targetLang, sourceLang, context);
+    return { translations: llmResults, source: "llm" };
+  } catch {
+    return { translations: strings, source: "original" };
+  }
+}
+
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
   const requestId = Math.random().toString(36).substring(2, 15);
@@ -128,7 +173,7 @@ export async function POST(req: NextRequest) {
 
   log("INFO", `Translation request #${requestId}`, { ip, strings: "processing" });
 
-  if (!ZAI_API_KEY) {
+  if (!ZAI_API_KEY && !isLingvaEnabled()) {
     return NextResponse.json({ error: "Translation API not configured" }, { status: 503 });
   }
 
@@ -158,42 +203,54 @@ export async function POST(req: NextRequest) {
 
     const serverCache = await getServerCachedBatch(sourceLang, targetLang, strings, context);
     const missingIndices: number[] = [];
-    const results: (string | null)[] = [...serverCache];
+    const results: (string | null)[] = [];
+    let cacheSource: TranslationSource | null = null;
 
     serverCache.forEach((cached, index) => {
-      if (cached === null) {
+      if (cached.text === null) {
         missingIndices.push(index);
+        results.push(null);
+      } else {
+        results.push(cached.text);
+        if (!cacheSource) cacheSource = cached.source;
       }
     });
 
     log("INFO", "Cache check", { 
       total: strings.length, 
-      serverHits: serverCache.filter(c => c !== null).length,
+      serverHits: serverCache.filter(c => c.text !== null).length,
       missing: missingIndices.length 
     });
+
+    let finalSource: TranslationSource = cacheSource ?? "llm";
 
     if (missingIndices.length > 0) {
       const missingStrings = missingIndices.map(i => strings[i]);
 
-      const { result: freshTranslations } = await withDeduplication(
+      const dedupeResult = await withDeduplication(
         missingStrings,
         targetLang,
         async () => {
-          return performTranslation(missingStrings, sourceLang, targetLang, context);
+          return performTranslation(missingStrings, targetLang, sourceLang, context);
         }
       );
       
+      const { translations, source } = dedupeResult.result;
+      const cacheSourceType = translations.length > 0 ? source : "llm";
       await setServerCachedBatch(
         sourceLang, 
         targetLang, 
         missingStrings, 
-        freshTranslations, 
-        context
+        translations, 
+        context,
+        cacheSourceType
       );
 
       missingIndices.forEach((idx, pos) => {
-        results[idx] = freshTranslations[pos];
+        results[idx] = translations[pos];
       });
+
+      finalSource = source;
     }
 
     const finalTranslations = results.map((t, i) => t ?? strings[i]);
@@ -201,6 +258,7 @@ export async function POST(req: NextRequest) {
     log("SUCCESS", `Request #${requestId} complete`, {
       duration: Date.now() - startTime,
       translated: finalTranslations.length,
+      source: finalSource,
     });
 
     return NextResponse.json({
@@ -208,7 +266,8 @@ export async function POST(req: NextRequest) {
       meta: {
         requestId,
         duration: Date.now() - startTime,
-        serverCacheHits: serverCache.filter(c => c !== null).length,
+        serverCacheHits: serverCache.filter(c => c.text !== null).length,
+        source: finalSource,
       },
     });
   } catch (err) {
@@ -220,17 +279,20 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET() {
+  const lingvaEnabled = isLingvaEnabled();
   return NextResponse.json({
     status: "ok",
     service: "vivim-translation",
     model: MODEL,
     endpoint: ZAI_BASE_URL,
+    deterministicEngine: lingvaEnabled ? "Lingva" : "none",
     features: {
       batchTranslation: true,
       caching: "multi-tier (client + server Redis)",
       rateLimit: "distributed (Redis)",
       retry: "exponential backoff",
       deduplication: true,
+      deterministicTranslation: lingvaEnabled,
     },
     supportedLanguages: ["en", "es", "zh", "fr", "de", "pt", "ja", "ar", "ru", "ko"],
   });
