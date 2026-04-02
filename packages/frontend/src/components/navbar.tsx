@@ -146,6 +146,23 @@ function MobileMenu({
     onClose();
   };
 
+  const demos = [
+    { href: "/demos/live-memory", label: "Live Memory", desc: "Extraction in action", icon: Brain, iconColor: "text-cyan-400" },
+    { href: "/demos/context-engine", label: "Context Engine", desc: "Memory assembly", icon: Cpu, iconColor: "text-violet-400" },
+    { href: "/demos/zero-knowledge-privacy", label: "Zero-Knowledge", desc: "Keys never leave device", icon: Lock, iconColor: "text-emerald-400" },
+    { href: "/demos/sovereign-history", label: "Sovereign History", desc: "Complete ownership", icon: History, iconColor: "text-amber-400" },
+    { href: "/demos/decentralized-network", label: "Decentralized", desc: "P2P sync", icon: Network, iconColor: "text-blue-400" },
+    { href: "/demos/secure-collaboration", label: "Secure Collaboration", desc: "Team sharing", icon: Users, iconColor: "text-rose-400" },
+    { href: "/demos/dynamic-intelligence", label: "Dynamic Intelligence", desc: "Adaptive context", icon: Zap, iconColor: "text-lime-400" },
+  ];
+
+  const githubLinks = [
+    { href: "https://github.com/owenservera/vivim-server", label: "Backend", desc: "Server infrastructure" },
+    { href: "https://github.com/owenservera/vivim-pwa", label: "App", desc: "Mobile application" },
+    { href: "https://github.com/owenservera/vivim-network", label: "Network", desc: "P2P protocol" },
+    { href: "https://github.com/owenservera/vivim-sdk", label: "SDK", desc: "Developer kit" },
+  ];
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -154,7 +171,7 @@ function MobileMenu({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-md md:hidden"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -164,66 +181,155 @@ function MobileMenu({
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-72 flex flex-col md:hidden bg-slate-950"
+            transition={{ type: "spring", damping: 24, stiffness: 300, mass: 0.8 }}
+            className="fixed right-0 top-0 bottom-0 z-50 w-[340px] max-w-[85vw] flex flex-col md:hidden bg-slate-950"
             style={{
-              backdropFilter: "blur(24px)",
-              borderLeft: "1px solid rgba(255,255,255,0.08)",
+              boxShadow: "-40px 0 80px rgba(0,0,0,0.5)",
             }}
             role="dialog"
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            <div className="flex items-center justify-between p-6 border-b border-white/5">
-              <img src="/nav-logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
+            <div className="flex items-center justify-between p-5 border-b border-white/[0.08]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center">
+                  <svg width="20" height="20" viewBox="0 0 40 40" fill="none" className="text-violet-400">
+                    <path d="M20 4L4 12L20 20L36 12L20 4Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                    <path d="M4 20L20 28L36 20" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                    <path d="M4 28L20 36L36 28" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <span className="text-white font-semibold tracking-tight">VIVIM</span>
+              </div>
               <button
                 type="button"
                 ref={closeButtonRef}
                 onClick={onClose}
-                className="text-slate-400 hover:text-white transition-colors p-1"
+                className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"
                 aria-label="Close menu"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto p-4 space-y-1" aria-label="Mobile navigation">
-              {sections.map((section, i) => (
-                <motion.button
-                  key={section.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  onClick={() => handleNavClick(section)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    activeSection === i
-                      ? "bg-violet-500/15 text-violet-300 border border-violet-500/20"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
-                  }`}
-                  aria-current={activeSection === i ? "page" : undefined}
+            <nav className="flex-1 overflow-y-auto" aria-label="Mobile navigation">
+              <div className="p-4">
+                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-3 pl-1">
+                  Navigate
+                </div>
+                <div className="space-y-1">
+                  {sections.map((section, i) => (
+                    <motion.button
+                      key={section.id}
+                      initial={{ opacity: 0, x: 16 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      onClick={() => handleNavClick(section)}
+                      className={`w-full text-left px-4 py-3.5 rounded-2xl text-sm font-medium transition-all ${
+                        activeSection === i
+                          ? "bg-gradient-to-r from-violet-500/15 to-cyan-500/10 text-white border border-violet-500/25 shadow-[0_0_30px_rgba(139,92,246,0.15)]"
+                          : "text-slate-400 hover:text-white hover:bg-white/[0.04] border border-transparent"
+                      }`}
+                      aria-current={activeSection === i ? "page" : undefined}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-1.5 h-1.5 rounded-full transition-all ${
+                          activeSection === i ? "bg-violet-400 shadow-[0_0_8px_rgba(139,92,246,0.8)]" : "bg-slate-700"
+                        }`} />
+                        {section.label}
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 pt-0">
+                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-3 pl-1">
+                  Interactive Demos
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {demos.map((demo, i) => {
+                    const Icon = demo.icon;
+                    return (
+                      <motion.div
+                        key={demo.href}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25 + i * 0.03, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      >
+                        <Link
+                          href={demo.href}
+                          onClick={onClose}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/[0.04] transition-all group border border-transparent hover:border-white/[0.06]"
+                        >
+                          <div className={`w-8 h-8 rounded-lg bg-slate-900/50 flex items-center justify-center ${demo.iconColor}`}>
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-white font-medium truncate">{demo.label}</p>
+                            <p className="text-xs text-slate-500 truncate">{demo.desc}</p>
+                          </div>
+                          <Zap className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="p-4 pt-0">
+                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-3 pl-1">
+                  GitHub
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {githubLinks.map((link, i) => (
+                    <motion.a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.45 + i * 0.03, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/[0.04] transition-all border border-transparent hover:border-white/[0.06]"
+                    >
+                      <Github className="w-4 h-4 text-slate-500" />
+                      <span className="text-sm text-slate-300">{link.label}</span>
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 pt-0">
+                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-3 pl-1">
+                  Language
+                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.55, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="px-2"
                 >
-                  {section.label}
-                </motion.button>
-              ))}
+                  <LanguageSwitcher />
+                </motion.div>
+              </div>
             </nav>
 
-            <div className="p-4 border-t border-white/5 space-y-2">
-              <Link
-                href="/demos/live-memory"
-                onClick={onClose}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+            <div className="p-4 border-t border-white/[0.08]">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
               >
-                <Play className="w-4 h-4 text-violet-400" />
-                <span className="text-sm text-white">Live Memory Demo</span>
-              </Link>
-              <Link
-                href="/demos/context-engine"
-                onClick={onClose}
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-violet-600/20 to-cyan-600/20 border border-white/10 text-white text-sm hover:bg-white/5 transition-colors"
-              >
-                <BookOpen className="w-4 h-4" />
-                Context Engine Demo
-              </Link>
+                <Link
+                  href="/chat"
+                  onClick={onClose}
+                  className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl bg-gradient-to-r from-violet-600 via-violet-500 to-cyan-500 text-white font-semibold shadow-[0_4px_20px_rgba(139,92,246,0.35),0_0_40px_rgba(139,92,246,0.15)] hover:shadow-[0_6px_30px_rgba(139,92,246,0.45),0_0_60px_rgba(6,182,212,0.2)] transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <span>Launch App</span>
+                  <Zap className="w-4 h-4" />
+                </Link>
+              </motion.div>
             </div>
           </motion.div>
         </>
