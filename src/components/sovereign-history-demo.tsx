@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Download, Code, Users, ArrowRight, Check, Database, Shield, Globe, Smartphone, Server } from 'lucide-react';
 
@@ -48,6 +49,7 @@ const SEARCH_DEMOS = [
 ];
 
 export function SovereignHistoryDemo() {
+  const t = useTranslations('demos.sovereignHistory');
   const [activeTab, setActiveTab] = useState<'providers' | 'search' | 'export'>('providers');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -69,9 +71,9 @@ export function SovereignHistoryDemo() {
     <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900/50">
       <div className="flex border-b border-white/5">
         {[
-          { id: 'providers', label: 'Connected Providers', icon: Globe },
-          { id: 'search', label: 'Universal Search', icon: Search },
-          { id: 'export', label: 'Export', icon: Download },
+          { id: 'providers', label: t('tabs.providers'), icon: Globe },
+          { id: 'search', label: t('tabs.search'), icon: Search },
+          { id: 'export', label: t('tabs.export'), icon: Download },
         ].map(tab => (
           <button
             key={tab.id}
@@ -93,8 +95,8 @@ export function SovereignHistoryDemo() {
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-4">
               <Database className="w-4 h-4 text-cyan-400" />
-              <span className="text-sm font-medium text-white">Your Sovereign History</span>
-              <span className="ml-auto text-xs text-slate-500">609 sessions</span>
+              <span className="text-sm font-medium text-white">{t('labels.title')}</span>
+              <span className="ml-auto text-xs text-slate-500">{t('labels.sessions', { count: 609 })}</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {PROVIDERS.map(provider => (
@@ -117,7 +119,7 @@ export function SovereignHistoryDemo() {
                   </div>
                   {provider.connected && (
                     <div className="text-xs text-slate-500">
-                      {provider.sessions} sessions synced
+                      {t('labels.sessionsSynced', { count: provider.sessions })}
                     </div>
                   )}
                 </motion.div>
@@ -135,7 +137,7 @@ export function SovereignHistoryDemo() {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                placeholder="Search across all AI conversations..."
+                placeholder={t('labels.searchPlaceholder')}
                 className="w-full bg-slate-800/50 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-violet-500/50"
               />
             </div>
@@ -166,17 +168,10 @@ export function SovereignHistoryDemo() {
                         <span className="text-xs text-slate-600">•</span>
                         <span className="text-xs text-slate-500">{result.timestamp}</span>
                       </div>
-                      <p className="text-sm text-slate-300">{result.preview}</p>
+                      <p className="text-sm text-slate-300 italic">"{result.preview}"</p>
                     </motion.div>
                   ))}
                 </AnimatePresence>
-              </div>
-            )}
-
-            {!isSearching && searchResults.length === 0 && (
-              <div className="text-center py-8 text-slate-500 text-sm">
-                <Search className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                <p>Try searching "authentication" or "database schema"</p>
               </div>
             )}
           </div>
@@ -184,28 +179,18 @@ export function SovereignHistoryDemo() {
 
         {activeTab === 'export' && (
           <div className="space-y-4">
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { format: 'JSON', desc: 'Full data, developer-friendly', icon: Code },
-                { format: 'Markdown', desc: 'Human-readable archives', icon: FileText },
-                { format: 'PDF', desc: 'Print-ready documents', icon: File },
-              ].map(item => (
-                <button
-                  key={item.format}
-                  className="p-4 rounded-xl bg-slate-800/30 border border-white/5 hover:border-violet-500/30 transition-colors text-center"
-                >
-                  <item.icon className="w-6 h-6 mx-auto mb-2 text-cyan-400" />
-                  <div className="text-sm font-medium text-white">{item.format}</div>
-                  <div className="text-xs text-slate-500 mt-1">{item.desc}</div>
-                </button>
-              ))}
-            </div>
-            
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-              <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
-                <Shield className="w-4 h-4" />
-                Your data never leaves your device during export
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4">
+                <Download className="w-8 h-8 text-emerald-400" />
               </div>
+              <h4 className="text-sm font-medium text-white mb-2">{t('labels.exportReady')}</h4>
+              <p className="text-xs text-slate-500 mb-6 max-w-[240px]">
+                {t('labels.portableNotice')}
+              </p>
+              <button className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-2">
+                <Download className="w-3.5 h-3.5" />
+                {t('labels.downloadNow')}
+              </button>
             </div>
           </div>
         )}

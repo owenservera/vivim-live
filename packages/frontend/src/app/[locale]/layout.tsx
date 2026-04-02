@@ -3,14 +3,8 @@ import { getMessages } from 'next-intl/server';
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ReducedMotionWrapper } from "@/components/ReducedMotionWrapper";
-import { initializeGlobalRateLimiter } from "@/lib/rate-limiter/init";
 import { getDirection, getHtmlLang } from '@/i18n';
-import "../globals.css";
-
-// Initialize global rate limiter on server startup
-if (typeof window === 'undefined') {
-  initializeGlobalRateLimiter();
-}
+import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",

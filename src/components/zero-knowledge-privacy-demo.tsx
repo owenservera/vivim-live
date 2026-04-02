@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Shield, Lock, Key, Server, Wifi, WifiOff, CheckCircle, AlertCircle, Activity, Eye, EyeOff, Smartphone } from 'lucide-react';
 
 type SecurityLayer = {
@@ -11,14 +12,6 @@ type SecurityLayer = {
   status: 'active' | 'pending' | 'warning';
   icon: typeof Lock;
 };
-
-const SECURITY_LAYERS: SecurityLayer[] = [
-  { id: 1, name: 'Device Encryption', description: 'Keys generated locally, never leave device', status: 'active', icon: Smartphone },
-  { id: 2, name: 'Transport Security', description: 'TLS 1.3 with perfect forward secrecy', status: 'active', icon: Wifi },
-  { id: 3, name: 'Storage Encryption', description: 'AES-256-GCM encryption at rest', status: 'active', icon: Lock },
-  { id: 4, name: 'Access Control', description: 'Cryptographic key-based permissions', status: 'active', icon: Key },
-  { id: 5, name: 'Audit & Transparency', description: 'Full access logging & verification', status: 'active', icon: Activity },
-];
 
 type AccessLog = {
   id: string;
@@ -36,25 +29,36 @@ const ACCESS_LOGS: AccessLog[] = [
 ];
 
 export function ZeroKnowledgePrivacyDemo() {
+  const t = useTranslations('demos.zeroKnowledgePrivacy');
   const [activeTab, setActiveTab] = useState<'shield' | 'keys' | 'logs'>('shield');
   const [isEncrypting, setIsEncrypting] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
 
+  const SECURITY_LAYERS: SecurityLayer[] = [
+    { id: 1, name: t('layers.clientEncryption.name'), description: t('layers.clientEncryption.desc'), status: 'active', icon: Smartphone },
+    { id: 2, name: t('layers.transportSecurity.name'), description: t('layers.transportSecurity.desc'), status: 'active', icon: Wifi },
+    { id: 3, name: t('layers.storageEncryption.name'), description: t('layers.storageEncryption.desc'), status: 'active', icon: Lock },
+    { id: 4, name: t('layers.accessControl.name'), description: t('layers.accessControl.desc'), status: 'active', icon: Key },
+    { id: 5, name: t('layers.audit.name'), description: t('layers.audit.desc'), status: 'active', icon: Activity },
+  ];
+
+  const TABS = [
+    { id: 'shield' as const, label: t('tabs.privacyShield'), icon: Shield },
+    { id: 'keys' as const, label: t('tabs.keyManagement'), icon: Key },
+    { id: 'logs' as const, label: t('tabs.accessLogs'), icon: Activity },
+  ];
+
   return (
     <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900/50">
       <div className="flex border-b border-white/5">
-        {[
-          { id: 'shield', label: 'Privacy Shield', icon: Shield },
-          { id: 'keys', label: 'Key Management', icon: Key },
-          { id: 'logs', label: 'Access Logs', icon: Activity },
-        ].map(tab => (
+        {TABS.map(tab => (
           <button
             key={tab.id}
             type="button"
             onClick={() => setActiveTab(tab.id as typeof activeTab)}
             className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 text-xs font-medium transition-colors ${
-              activeTab === tab.id 
-                ? 'bg-violet-600/20 text-violet-400 border-b-2 border-violet-500' 
+              activeTab === tab.id
+                ? 'bg-violet-600/20 text-violet-400 border-b-2 border-violet-500'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
@@ -70,8 +74,8 @@ export function ZeroKnowledgePrivacyDemo() {
             <div className="flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 border border-emerald-500/30">
               <Shield className="w-8 h-8 text-emerald-400" />
               <div className="flex-1">
-                <div className="text-sm font-medium text-white">Security Score</div>
-                <div className="text-xs text-slate-400">100% - All layers protected</div>
+                <div className="text-sm font-medium text-white">{t('securityScore')}</div>
+                <div className="text-xs text-slate-400">{t('allLayersProtected')}</div>
               </div>
               <div className="text-2xl font-bold text-emerald-400">100%</div>
             </div>
@@ -106,11 +110,11 @@ export function ZeroKnowledgePrivacyDemo() {
             <div className="grid grid-cols-2 gap-3 text-center">
               <div className="p-3 rounded-lg bg-slate-800/30">
                 <div className="text-xl font-bold text-white">2,847</div>
-                <div className="text-xs text-slate-500">Encrypted Memories</div>
+                <div className="text-xs text-slate-500">{t('encryptedMemories')}</div>
               </div>
               <div className="p-3 rounded-lg bg-slate-800/30">
                 <div className="text-xl font-bold text-white">100%</div>
-                <div className="text-xs text-slate-500">Data Encrypted</div>
+                <div className="text-xs text-slate-500">{t('dataEncrypted')}</div>
               </div>
             </div>
           </div>
@@ -121,39 +125,39 @@ export function ZeroKnowledgePrivacyDemo() {
             <div className="p-4 rounded-xl bg-slate-800/30 border border-white/5">
               <div className="flex items-center gap-2 mb-4">
                 <Key className="w-4 h-4 text-violet-400" />
-                <span className="text-sm font-medium text-white">Your Encryption Keys</span>
+                <span className="text-sm font-medium text-white">{t('yourEncryptionKeys')}</span>
               </div>
-              
+
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 rounded-lg bg-slate-900/50">
                   <div className="flex items-center gap-2">
                     <Smartphone className="w-4 h-4 text-cyan-400" />
-                    <span className="text-sm text-slate-300">Master Key</span>
+                    <span className="text-sm text-slate-300">{t('masterKey')}</span>
                   </div>
-                  <span className="text-xs text-emerald-400">Generated on device</span>
+                  <span className="text-xs text-emerald-400">{t('generatedOnDevice')}</span>
                 </div>
-                
+
                 <div className="flex items-center justify-between p-3 rounded-lg bg-slate-900/50">
                   <div className="flex items-center gap-2">
                     <Server className="w-4 h-4 text-violet-400" />
-                    <span className="text-sm text-slate-300">Session Keys</span>
+                    <span className="text-sm text-slate-300">{t('sessionKeys')}</span>
                   </div>
-                  <span className="text-xs text-emerald-400">Unique per session</span>
+                  <span className="text-xs text-emerald-400">{t('uniquePerSession')}</span>
                 </div>
 
                 <div className="flex items-center justify-between p-3 rounded-lg bg-slate-900/50">
                   <div className="flex items-center gap-2">
                     <Lock className="w-4 h-4 text-amber-400" />
-                    <span className="text-sm text-slate-300">Content Keys</span>
+                    <span className="text-sm text-slate-300">{t('contentKeys')}</span>
                   </div>
-                  <span className="text-xs text-emerald-400">Per-memory encryption</span>
+                  <span className="text-xs text-emerald-400">{t('perMemoryEncryption')}</span>
                 </div>
               </div>
 
               <div className="mt-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30">
                 <div className="flex items-center gap-2 text-amber-400 text-xs">
                   <AlertCircle className="w-4 h-4" />
-                  Keys never leave your device - not even to VIVIM servers
+                  {t('keysNeverLeaveDevice')}
                 </div>
               </div>
             </div>

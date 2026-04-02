@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Share2, Link2, Check, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function SocialShare() {
+  const t = useTranslations('components.socialShare');
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -51,10 +53,10 @@ export function SocialShare() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5"
-        aria-label="Share"
+        aria-label={t('buttonLabel')}
       >
         <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        <span className="hidden sm:inline">Share</span>
+        <span className="hidden sm:inline">{t('buttonLabel')}</span>
       </button>
 
       <AnimatePresence>
@@ -72,7 +74,7 @@ export function SocialShare() {
                 className="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
               >
                 <Share2 className="w-4 h-4 text-violet-400" />
-                <span className="text-sm text-white">Share...</span>
+                <span className="text-sm text-white">{t('shareGeneric')}</span>
               </button>
 
               <button
@@ -85,7 +87,7 @@ export function SocialShare() {
                 ) : (
                   <Link2 className="w-4 h-4 text-cyan-400" />
                 )}
-                <span className="text-sm text-white">{copied ? "Copied!" : "Copy Link"}</span>
+                <span className="text-sm text-white">{copied ? t('copied') : t('copyLink')}</span>
               </button>
 
               <button
@@ -94,7 +96,7 @@ export function SocialShare() {
                 className="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
               >
                 <MessageCircle className="w-4 h-4 text-green-400" />
-                <span className="text-sm text-white">WhatsApp</span>
+                <span className="text-sm text-white">{t('whatsapp')}</span>
               </button>
             </div>
           </motion.div>

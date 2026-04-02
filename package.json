@@ -46,6 +46,7 @@
     "bun": ">=1.0.0"
   },
   "dependencies": {
+    "next-intl": "^4.8.4",
     "uuid": "^13.0.0"
   }
 }

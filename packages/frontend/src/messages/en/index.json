@@ -593,22 +593,7 @@
       "portableExports": "Portable exports in open formats",
       "ownYourArchives": "Own Your Archives",
       "universalExport": "Universal Export",
-      "description": "Break free from siloed AI providers. VIVIM syncs and centrally organizes your history across ChatGPT, Claude, and Gemini, giving you true ownership over your digital footprint.",
-      "tabs": {
-        "providers": "Connected Providers",
-        "search": "Universal Search",
-        "export": "Export"
-      },
-      "labels": {
-        "title": "Your Sovereign History",
-        "sessions": "{count} sessions",
-        "sessionsSynced": "{count} sessions synced",
-        "searchPlaceholder": "Search across all AI conversations...",
-        "exportFormat": "Select Export Format",
-        "exportReady": "Your history is ready for export",
-        "downloadNow": "Download JSON Archive",
-        "portableNotice": "This archive is fully portable and compatible with open standards."
-      }
+      "description": "Break free from siloed AI providers. VIVIM syncs and centrally organizes your history across ChatGPT, Claude, and Gemini, giving you true ownership over your digital footprint."
     },
     "decentralizedNetwork": {
       "title": "Decentralized Network Demo",
@@ -617,27 +602,7 @@
       "noCentralServers": "No central servers",
       "localFirstCrdt": "Local-First CRDT",
       "peerToPeerSyncTitle": "Peer-to-Peer Sync",
-      "description": "VIVIM runs as a local-first node on your device. It synchronizes data natively across your trusted devices and peers using CRDTs, ensuring conflict-free operations even when offline.",
-      "tabs": {
-        "network": "P2P Network",
-        "sync": "Sync Status",
-        "node": "Your Node"
-      },
-      "labels": {
-        "online": "Network Online",
-        "offline": "Offline Mode",
-        "peersConnected": "{count} peers connected",
-        "workingLocally": "Working locally, will sync when online",
-        "connected": "Connected",
-        "dataSynced": "Data Synced",
-        "discovered": "Discovered",
-        "meshVisualization": "Peer Mesh Visualization",
-        "you": "You",
-        "syncStatus": "Real-time CRDT Sync",
-        "activePeers": "Active Peers",
-        "nodeHealth": "Node Health",
-        "storage": "Storage"
-      }
+      "description": "VIVIM runs as a local-first node on your device. It synchronizes data natively across your trusted devices and peers using CRDTs, ensuring conflict-free operations even when offline."
     },
     "secureCollaboration": {
       "title": "Secure Collaboration Demo",
@@ -654,95 +619,12 @@
     "rightsLayer": {
       "title": "Rights Layer Demo",
       "granularTiers": "Granular ownership tiers",
-      "coGovernance": "Co-governance for your data",
-      "tiers": {
-        "t0": { "label": "Personal Only", "desc": "Complete ownership, no sharing" },
-        "t1": { "label": "Personal-Likely", "desc": "Probably personal, reviewable" },
-        "t2": { "label": "Shared-Possibly", "desc": "Ready for co-governance" },
-        "t3": { "label": "Co-Governed", "desc": "Dual-key required for exports" },
-        "t4": { "label": "Restricted", "desc": "Enhanced protection" },
-        "t5": { "label": "Regulated", "desc": "Never exports, lockbox" }
-      },
-      "sampleConversations": {
-        "dinner": { "text": "What should I make for dinner tonight?", "expectedTier": "T0", "description": "Personal, everyday question" },
-        "code": { "text": "Here's the code for the new login flow...", "expectedTier": "T3", "description": "Work-related, company asset" },
-        "medical": { "text": "My medical symptoms have been...", "expectedTier": "T5", "description": "Health information, regulated" },
-        "preference": { "text": "I prefer dark mode in all my IDEs", "expectedTier": "T1", "description": "Personal preference" },
-        "financial": { "text": "The Q4 financial projections are ready", "expectedTier": "T3", "description": "Business confidential" },
-        "general": { "text": "What are the best restaurants in Tokyo?", "expectedTier": "T0", "description": "General personal interest" }
-      },
-      "actions": {
-        "classify": "Classify Content",
-        "export": "Export Memory",
-        "classifying": "Classifying...",
-        "detectedTier": "Detected Tier",
-        "confidence": "Confidence",
-        "approvalPending": "Pending Approval",
-        "approvalApproved": "Approved",
-        "approvalDenied": "Denied",
-        "tierClassifier": "Tier Classifier",
-        "selectSample": "Select a sample conversation:",
-        "sample": "Sample",
-        "expected": "Expected",
-        "simulateExport": "Simulate Export Request",
-        "exportApproved": "Export approved ({reason})",
-        "exportDenied": "Export denied — Tier 5 content cannot leave vault",
-        "dualKeyRequired": "dual-key required",
-        "noRestrictions": "no restrictions",
-        "tdassTimeline": "TDASS Timeline",
-        "phaseActive": "Active",
-        "phaseSunset": "Sunset",
-        "phasePostSunset": "Post-Sunset",
-        "humanKey": "Human Key",
-        "companyKey": "Company Key",
-        "keyRequired": "Required",
-        "keyFading": "Fading...",
-        "keyNotRequired": "Not Required",
-        "companyDecaying": "Company share decaying — transfer in progress",
-        "ownershipTiers": "Ownership Tiers"
-      }
+      "coGovernance": "Co-governance for your data"
     },
     "sentinelDetection": {
       "title": "Sentinel Detection Demo",
       "algorithms": "13 detection algorithms",
-      "cryptographicProof": "Cryptographic proof",
-      "backToHome": "Back to Home",
-      "interactiveDemo": "Interactive Demo",
-      "startScan": "Start Scan",
-      "startDetectionScan": "Start Detection Scan",
-      "generatingEvidence": "Generating Evidence...",
-      "viewEvidence": "View Evidence",
-      "detected": "Detected",
-      "ready": "Ready",
-      "scanning": "Scanning",
-      "confidence": "Confidence",
-      "detectionDashboard": "Detection Dashboard",
-      "detectionsFound": "{count} Detection{count > 1 ? 's' : ''} Found",
-      "canarySystem": "Canary System",
-      "canaryDescription": "Plant unique tokens in your conversations. When AI models reference them without authorization — detection confirmed.",
-      "algorithmList": {
-        "spectral-mi": { "name": "Spectral Membership Inference", "description": "Primary detection via spectroscopy" },
-        "mutual-info": { "name": "Mutual Information Estimation", "description": "Quantify retained information" },
-        "kolmogorov": { "name": "Kolmogorov Uniqueness Scoring", "description": "Identify most-detectable content" },
-        "photon-counting": { "name": "Photon Counting", "description": "Per-token attribution" },
-        "interference": { "name": "Interference Pattern Detection", "description": "Cross-provider contamination" },
-        "canary": { "name": "Canary Wave Function", "description": "Proactive detection" },
-        "boltzmann": { "name": "Boltzmann Calibration", "description": "Statistical calibration" },
-        "holographic": { "name": "Holographic Watermarking", "description": "Identity encoding" },
-        "thermodynamic": { "name": "Thermodynamic Flow Tracing", "description": "Temporal absorption" },
-        "fisher": { "name": "Fisher Information Fingerprinting", "description": "Parameter influence" },
-        "entanglement": { "name": "Entanglement Testing", "description": "Hidden sharing detection" },
-        "diffraction": { "name": "Diffraction Grating Analysis", "description": "Multi-scale analysis" },
-        "conservation": { "name": "Conservation Law Verification", "description": "Complete accounting" }
-      },
-      "canaryTokens": {
-        "ready": "Ready",
-        "detected": "Detected"
-      },
-      "evidence": {
-        "title": "Detection Evidence",
-        "description": "Cryptographic proof of unauthorized data usage"
-      }
+      "cryptographicProof": "Cryptographic proof"
     },
     "marketplace": {
       "title": "Marketplace Demo",

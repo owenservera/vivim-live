@@ -77,6 +77,7 @@ function MobileMenu({
   activeSection: number;
   scrollToSection: (id: string) => void;
 }) {
+  const t = useTranslations('common.navbar');
   const menuRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -192,7 +193,7 @@ function MobileMenu({
                 className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
               >
                 <Play className="w-4 h-4 text-violet-400" />
-                <span className="text-sm text-white">Live Memory Demo</span>
+                <span className="text-sm text-white">{t('mobile.liveMemoryDemo')}</span>
               </Link>
               <Link
                 href="/demos/context-engine"
@@ -200,7 +201,7 @@ function MobileMenu({
                 className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-violet-600/20 to-cyan-600/20 border border-white/10 text-white text-sm hover:bg-white/5 transition-colors"
               >
                 <BookOpen className="w-4 h-4" />
-                Context Engine Demo
+                {t('mobile.contextEngineDemo')}
               </Link>
             </div>
           </motion.div>
@@ -212,6 +213,7 @@ function MobileMenu({
 
 function DemosDropdown() {
   const t = useTranslations('common.navbar.demoDropdown');
+  const tNav = useTranslations('common.navbar');
   const demos = [
     { href: "/demos/live-memory", key: "liveMemory", icon: Brain, iconColor: "text-cyan-400" },
     { href: "/demos/context-engine", key: "contextEngine", icon: Cpu, iconColor: "text-violet-400" },
@@ -229,7 +231,7 @@ function DemosDropdown() {
         className="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5 flex items-center gap-1"
       >
         <Play className="w-3.5 h-3.5" />
-        Demos
+        {tNav('sections.demos') || 'Demos'}
       </button>
 
       <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover/demos:opacity-100 group-hover/demos:visible transition-all duration-200">
@@ -367,7 +369,7 @@ export function Navbar() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5 whitespace-nowrap"
               >
                 <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">GitHub</span>
+                <span className="hidden sm:inline">{t('github')}</span>
               </button>
 
               <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover/github:opacity-100 group-hover/github:visible transition-all duration-200">
@@ -378,7 +380,7 @@ export function Navbar() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                    <span className="text-sm text-white">Backend</span>
+                    <span className="text-sm text-white">{t('backend')}</span>
                   </a>
                   <a
                     href="https://github.com/owenservera/vivim-pwa"
@@ -386,7 +388,7 @@ export function Navbar() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                    <span className="text-sm text-white">App</span>
+                    <span className="text-sm text-white">{t('app')}</span>
                   </a>
                   <a
                     href="https://github.com/owenservera/vivim-network"
@@ -394,7 +396,7 @@ export function Navbar() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                    <span className="text-sm text-white">Network</span>
+                    <span className="text-sm text-white">{t('network')}</span>
                   </a>
                   <a
                     href="https://github.com/owenservera/vivim-sdk"
@@ -402,7 +404,7 @@ export function Navbar() {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
                   >
-                    <span className="text-sm text-white">SDK</span>
+                    <span className="text-sm text-white">{t('sdk')}</span>
                   </a>
                 </div>
               </div>

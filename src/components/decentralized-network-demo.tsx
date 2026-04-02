@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import { Wifi, WifiOff, Server, Globe, RefreshCw, Activity, HardDrive, Cpu, ArrowUp, ArrowDown, Users, Shield, CheckCircle } from 'lucide-react';
 
@@ -36,6 +37,7 @@ const SYNC_EVENTS: SyncEvent[] = [
 ];
 
 export function DecentralizedNetworkDemo() {
+  const t = useTranslations('demos.decentralizedNetwork');
   const [activeTab, setActiveTab] = useState<'network' | 'sync' | 'node'>('network');
   const [peers, setPeers] = useState(INITIAL_PEERS);
   const [isOnline, setIsOnline] = useState(true);
@@ -50,9 +52,9 @@ export function DecentralizedNetworkDemo() {
     <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900/50">
       <div className="flex border-b border-white/5">
         {[
-          { id: 'network', label: 'P2P Network', icon: Globe },
-          { id: 'sync', label: 'Sync Status', icon: RefreshCw },
-          { id: 'node', label: 'Your Node', icon: Server },
+          { id: 'network', label: t('tabs.network'), icon: Globe },
+          { id: 'sync', label: t('tabs.sync'), icon: RefreshCw },
+          { id: 'node', label: t('tabs.node'), icon: Server },
         ].map(tab => (
           <button
             key={tab.id}
@@ -78,16 +80,16 @@ export function DecentralizedNetworkDemo() {
                 <>
                   <Wifi className="w-6 h-6 text-cyan-400" />
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-white">Network Online</div>
-                    <div className="text-xs text-slate-400">{networkStats.totalPeers} peers connected</div>
+                    <div className="text-sm font-medium text-white">{t('labels.online')}</div>
+                    <div className="text-xs text-slate-400">{t('labels.peersConnected', { count: networkStats.totalPeers })}</div>
                   </div>
                 </>
               ) : (
                 <>
                   <WifiOff className="w-6 h-6 text-amber-400" />
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-white">Offline Mode</div>
-                    <div className="text-xs text-slate-400">Working locally, will sync when online</div>
+                    <div className="text-sm font-medium text-white">{t('labels.offline')}</div>
+                    <div className="text-xs text-slate-400">{t('labels.workingLocally')}</div>
                   </div>
                 </>
               )}
@@ -96,20 +98,20 @@ export function DecentralizedNetworkDemo() {
             <div className="grid grid-cols-3 gap-3 text-center">
               <div className="p-3 rounded-lg bg-slate-800/30">
                 <div className="text-xl font-bold text-cyan-400">{peers.filter(p => p.status !== 'offline').length}</div>
-                <div className="text-xs text-slate-500">Connected</div>
+                <div className="text-xs text-slate-500">{t('labels.connected')}</div>
               </div>
               <div className="p-3 rounded-lg bg-slate-800/30">
                 <div className="text-xl font-bold text-violet-400">{networkStats.dataSynced}</div>
-                <div className="text-xs text-slate-500">Data Synced</div>
+                <div className="text-xs text-slate-500">{t('labels.dataSynced')}</div>
               </div>
               <div className="p-3 rounded-lg bg-slate-800/30">
                 <div className="text-xl font-bold text-emerald-400">{peers.length}</div>
-                <div className="text-xs text-slate-500">Discovered</div>
+                <div className="text-xs text-slate-500">{t('labels.discovered')}</div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <h4 className="text-xs font-medium text-slate-400">Peer Mesh Visualization</h4>
+              <h4 className="text-xs font-medium text-slate-400">{t('labels.meshVisualization')}</h4>
               <div className="relative h-32 flex items-center justify-center">
                 <svg className="w-full h-full" viewBox="0 0 200 100">
                   <defs>
@@ -125,7 +127,7 @@ export function DecentralizedNetworkDemo() {
                   <line x1="100" y1="50" x2="80" y2="20" stroke="#8B5CF6" strokeWidth="1" opacity="0.4" />
                   
                   <circle cx="100" cy="50" r="8" fill="#10B981" />
-                  <text x="100" y="53" textAnchor="middle" fill="white" fontSize="6">You</text>
+                  <text x="100" y="53" textAnchor="middle" fill="white" fontSize="6">{t('labels.you')}</text>
                   
                   <circle cx="40" cy="20" r="5" fill="#8B5CF6" />
                   <text x="40" y="23" textAnchor="middle" fill="white" fontSize="5">A</text>
@@ -145,7 +147,7 @@ export function DecentralizedNetworkDemo() {
               </div>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
               {peers.slice(1).map(peer => (
                 <div key={peer.id} className="flex items-center gap-3 p-2 rounded-lg bg-slate-800/20">
                   <div className={`w-2 h-2 rounded-full ${
@@ -153,8 +155,7 @@ export function DecentralizedNetworkDemo() {
                     peer.status === 'syncing' ? 'bg-amber-400 animate-pulse' : 'bg-slate-600'
                   }`} />
                   <span className="text-sm text-slate-300 flex-1">{peer.name}</span>
-                  <span className="text-xs text-slate-500">{peer.distance}</span>
-                  <span className="text-xs text-slate-600">{peer.dataSynced} mem</span>
+                  <span className="text-[10px] text-slate-500">{peer.distance}</span>
                 </div>
               ))}
             </div>
@@ -164,25 +165,25 @@ export function DecentralizedNetworkDemo() {
         {activeTab === 'sync' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white">CRDT Sync Events</span>
+              <span className="text-sm font-medium text-white">{t('labels.syncStatus')}</span>
               <button
                 type="button"
                 onClick={() => setIsOnline(!isOnline)}
                 className={`text-xs px-2 py-1 rounded ${isOnline ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}`}
               >
-                {isOnline ? 'Online' : 'Offline'}
+                {isOnline ? t('labels.online') : t('labels.offline')}
               </button>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
               {SYNC_EVENTS.map(event => (
                 <div key={event.id} className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/30">
                   <RefreshCw className="w-4 h-4 text-cyan-400" />
                   <div className="flex-1">
-                    <div className="text-sm text-slate-300">{event.action}</div>
-                    <div className="text-xs text-slate-500">{event.peers} peers involved</div>
+                    <div className="text-xs text-slate-300">{event.action}</div>
+                    <div className="text-[10px] text-slate-500">{event.peers} {t('labels.peersConnected', { count: event.peers })}</div>
                   </div>
-                  <span className="text-xs text-slate-500">{event.timestamp}</span>
+                  <span className="text-[10px] text-slate-500">{event.timestamp}</span>
                 </div>
               ))}
             </div>
@@ -201,7 +202,7 @@ export function DecentralizedNetworkDemo() {
             <div className="p-4 rounded-xl bg-slate-800/30 border border-white/5">
               <div className="flex items-center gap-2 mb-4">
                 <Server className="w-4 h-4 text-violet-400" />
-                <span className="text-sm font-medium text-white">Your Node Status</span>
+                <span className="text-sm font-medium text-white">{t('labels.nodeHealth')}</span>
                 <span className="ml-auto text-xs text-emerald-400 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
                   Running
@@ -212,7 +213,7 @@ export function DecentralizedNetworkDemo() {
                 <div className="p-3 rounded-lg bg-slate-900/50">
                   <div className="flex items-center gap-2 mb-2">
                     <HardDrive className="w-4 h-4 text-cyan-400" />
-                    <span className="text-xs text-slate-400">Storage</span>
+                    <span className="text-xs text-slate-400">{t('labels.storage')}</span>
                   </div>
                   <div className="text-lg font-bold text-white">50,234</div>
                   <div className="text-xs text-slate-500">local memories</div>
@@ -226,33 +227,18 @@ export function DecentralizedNetworkDemo() {
                   <div className="text-xs text-slate-500">CPU • 12% RAM</div>
                 </div>
               </div>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between p-2 rounded bg-slate-900/30">
-                  <span className="text-slate-400">Uptime</span>
-                  <span className="text-white">45 days</span>
-                </div>
-                <div className="flex items-center justify-between p-2 rounded bg-slate-900/30">
-                  <span className="text-slate-400">Port</span>
-                  <span className="text-white">8080 (public)</span>
-                </div>
-                <div className="flex items-center justify-between p-2 rounded bg-slate-900/30">
-                  <span className="text-slate-400">Network Key</span>
-                  <span className="text-white">✓ Configured</span>
-                </div>
-              </div>
             </div>
 
             <div className="flex gap-2">
               <button
                 type="button"
-                className="flex-1 py-2.5 rounded-lg bg-violet-600/20 text-violet-400 text-sm font-medium border border-violet-500/30"
+                className="flex-1 py-2 rounded-lg bg-violet-600/20 text-violet-400 text-xs font-medium border border-violet-500/30"
               >
                 View Logs
               </button>
               <button
                 type="button"
-                className="flex-1 py-2.5 rounded-lg bg-cyan-600/20 text-cyan-400 text-sm font-medium border border-cyan-500/30"
+                className="flex-1 py-2 rounded-lg bg-cyan-600/20 text-cyan-400 text-xs font-medium border border-cyan-500/30"
               >
                 Configure
               </button>

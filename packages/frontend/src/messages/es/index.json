@@ -593,22 +593,7 @@
       "portableExports": "Exportaciones portátiles en formatos abiertos",
       "ownYourArchives": "Posee Tus Archivos",
       "universalExport": "Exportación Universal",
-      "description": "Libérate de los proveedores de IA aislados. VIVIM sincroniza y organiza centralmente tu historial en ChatGPT, Claude y Gemini, dándote verdadera propiedad sobre tu huella digital.",
-      "tabs": {
-        "providers": "Proveedores Conectados",
-        "search": "Búsqueda Universal",
-        "export": "Exportar"
-      },
-      "labels": {
-        "title": "Tu Historia Soberana",
-        "sessions": "{count} sesiones",
-        "sessionsSynced": "{count} sesiones sincronizadas",
-        "searchPlaceholder": "Buscar en todas las conversaciones de IA...",
-        "exportFormat": "Seleccionar Formato de Exportación",
-        "exportReady": "Tu historial está listo para exportar",
-        "downloadNow": "Descargar Archivo JSON",
-        "portableNotice": "Este archivo es totalmente portátil y compatible con estándares abiertos."
-      }
+      "description": "Libérate de los proveedores de IA aislados. VIVIM sincroniza y organiza centralmente tu historial en ChatGPT, Claude y Gemini, dándote verdadera propiedad sobre tu huella digital."
     },
     "decentralizedNetwork": {
       "title": "Demo de Red Descentralizada",
@@ -617,27 +602,7 @@
       "noCentralServers": "Sin servidores centrales",
       "localFirstCrdt": "CRDT Local-First",
       "peerToPeerSyncTitle": "Sincronización Peer-to-Peer",
-      "description": "VIVIM funciona como un nodo local-first en tu dispositivo. Sincroniza datos nativamente a través de tus dispositivos y pares de confianza usando CRDTs, asegurando operaciones sin conflictos incluso sin conexión.",
-      "tabs": {
-        "network": "Red P2P",
-        "sync": "Estado de Sincronización",
-        "node": "Tu Nodo"
-      },
-      "labels": {
-        "online": "Red en Línea",
-        "offline": "Modo Desconectado",
-        "peersConnected": "{count} pares conectados",
-        "workingLocally": "Trabajando localmente, se sincronizará al estar en línea",
-        "connected": "Conectado",
-        "dataSynced": "Datos Sincronizados",
-        "discovered": "Descubiertos",
-        "meshVisualization": "Visualización de Malla de Pares",
-        "you": "Tú",
-        "syncStatus": "Sincronización CRDT en Tiempo Real",
-        "activePeers": "Pares Activos",
-        "nodeHealth": "Salud del Nodo",
-        "storage": "Almacenamiento"
-      }
+      "description": "VIVIM funciona como un nodo local-first en tu dispositivo. Sincroniza datos nativamente a través de tus dispositivos y pares de confianza usando CRDTs, asegurando operaciones sin conflictos incluso sin conexión."
     },
     "secureCollaboration": {
       "title": "Demo de Colaboración Segura",
@@ -654,95 +619,12 @@
     "rightsLayer": {
       "title": "Demo de Capa de Derechos",
       "granularTiers": "Niveles de propiedad granular",
-      "coGovernance": "Co-gobernanza para tus datos",
-      "tiers": {
-        "t0": { "label": "Solo Personal", "desc": "Propiedad completa, sin compartir" },
-        "t1": { "label": "Probablemente Personal", "desc": "Probablemente personal, revisable" },
-        "t2": { "label": "Possibly Compartido", "desc": "Listo para co-gobernanza" },
-        "t3": { "label": "Co-Gobernado", "desc": "Clave dual requerida para exportaciones" },
-        "t4": { "label": "Restringido", "desc": "Protección mejorada" },
-        "t5": { "label": "Regulado", "desc": "Nunca exporta, caja fuerte" }
-      },
-      "sampleConversations": {
-        "dinner": { "text": "¿Qué debería preparar para cenar hoy?", "expectedTier": "T0", "description": "Pregunta personal, cotidiana" },
-        "code": { "text": "Aquí está el código para el nuevo flujo de inicio de sesión...", "expectedTier": "T3", "description": "Relacionado con el trabajo, activo de la empresa" },
-        "medical": { "text": "Mis síntomas médicos han sido...", "expectedTier": "T5", "description": "Información de salud, regulada" },
-        "preference": { "text": "Prefiero el modo oscuro en todos mis IDEs", "expectedTier": "T1", "description": "Preferencia personal" },
-        "financial": { "text": "Las proyecciones financieras del Q4 están listas", "expectedTier": "T3", "description": "Confidencial de negocio" },
-        "general": { "text": "¿Cuáles son los mejores restaurantes de Tokio?", "expectedTier": "T0", "description": "Interés personal general" }
-      },
-      "actions": {
-        "classify": "Clasificar Contenido",
-        "export": "Exportar Memoria",
-        "classifying": "Clasificando...",
-        "detectedTier": "Nivel Detectado",
-        "confidence": "Confianza",
-        "approvalPending": "Aprobación Pendiente",
-        "approvalApproved": "Aprobado",
-        "approvalDenied": "Denegado",
-        "tierClassifier": "Clasificador de Niveles",
-        "selectSample": "Selecciona una conversación de ejemplo:",
-        "sample": "Ejemplo",
-        "expected": "Esperado",
-        "simulateExport": "Simular Solicitud de Exportación",
-        "exportApproved": "Exportación aprobada ({reason})",
-        "exportDenied": "Exportación denegada — El contenido Tier 5 no puede salir de la caja fuerte",
-        "dualKeyRequired": "se requiere clave dual",
-        "noRestrictions": "sin restricciones",
-        "tdassTimeline": "Línea de Tiempo TDASS",
-        "phaseActive": "Activo",
-        "phaseSunset": "Transición",
-        "phasePostSunset": "Post-Transición",
-        "humanKey": "Clave Humana",
-        "companyKey": "Clave de Empresa",
-        "keyRequired": "Requerida",
-        "keyFading": "Desapareciendo...",
-        "keyNotRequired": "No Requerida",
-        "companyDecaying": "La participación de la empresa se está reduciendo — transferencia en progreso",
-        "ownershipTiers": "Niveles de Propiedad"
-      }
+      "coGovernance": "Co-gobernanza para tus datos"
     },
     "sentinelDetection": {
       "title": "Demo de Detección Sentinel",
       "algorithms": "13 algoritmos de detección",
-      "cryptographicProof": "Prueba criptográfica",
-      "backToHome": "Volver al Inicio",
-      "interactiveDemo": "Demo Interactiva",
-      "startScan": "Iniciar Escaneo",
-      "startDetectionScan": "Iniciar Escaneo de Detección",
-      "generatingEvidence": "Generando Evidencia...",
-      "viewEvidence": "Ver Evidencia",
-      "detected": "Detectado",
-      "ready": "Listo",
-      "scanning": "Escaneando",
-      "confidence": "Confianza",
-      "detectionDashboard": "Panel de Detección",
-      "detectionsFound": "{count} Detección{count > 1 ? 'es' : ''} Encontrada{count > 1 ? 's' : ''}",
-      "canarySystem": "Sistema Canary",
-      "canaryDescription": "Planta tokens únicos en tus conversaciones. Cuando los modelos de IA los referencian sin autorización — detección confirmada.",
-      "algorithmList": {
-        "spectral-mi": { "name": "Inferencia de Membresía Espectral", "description": "Detección primaria vía espectroscopía" },
-        "mutual-info": { "name": "Estimación de Información Mutua", "description": "Cuantificar información retenida" },
-        "kolmogorov": { "name": "Puntuación de Singularidad de Kolmogorov", "description": "Identificar contenido más detectable" },
-        "photon-counting": { "name": "Conteo de Fotones", "description": "Atribución por token" },
-        "interference": { "name": "Detección de Patrones de Interferencia", "description": "Contaminación entre proveedores" },
-        "canary": { "name": "Función de Onda Canary", "description": "Detección proactiva" },
-        "boltzmann": { "name": "Calibración de Boltzmann", "description": "Calibración estadística" },
-        "holographic": { "name": "Marca de Agua Holográfica", "description": "Codificación de identidad" },
-        "thermodynamic": { "name": "Trazado de Flujo Termodinámico", "description": "Absorción temporal" },
-        "fisher": { "name": "Huella de Información de Fisher", "description": "Influencia de parámetros" },
-        "entanglement": { "name": "Prueba de Entrelazamiento", "description": "Detección de compartición oculta" },
-        "diffraction": { "name": "Análisis de Rejilla de Difracción", "description": "Análisis multi-escala" },
-        "conservation": { "name": "Verificación de Ley de Conservación", "description": "Contabilidad completa" }
-      },
-      "canaryTokens": {
-        "ready": "Listo",
-        "detected": "Detectado"
-      },
-      "evidence": {
-        "title": "Evidencia de Detección",
-        "description": "Prueba criptográfica de uso no autorizado de datos"
-      }
+      "cryptographicProof": "Prueba criptográfica"
     },
     "marketplace": {
       "title": "Demo del Mercado",
