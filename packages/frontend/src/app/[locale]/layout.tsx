@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ReducedMotionWrapper } from "@/components/ReducedMotionWrapper";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { getDirection, getHtmlLang } from '@/i18n';
 import "./globals.css";
 
@@ -139,6 +140,7 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ReducedMotionWrapper>
             {children}
+            <CookieConsentBanner />
           </ReducedMotionWrapper>
         </NextIntlClientProvider>
       </body>

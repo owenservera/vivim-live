@@ -3,43 +3,11 @@
 import { AssistantRuntimeProvider, useLocalRuntime, type ChatModelAdapter } from "@assistant-ui/react";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import type { ChatMessage, DualContext } from "@/types/chat";
+import { getFingerprint } from "@/lib/fingerprint";
 
 interface ChatProviderProps {
   children: ReactNode;
   threadId?: string;
-}
-
-const FINGERPRINT_KEY = "vivim_user_fp";
-
-function getFingerprint(): string {
-  try {
-    const stored = localStorage.getItem(FINGERPRINT_KEY);
-    if (stored) return stored;
-  } catch {}
-  
-  const nav = typeof navigator !== "undefined" ? navigator : {} as any;
-  const components = [
-    nav.userAgent || "unknown",
-    nav.language || "unknown",
-    nav.platform || "unknown",
-    typeof window !== "undefined" ? window.screen.colorDepth : "unknown",
-    typeof window !== "undefined" ? new Date().getTimezoneOffset() : "unknown",
-  ];
-  
-  const str = components.join("|");
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
-  }
-  const fp = `fp_${Math.abs(hash).toString(36)}`;
-  
-  try {
-    localStorage.setItem(FINGERPRINT_KEY, fp);
-  } catch {}
-  
-  return fp;
 }
 
 export function ChatProvider({ children, threadId }: ChatProviderProps) {
