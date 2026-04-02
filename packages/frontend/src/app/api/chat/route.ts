@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
-        Connection: "keep-alive",
+        "Connection": "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "X-Context-Engine": contextStats.engineUsed ?? "fallback",
       },
