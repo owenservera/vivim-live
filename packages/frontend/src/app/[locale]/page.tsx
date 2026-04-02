@@ -112,18 +112,30 @@ const SOLUTION_FEATURES = [
   { icon: Globe, title: "Works with Any AI", desc: "Model-agnostic design means you can switch providers without losing your memory." },
 ];
 
-// Demo icons and colors - these are design elements, not translatable
-const DEMO_ICONS: Record<string, { icon: typeof Brain; color: string }> = {
-  "live-memory": { icon: Brain, color: "from-violet-500 to-purple-600" },
-  "context-engine": { icon: Layers, color: "from-cyan-500 to-blue-600" },
-  "zero-knowledge-privacy": { icon: Lock, color: "from-emerald-500 to-teal-600" },
-  "sovereign-history": { icon: History, color: "from-amber-500 to-orange-600" },
-  "decentralized-network": { icon: Network, color: "from-blue-500 to-indigo-600" },
-  "secure-collaboration": { icon: Users, color: "from-rose-500 to-pink-600" },
-  "dynamic-intelligence": { icon: BrainZap, color: "from-lime-500 to-green-600" },
-  "rights-layer": { icon: ShieldCheck, color: "from-amber-500 to-orange-600" },
-  "sentinel-detection": { icon: Radar, color: "from-red-500 to-rose-600" },
-  "marketplace": { icon: ShoppingCart, color: "from-emerald-500 to-teal-600" },
+const DEMO_DATA: Record<string, { title: string; desc: string }> = {
+  liveMemory: { title: "Live Memory", desc: "Watch your memory get extracted from real conversations in real-time" },
+  contextEngine: { title: "Context Engine", desc: "See the 8-layer context assembly system build context from scratch" },
+  zeroKnowledgePrivacy: { title: "Zero-Knowledge Privacy", desc: "Your encryption keys never leave your device — even we can't see your data" },
+  sovereignHistory: { title: "Sovereign History", desc: "Complete ownership of your conversation history with portable exports" },
+  decentralizedNetwork: { title: "Decentralized Network", desc: "Peer-to-peer memory sync without central servers or lock-in" },
+  secureCollaboration: { title: "Secure Collaboration", desc: "Share memory context with your team while preserving individual sovereignty" },
+  dynamicIntelligence: { title: "Dynamic Intelligence", desc: "Adaptive context that evolves based on your usage patterns" },
+  rightsLayer: { title: "Rights Layer", desc: "Granular ownership tiers with co-governance for your data" },
+  sentinelDetection: { title: "Sentinel Detection", desc: "13 algorithms that detect if your data was used without permission" },
+  marketplace: { title: "Marketplace", desc: "Monetize your intelligence on your terms" },
+};
+
+const DEMO_ICON_MAP: Record<string, { icon: typeof Brain; color: string }> = {
+  liveMemory: { icon: Brain, color: "from-violet-500 to-purple-600" },
+  contextEngine: { icon: Layers, color: "from-cyan-500 to-blue-600" },
+  zeroKnowledgePrivacy: { icon: Lock, color: "from-emerald-500 to-teal-600" },
+  sovereignHistory: { icon: History, color: "from-amber-500 to-orange-600" },
+  decentralizedNetwork: { icon: Network, color: "from-blue-500 to-indigo-600" },
+  secureCollaboration: { icon: Users, color: "from-rose-500 to-pink-600" },
+  dynamicIntelligence: { icon: BrainZap, color: "from-lime-500 to-green-600" },
+  rightsLayer: { icon: ShieldCheck, color: "from-amber-500 to-orange-600" },
+  sentinelDetection: { icon: Radar, color: "from-red-500 to-rose-600" },
+  marketplace: { icon: ShoppingCart, color: "from-emerald-500 to-teal-600" },
 };
 
 const LAYER_COLORS = [
@@ -148,12 +160,106 @@ const PROVIDER_NAME_KEYS: Record<string, string> = {
   "kimi": "Kimi",
 };
 
+const RIGHTS_TIER_DATA: Record<string, { label: string; desc: string }> = {
+  t0: { label: "Personal Only", desc: "You own it completely. No sharing, no governance." },
+  t1: { label: "Personal-Likely", desc: "Probably personal, but open to classification review." },
+  t2: { label: "Shared-Possibly", desc: "Could be shared — ready for co-governance setup." },
+  t3: { label: "Co-Governed", desc: "Company gets governance. Dual-key required for exports." },
+  t4: { label: "Restricted", desc: "Enhanced protection. Limited access even for you." },
+  t5: { label: "Regulated", desc: "Never exports. Medical, legal, financial lockbox." },
+};
+
+const RIGHTS_TIER_COLORS: Record<string, { color: string; border: string }> = {
+  t0: { color: "from-emerald-500 to-green-600", border: "border-emerald-500/30" },
+  t1: { color: "from-emerald-400 to-teal-500", border: "border-emerald-400/30" },
+  t2: { color: "from-amber-400 to-orange-500", border: "border-amber-400/30" },
+  t3: { color: "from-orange-500 to-amber-600", border: "border-orange-500/30" },
+  t4: { color: "from-red-500 to-rose-600", border: "border-red-500/30" },
+  t5: { color: "from-red-600 to-red-700", border: "border-red-600/30" },
+};
+
+const SENTINEL_ALGORITHMS = [
+  "Spectral Membership Inference",
+  "Mutual Information Estimation",
+  "Kolmogorov Uniqueness",
+  "Photon Counting",
+  "Interference Pattern",
+  "Canary Wave Function",
+  "Boltzmann Calibration",
+  "Holographic Watermarking",
+  "Thermodynamic Flow",
+  "Fisher Fingerprinting",
+  "Entanglement Testing",
+  "Diffraction Grating",
+  "Conservation Law",
+];
+
+const MARKETPLACE_STEPS = [
+  { label: "List", desc: "Select ACUs, set price, generate ZK proof" },
+  { label: "Discover", desc: "Buyers browse verified listings" },
+  { label: "Purchase", desc: "Escrow payment secures transaction" },
+  { label: "Exchange", desc: "Encrypted delivery via ECDH" },
+  { label: "Verify", desc: "ZK proof validation" },
+];
+
+const PRINCIPLES_DATA = [
+  { title: "Sovereign", desc: "You own your memory data completely. VIVIM never claims ownership — your AI memory belongs to you, not the platform." },
+  { title: "Personal", desc: "Your memory is yours alone. Unlike shared databases, VIVIM creates an individual memory layer unique to each user." },
+  { title: "Provider Agnostic", desc: "Switch between GPT-4, Claude, Gemini, or any AI model — your memory stays intact. No vendor lock-in, ever." },
+  { title: "Portable", desc: "Export your entire memory at any time in standard formats. Take your AI memory wherever you go." },
+  { title: "Use-Case Agnostic", desc: "Works for coding assistants, customer support, education, healthcare — any application that benefits from memory." },
+  { title: "Dynamically Generated", desc: "Context isn't static — it's built fresh for each interaction based on what you're doing right now." },
+];
+
+const CONTEXT_LAYERS_DATA = [
+  { label: "Identity Core", desc: "Who you are — permanent context", tokens: "~300" },
+  { label: "Global Preferences", desc: "How AI should respond to you", tokens: "~500" },
+  { label: "Topic Context", desc: "Deep knowledge about current topics", tokens: "~1,500" },
+  { label: "Entity Context", desc: "People, projects, and tools you discuss", tokens: "~1,000" },
+  { label: "Conversation Arc", desc: "Thread of current discussion", tokens: "~2,000" },
+  { label: "JIT Retrieval", desc: "Real-time relevant knowledge", tokens: "~2,500" },
+  { label: "Message History", desc: "Recent conversation messages", tokens: "~3,500" },
+  { label: "User Message", desc: "Your current input", tokens: "Variable" },
+];
+
+const MEMORY_TYPES_DATA = [
+  { name: "Episodic", example: "\"Last week we discussed...\"" },
+  { name: "Semantic", example: "\"Python is your primary language\"" },
+  { name: "Procedural", example: "\"You prefer TDD methodology\"" },
+  { name: "Factual", example: "\"You work as a senior engineer\"" },
+  { name: "Preference", example: "\"Prefers dark mode interface\"" },
+  { name: "Identity", example: "\"Full-stack developer\"" },
+  { name: "Relationship", example: "\"John is your tech lead\"" },
+  { name: "Goal", example: "\"Launch MVP by Q2\"" },
+  { name: "Project", example: "\"E-commerce uses Next.js\"" },
+];
+
+const MARKETPLACE_REVENUE_BREAKS = [
+  { label: "Platform (15%)", value: "$150", color: "slate" },
+  { label: "Human (60% × 40%)", value: "$240", color: "slate" },
+  { label: "Company (60% × 40%)", value: "$240", color: "slate" },
+  { label: "Total Sale", value: "$1,000", color: "emerald" },
+];
+
+const DEVELOPERS_DATA = [
+  { title: "Simple SDK", desc: "Drop-in memory backend for LangChain, LlamaIndex, or custom" },
+  { title: "Local First", desc: "CRDT-based sync with optional IPFS persistence" },
+  { title: "Storage Options", desc: "Local, SQLite, or IPFS with end-to-end encryption" },
+  { title: "Zero-Knowledge", desc: "Encryption keys never leave the user's device" },
+];
+
 interface Problem {
   rank: number;
   key: string;
   category: "memory" | "portability" | "trust" | "developer";
   scores: { P: number; T: number; E: number; M: number };
   vivimScore: number;
+  title?: string;
+  hook?: string;
+  stat?: string;
+  desc?: string;
+  vivimAnswer?: string;
+  vivimGap?: string;
 }
 
 const BASE_PROBLEMS: Problem[] = [
@@ -199,12 +305,18 @@ export default function Home() {
   const problemsData = useMemo(() => {
     return BASE_PROBLEMS.map(p => ({
       ...p,
-      title: problem(`cards.${p.key}.title`),
-      hook: problem(`cards.${p.key}.hook`),
-      stat: problem(`cards.${p.key}.stat`),
-      desc: problem(`cards.${p.key}.desc`),
-      vivimAnswer: problem(`cards.${p.key}.vivimAnswer`),
-      vivimGap: problem(`cards.${p.key}.vivimGap`),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      title: problem(`cards.${p.key}.title` as any),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      hook: problem(`cards.${p.key}.hook` as any),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      stat: problem(`cards.${p.key}.stat` as any),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      desc: problem(`cards.${p.key}.desc` as any),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vivimAnswer: problem(`cards.${p.key}.vivimAnswer` as any),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vivimGap: problem(`cards.${p.key}.vivimGap` as any),
     }));
   }, [problem]);
 
@@ -307,7 +419,8 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.35 }}
                 className="text-lg text-slate-400 max-w-xl mx-auto mb-6 hero-stagger-3"
               >
-                {hero.rich('description')}
+                A memory layer that <span className="text-violet-400">you own</span>, that works with{" "}
+                <span className="text-cyan-400">any AI provider</span>, and goes <span className="text-emerald-400">wherever you go</span>.
               </motion.p>
               
               <motion.div
@@ -327,7 +440,9 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.45 }}
                 className="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-3xl mx-auto mb-8 hero-stagger-4"
               >
-                {hero.rich('descriptionExtended')}
+                A <span className="text-violet-400 font-semibold">sovereign, portable, personal memory</span> and{" "}
+                <span className="text-cyan-400 font-semibold">dynamic context engine</span> that works with{" "}
+                <span className="text-emerald-400 font-semibold">all AI providers</span> — your single, AI-native database.
               </motion.p>
 
               <motion.div
@@ -377,15 +492,15 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-wrap justify-center gap-8">
-              {Object.keys(providers.raw('logos') as Record<string, string>).map((key) => (
+              {Object.entries(PROVIDER_NAME_KEYS).map(([key, name]) => (
                 <div
                   key={key}
                   className="flex flex-col items-center gap-2 p-4 rounded-xl glass-card hover:border-violet-500/30 transition-colors min-w-[120px] card-lift cursor-pointer"
                 >
                   <div className="w-12 h-12 flex items-center justify-center">
-                    <ProviderLogo name={PROVIDER_NAME_KEYS[key]} className="w-10 h-10" />
+                    <ProviderLogo name={name} className="w-10 h-10" />
                   </div>
-                  <span className="text-sm text-slate-400">{providers(`logos.${key}`)}</span>
+                  <span className="text-sm text-slate-400">{providers(`logos.${key}` as any)}</span>
                 </div>
               ))}
             </div>
@@ -633,15 +748,16 @@ export default function Home() {
               </div>
               
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {Object.keys(demos.raw('items') as Record<string, { title: string; desc: string }>).map((slug, idx) => {
-                  const demo = (demos.raw('items') as Record<string, { title: string; desc: string }>)[slug];
-                  const demoConfig = DEMO_ICONS[slug];
+                {Object.keys(DEMO_ICON_MAP).map((slug, idx) => {
+                  const demoData = DEMO_DATA[slug];
+                  const demoConfig = DEMO_ICON_MAP[slug];
                   const Icon = demoConfig?.icon;
                   const isFeatured = idx === 0;
+                  const href = `/demos/${slug.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
                   return (
                     <Link 
                       key={slug} 
-                      href={`/demos/${slug}`}
+                      href={href}
                       className={isFeatured ? "md:col-span-2 lg:col-span-2" : ""}
                     >
                       <motion.div
@@ -660,10 +776,10 @@ export default function Home() {
                         <h3 className={`font-bold text-white mb-2 group-hover:text-violet-300 transition-colors ${
                           isFeatured ? "text-2xl mb-3" : "text-lg"
                         }`}>
-                          {demo.title}
+                          {demoData?.title}
                         </h3>
                         <p className={`text-slate-400 ${isFeatured ? "text-base" : "text-sm"}`}>
-                          {demo.desc}
+                          {demoData?.desc}
                         </p>
                       </motion.div>
                     </Link>
@@ -741,17 +857,9 @@ export default function Home() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-              {Object.keys((rightsLayer.raw('tiers') as Record<string, { label: string; desc: string }>)).map((tierKey) => {
-                const tier = (rightsLayer.raw('tiers') as Record<string, { label: string; desc: string }>)[tierKey];
-                const colors: Record<string, { color: string; border: string }> = {
-                  t0: { color: "from-emerald-500 to-green-600", border: "border-emerald-500/30" },
-                  t1: { color: "from-emerald-400 to-teal-500", border: "border-emerald-400/30" },
-                  t2: { color: "from-amber-400 to-orange-500", border: "border-amber-400/30" },
-                  t3: { color: "from-orange-500 to-amber-600", border: "border-orange-500/30" },
-                  t4: { color: "from-red-500 to-rose-600", border: "border-red-500/30" },
-                  t5: { color: "from-red-600 to-red-700", border: "border-red-600/30" },
-                };
-                const tierStyle = colors[tierKey] || colors.t0;
+              {Object.keys(RIGHTS_TIER_DATA).map((tierKey) => {
+                const tier = RIGHTS_TIER_DATA[tierKey];
+                const tierStyle = RIGHTS_TIER_COLORS[tierKey] || RIGHTS_TIER_COLORS.t0;
                 return (
                   <motion.div
                     key={tierKey}
@@ -841,7 +949,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
-              {(sentinel.raw('algorithms') as string[]).map((algo, i) => (
+              {SENTINEL_ALGORITHMS.map((algo, i) => (
                 <motion.div
                   key={algo}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -927,25 +1035,22 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-5 gap-4 mb-12">
-              {Object.keys((marketplace.raw('steps') as Record<string, { label: string; desc: string }>)).map((stepKey, i) => {
-                const step = (marketplace.raw('steps') as Record<string, { label: string; desc: string }>)[stepKey];
-                return (
-                  <motion.div
-                    key={stepKey}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    viewport={{ once: true }}
-                    className="text-center"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-3">
-                      <span className="text-white font-bold">{i + 1}</span>
-                    </div>
-                    <h3 className="text-white font-bold mb-1">{step.label}</h3>
-                    <p className="text-xs text-slate-500">{step.desc}</p>
-                  </motion.div>
-                );
-              })}
+              {MARKETPLACE_STEPS.map((step, i) => (
+                <motion.div
+                  key={step.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  viewport={{ once: true }}
+                  className="text-center"
+                >
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-3">
+                    <span className="text-white font-bold">{i + 1}</span>
+                  </div>
+                  <h3 className="text-white font-bold mb-1">{step.label}</h3>
+                  <p className="text-xs text-slate-500">{step.desc}</p>
+                </motion.div>
+              ))}
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -960,10 +1065,10 @@ export default function Home() {
                   {marketplace('features.revenue.desc')}
                 </p>
                 <div className="space-y-3">
-                  {Object.entries((marketplace.raw('features.revenue.breaks') as Record<string, { label: string; value: string; color?: string }>)).map(([key, item]) => (
-                    <div key={key} className={`flex justify-between items-center p-2 rounded bg-slate-800/30 ${key === 'total' ? 'border-t border-slate-700 pt-2' : ''}`}>
-                      <span className={`text-sm ${key === 'total' ? 'text-white font-medium' : 'text-slate-400'}`}>{item.label}</span>
-                      <span className={`text-sm font-mono ${item.color === 'emerald' ? 'text-emerald-400' : item.color === 'amber' ? 'text-amber-400' : key === 'total' ? 'text-white' : 'text-white'}`}>{item.value}</span>
+                  {MARKETPLACE_REVENUE_BREAKS.map((item, idx) => (
+                    <div key={idx} className={`flex justify-between items-center p-2 rounded bg-slate-800/30 ${idx === MARKETPLACE_REVENUE_BREAKS.length - 1 ? 'border-t border-slate-700 pt-2' : ''}`}>
+                      <span className={`text-sm ${idx === MARKETPLACE_REVENUE_BREAKS.length - 1 ? 'text-white font-medium' : 'text-slate-400'}`}>{item.label}</span>
+                      <span className={`text-sm font-mono ${item.color === 'emerald' ? 'text-emerald-400' : item.color === 'amber' ? 'text-amber-400' : idx === MARKETPLACE_REVENUE_BREAKS.length - 1 ? 'text-white' : 'text-white'}`}>{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -1034,7 +1139,7 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Object.values(principles.raw('items') as Record<string, { title: string; desc: string }>).map((item, i) => (
+              {PRINCIPLES_DATA.map((item, i) => (
                 <motion.div
                   key={item.title}
                   initial={{ opacity: 0, y: 20 }}
@@ -1068,7 +1173,7 @@ export default function Home() {
             </div>
 
             <div className="space-y-4">
-              {Object.entries((contextLayers.raw('layers') as Record<string, { label: string; desc: string; tokens: string }>)).map(([key, layer], i) => (
+              {Object.entries(CONTEXT_LAYERS_DATA).map(([key, layer], i) => (
                 <motion.div
                   key={key}
                   initial={{ opacity: 0, x: -20 }}
@@ -1114,7 +1219,7 @@ export default function Home() {
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Object.values(memoryTypes.raw('types') as Record<string, { name: string; example: string }>).map((memory, i) => (
+              {MEMORY_TYPES_DATA.map((memory, i) => (
                 <motion.div
                   key={memory.name}
                   initial={{ opacity: 0, y: 20 }}
@@ -1140,21 +1245,21 @@ export default function Home() {
                 {developers('sectionBadge')}
               </Badge>
               <h2 className="text-4xl sm:text-5xl font-bold mb-4">
-                {developers('headingPrefix')}{" "}
+                {developers('heading')}{" "}
                 <span className="text-cyan-400">
-                  {developers('headingHighlight')}
+                  {developers('highlight')}
                 </span>
               </h2>
               <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-4">
                 {developers('description')}
               </p>
               <p className="text-base text-slate-500 max-w-xl mx-auto">
-                {developers.rich('philosophy')}
+                {developers('descriptionExtended')}
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 mb-12">
-              {Object.values(developers.raw('items') as Record<string, { title: string; desc: string }>).map((feature, i) => (
+              {DEVELOPERS_DATA.map((feature, i) => (
                 <div key={i} className="p-5 rounded-xl glass-card flex items-start gap-4">
                   <CheckCircle2 className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
