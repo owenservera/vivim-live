@@ -32,14 +32,13 @@ export default function DynamicIntelligencePage() {
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="text-amber-400">
-              Continual Learning
+              {t('headline')}
             </span>
             <br />
-            <span className="text-white">Knowledge Graph Extraction</span>
+            <span className="text-white">{t('subheadline')}</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            VIVIM analyzes every interaction securely, extracting entities, preferences, and facts,
-            wiring them into a personal knowledge graph. It learns continually with zero manual configuration.
+            {t('description')}
           </p>
         </div>
 

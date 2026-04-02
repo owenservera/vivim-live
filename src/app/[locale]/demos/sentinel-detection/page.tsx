@@ -82,7 +82,7 @@ export default function SentinelDetectionDemoPage() {
             <span className="text-sm text-slate-300">{t('interactiveDemo')}</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            The <span className="text-red-400">Sentinel</span>
+            <span className="text-red-400">{t('headline')}</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
             {t('algorithms')}
@@ -206,7 +206,7 @@ export default function SentinelDetectionDemoPage() {
             <div className="p-6 rounded-2xl glass-card">
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <FileCheck className="w-5 h-5 text-red-400" />
-                All 13 Algorithms
+                {t('allAlgorithms')}
               </h2>
               <div className="space-y-2">
                 {ALGORITHMS.map((algo, i) => (
@@ -238,11 +238,11 @@ export default function SentinelDetectionDemoPage() {
             <div className="p-6 rounded-2xl glass-card">
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <FileCheck className="w-5 h-5 text-violet-400" />
-                Evidence Package
+                {t('evidencePackage')}
               </h2>
               
               <p className="text-sm text-slate-400 mb-4">
-                Generate cryptographic proof ready for legal action.
+                {t('evidenceDescription')}
               </p>
 
               {detectionResults.length > 0 ? (
@@ -251,11 +251,11 @@ export default function SentinelDetectionDemoPage() {
                   onClick={generateEvidence}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 font-medium text-white hover:from-violet-400 hover:to-purple-500 transition-all"
                 >
-                  Generate Evidence Package
+                  {t('generateEvidence')}
                 </button>
               ) : (
                 <div className="p-4 rounded-lg bg-slate-900/60 border border-slate-800/60 text-center">
-                  <p className="text-sm text-slate-500">Run detection scan first to generate evidence</p>
+                  <p className="text-sm text-slate-500">{t('runScanFirst')}</p>
                 </div>
               )}
 
@@ -267,7 +267,7 @@ export default function SentinelDetectionDemoPage() {
                 >
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-emerald-400">Evidence Generated</span>
+                    <span className="text-sm text-emerald-400">{t('evidenceGenerated')}</span>
                   </div>
                   <div className="text-xs font-mono text-slate-400 space-y-1">
                     <p>{"{"}</p>
@@ -283,27 +283,27 @@ export default function SentinelDetectionDemoPage() {
             </div>
 
             <div className="p-6 rounded-2xl glass-card">
-              <h2 className="text-xl font-bold mb-4">Detection Pipeline</h2>
+              <h2 className="text-xl font-bold mb-4">{t('detectionPipeline')}</h2>
               <div className="flex items-center justify-between text-sm">
                 <div className="text-center">
                   <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-slate-400 text-xs">Vault</span>
+                    <span className="text-slate-400 text-xs">{t('userData')}</span>
                   </div>
-                  <p className="text-slate-500 text-xs">User Data</p>
+                  <p className="text-slate-500 text-xs">{t('userData')}</p>
                 </div>
                 <div className="flex-1 h-0.5 bg-slate-700 mx-1" />
                 <div className="text-center">
                   <div className="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center mx-auto mb-2">
                     <Radar className="w-4 h-4 text-red-400" />
                   </div>
-                  <p className="text-slate-500 text-xs">13 Algos</p>
+                  <p className="text-slate-500 text-xs">{t('algos')}</p>
                 </div>
                 <div className="flex-1 h-0.5 bg-slate-700 mx-1" />
                 <div className="text-center">
                   <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center mx-auto mb-2">
                     <FileCheck className="w-4 h-4 text-violet-400" />
                   </div>
-                  <p className="text-slate-500 text-xs">Evidence</p>
+                  <p className="text-slate-500 text-xs">{t('evidence')}</p>
                 </div>
               </div>
             </div>

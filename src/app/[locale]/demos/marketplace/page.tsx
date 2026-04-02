@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { ShoppingCart, ArrowLeft, DollarSign, Shield, CheckCircle2, Tag, Users, Key } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +20,9 @@ const PRICING_MODELS = [
 ];
 
 export default function MarketplaceDemoPage() {
+  const t = useTranslations('demos.marketplace');
+  const tCommon = useTranslations('demos.common');
+  
   const [step, setStep] = useState<"select" | "create" | "purchase" | "complete">("select");
   const [selectedListing, setSelectedListing] = useState<typeof MOCK_LISTINGS[0] | null>(null);
   const [salePrice, setSalePrice] = useState(1000);
@@ -48,19 +52,19 @@ export default function MarketplaceDemoPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" />
-          Back to Home
+          {tCommon('backToHome')}
         </Link>
 
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-emerald-500/30 mb-6">
             <ShoppingCart className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-slate-300">Interactive Demo</span>
+            <span className="text-sm text-slate-300">{tCommon('interactiveDemo')}</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            The <span className="text-emerald-400">Marketplace</span>
+            {t('headline')}
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Monetize your intelligence — sell data on your terms with zero-knowledge proofs.
+            {t('description')}
           </p>
         </div>
 
@@ -70,7 +74,7 @@ export default function MarketplaceDemoPage() {
               <div className="p-6 rounded-2xl glass-card">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <Tag className="w-5 h-5 text-emerald-400" />
-                  Browse Listings
+                  {t('browseListings')}
                 </h2>
                 <div className="space-y-3">
                   {MOCK_LISTINGS.map((listing) => (
@@ -99,15 +103,15 @@ export default function MarketplaceDemoPage() {
               <div className="p-6 rounded-2xl glass-card">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <ShoppingCart className="w-5 h-5 text-emerald-400" />
-                  Purchase Flow
+                  {t('purchaseFlow')}
                 </h2>
                 
                 <div className="space-y-4 mb-6">
                   {[
-                    { num: 1, label: "Select Listing", status: purchaseStep >= 0 ? "complete" : "pending" },
-                    { num: 2, label: "Escrow Payment", status: purchaseStep >= 1 ? "complete" : "pending" },
-                    { num: 3, label: "Encrypted Delivery", status: purchaseStep >= 2 ? "complete" : "pending" },
-                    { num: 4, label: "Verify & Complete", status: purchaseStep >= 3 ? "complete" : "pending" },
+                    { num: 1, label: t('selectListing'), status: purchaseStep >= 0 ? "complete" : "pending" },
+                    { num: 2, label: t('escrowPayment'), status: purchaseStep >= 1 ? "complete" : "pending" },
+                    { num: 3, label: t('encryptedDelivery'), status: purchaseStep >= 2 ? "complete" : "pending" },
+                    { num: 4, label: t('verifyComplete'), status: purchaseStep >= 3 ? "complete" : "pending" },
                   ].map((s) => (
                     <div key={s.num} className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -134,10 +138,10 @@ export default function MarketplaceDemoPage() {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      <span className="text-sm text-emerald-400 font-medium">Purchase Complete!</span>
+                      <span className="text-sm text-emerald-400 font-medium">{t('purchaseComplete')}</span>
                     </div>
                     <p className="text-xs text-slate-400">
-                      You now have encrypted access to "{selectedListing.title}"
+                      {t('encryptedAccess')} "{selectedListing.title}"
                     </p>
                   </motion.div>
                 )}
@@ -148,12 +152,13 @@ export default function MarketplaceDemoPage() {
               <div className="p-6 rounded-2xl glass-card">
                 <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                   <Tag className="w-5 h-5 text-emerald-400" />
-                  Create Listing
+                  {t('createListing')}
                 </h2>
                 
                 <div className="mb-4">
-                  <label className="text-sm text-slate-400 mb-2 block">Sale Price ($)</label>
+                  <label htmlFor="sale-price" className="text-sm text-slate-400 mb-2 block">{t('salePrice')} ($)</label>
                   <input
+                    id="sale-price"
                     type="number"
                     value={salePrice}
                     onChange={(e) => setSalePrice(Number(e.target.value))}
@@ -162,7 +167,7 @@ export default function MarketplaceDemoPage() {
                 </div>
 
                 <div className="mb-4">
-                  <label className="text-sm text-slate-400 mb-2 block">Pricing Model</label>
+                  <label htmlFor="pricing-model" className="text-sm text-slate-400 mb-2 block">Pricing Model</label>
                   <div className="grid grid-cols-2 gap-2">
                     {PRICING_MODELS.map((model) => (
                       <button
@@ -187,7 +192,7 @@ export default function MarketplaceDemoPage() {
                   onClick={handleCreateListing}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 font-medium text-white hover:from-emerald-400 hover:to-teal-500 transition-all"
                 >
-                  Publish Listing
+                  {t('listingPublished')}
                 </button>
               </div>
             )}
@@ -201,16 +206,16 @@ export default function MarketplaceDemoPage() {
                 >
                   <CheckCircle2 className="w-8 h-8 text-emerald-400" />
                 </motion.div>
-                <h2 className="text-xl font-bold mb-2">Listing Published!</h2>
+                <h2 className="text-xl font-bold mb-2">{t('listingPublished')}</h2>
                 <p className="text-sm text-slate-400 mb-4">
-                  Your data is now available for purchase with ZK proofs.
+                  {t('listingDescription')}
                 </p>
                 <button
                   type="button"
                   onClick={() => setStep("select")}
                   className="text-emerald-400 text-sm hover:underline"
                 >
-                  Back to Browse
+                  {t('backToBrowse')}
                 </button>
               </div>
             )}
@@ -224,8 +229,9 @@ export default function MarketplaceDemoPage() {
               </h2>
               
               <div className="mb-4">
-                <label className="text-sm text-slate-400 mb-2 block">Sale Price: ${salePrice}</label>
+                <label htmlFor="sale-price-range" className="text-sm text-slate-400 mb-2 block">{t('salePrice')}: ${salePrice}</label>
                 <input
+                  id="sale-price-range"
                   type="range"
                   min="100"
                   max="10000"
@@ -239,26 +245,26 @@ export default function MarketplaceDemoPage() {
                 <div className="flex justify-between items-center p-3 rounded-lg bg-slate-900/60 border border-slate-800/60">
                   <div className="flex items-center gap-2">
                     <ShoppingCart className="w-4 h-4 text-slate-500" />
-                    <span className="text-sm text-slate-400">Platform (15%)</span>
+                    <span className="text-sm text-slate-400">{t('platform')}</span>
                   </div>
                   <span className="text-white font-mono">${platformFee.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 rounded-lg bg-slate-900/60 border border-slate-800/60">
                   <div className="flex items-center gap-2">
                     <Key className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-slate-400">Human (60% × 40%)</span>
+                    <span className="text-sm text-slate-400">{t('human')}</span>
                   </div>
                   <span className="text-emerald-400 font-mono">${humanShare.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center p-3 rounded-lg bg-slate-900/60 border border-slate-800/60">
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-amber-400" />
-                    <span className="text-sm text-slate-400">Company (60% × 40%)</span>
+                    <span className="text-sm text-slate-400">{t('company')}</span>
                   </div>
                   <span className="text-amber-400 font-mono">${companyShare.toFixed(2)}</span>
                 </div>
                 <div className="border-t border-slate-700 pt-3 flex justify-between items-center">
-                  <span className="text-sm text-white font-medium">Total</span>
+                  <span className="text-sm text-white font-medium">{t('total')}</span>
                   <span className="text-white font-mono">${salePrice.toFixed(2)}</span>
                 </div>
               </div>
@@ -267,43 +273,43 @@ export default function MarketplaceDemoPage() {
             <div className="p-6 rounded-2xl glass-card">
               <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-emerald-400" />
-                Zero-Knowledge Proofs
+                {t('zeroKnowledgeProofs')}
               </h2>
               
               <div className="space-y-3">
                 <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
                   <div className="flex items-center gap-2 mb-1">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-emerald-400">Ownership Proof</span>
+                    <span className="text-sm text-emerald-400">{t('ownershipProof')}</span>
                   </div>
-                  <p className="text-xs text-slate-500">Prove you own the data without revealing it</p>
+                  <p className="text-xs text-slate-500">{t('ownershipProofDesc')}</p>
                 </div>
                 <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
                   <div className="flex items-center gap-2 mb-1">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-emerald-400">Consent Validity</span>
+                    <span className="text-sm text-emerald-400">{t('consentValidity')}</span>
                   </div>
-                  <p className="text-xs text-slate-500">Prove valid consent exists for the data</p>
+                  <p className="text-xs text-slate-500">{t('consentValidityDesc')}</p>
                 </div>
                 <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
                   <div className="flex items-center gap-2 mb-1">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-emerald-400">Data Property Attestation</span>
+                    <span className="text-sm text-emerald-400">{t('dataProperty')}</span>
                   </div>
-                  <p className="text-xs text-slate-500">Prove data properties without exposure</p>
+                  <p className="text-xs text-slate-500">{t('dataPropertyDesc')}</p>
                 </div>
               </div>
             </div>
 
             <div className="p-6 rounded-2xl glass-card">
-              <h2 className="text-xl font-bold mb-4">Marketplace Flow</h2>
+              <h2 className="text-xl font-bold mb-4">{t('marketplaceFlow')}</h2>
               <div className="flex items-center justify-between text-sm">
                 {[
-                  { label: "List", icon: Tag },
-                  { label: "Discover", icon: ShoppingCart },
-                  { label: "Purchase", icon: DollarSign },
-                  { label: "Exchange", icon: Shield },
-                  { label: "Verify", icon: CheckCircle2 },
+                  { label: t('list'), icon: Tag },
+                  { label: t('discover'), icon: ShoppingCart },
+                  { label: t('purchase'), icon: DollarSign },
+                  { label: t('exchange'), icon: Shield },
+                  { label: t('verify'), icon: CheckCircle2 },
                 ].map((s, i) => (
                   <div key={s.label} className="text-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-1 ${
@@ -325,7 +331,7 @@ export default function MarketplaceDemoPage() {
             onClick={() => setStep("create")}
             className="px-6 py-3 rounded-xl border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 transition-colors"
           >
-            Create New Listing
+            {t('createNewListing')}
           </button>
         </div>
       </div>

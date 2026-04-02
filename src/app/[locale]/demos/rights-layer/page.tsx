@@ -99,10 +99,10 @@ export default function RightsLayerDemoPage() {
             <span className="text-sm text-slate-300">{t('interactiveDemo') || 'Interactive Demo'}</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            The <span className="text-amber-400">Rights Layer</span>
+            The <span className="text-amber-400">{t('title').replace(' Demo', '')}</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            {t('description') || 'Explore granular ownership tiers and co-governance — see how VIVIM classifies your conversations.'}
+            {t('description')}
           </p>
         </div>
 

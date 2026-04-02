@@ -32,15 +32,13 @@ export default function SecureCollaborationPage() {
           </div>
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="text-emerald-400">
-              Share With Confidence
+              {t('headline')}
             </span>
             <br />
-            <span className="text-white">Zero-Knowledge Sharing</span>
+            <span className="text-white">{t('subheadline')}</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            VIVIM enables true end-to-end encrypted collaboration. By creating unique decryption keys
-            per circle or share link, your data remains completely blind to our servers while
-            allowing complex team workflows.
+            {t('description')}
           </p>
         </div>
 

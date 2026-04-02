@@ -34,8 +34,7 @@ export default function ZeroKnowledgePrivacyPage() {
             <span className="text-emerald-400">{t('mathPrivacy')}</span>
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Our architecture is designed so that even we can't read your data.
-            All intelligence and context generation happens client-side, with full transparency.
+            {t('description')}
           </p>
         </div>
 
