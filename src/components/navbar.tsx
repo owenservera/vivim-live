@@ -81,6 +81,23 @@ function MobileMenu({
   const menuRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  const demos = [
+    { href: "/demos/live-memory", key: "liveMemory", icon: Brain, iconColor: "text-cyan-400" },
+    { href: "/demos/context-engine", key: "contextEngine", icon: Cpu, iconColor: "text-violet-400" },
+    { href: "/demos/zero-knowledge-privacy", key: "zeroKnowledgePrivacy", icon: Lock, iconColor: "text-emerald-400" },
+    { href: "/demos/sovereign-history", key: "sovereignHistory", icon: History, iconColor: "text-amber-400" },
+    { href: "/demos/decentralized-network", key: "decentralizedNetwork", icon: Network, iconColor: "text-blue-400" },
+    { href: "/demos/secure-collaboration", key: "secureCollaboration", icon: Users, iconColor: "text-rose-400" },
+    { href: "/demos/dynamic-intelligence", key: "dynamicIntelligence", icon: Zap, iconColor: "text-lime-400" },
+  ];
+
+  const githubLinks = [
+    { href: "https://github.com/owenservera/vivim-server", label: t('backend') },
+    { href: "https://github.com/owenservera/vivim-pwa", label: t('app') },
+    { href: "https://github.com/owenservera/vivim-network", label: t('network') },
+    { href: "https://github.com/owenservera/vivim-sdk", label: t('sdk') },
+  ];
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -132,7 +149,7 @@ function MobileMenu({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 bg-slate-950/80 backdrop-blur-md"
             onClick={onClose}
             aria-hidden="true"
           />
@@ -143,7 +160,7 @@ function MobileMenu({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 280 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-72 flex flex-col md:hidden bg-slate-950"
+            className="fixed right-0 top-0 bottom-0 z-50 w-[85vw] max-w-sm flex flex-col bg-slate-950"
             style={{
               backdropFilter: "blur(24px)",
               borderLeft: "1px solid rgba(255,255,255,0.08)",
@@ -152,57 +169,116 @@ function MobileMenu({
             aria-modal="true"
             aria-label="Navigation menu"
           >
-            <div className="flex items-center justify-between p-6 border-b border-white/5">
-              <img src="/nav-logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/5">
+              <Link href="/" onClick={onClose} className="flex items-center gap-2 flex-shrink-0">
+                <img src="/nav-logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
+                <span className="text-lg font-bold text-white">VIVIM</span>
+              </Link>
               <button
                 type="button"
                 ref={closeButtonRef}
                 onClick={onClose}
-                className="text-slate-400 hover:text-white transition-colors p-1"
+                className="text-slate-400 hover:text-white transition-colors p-2 -mr-2"
                 aria-label="Close menu"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto p-4 space-y-1" aria-label="Mobile navigation">
-              {sections.map((section, i) => (
-                <motion.button
-                  key={section.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  onClick={() => handleNavClick(section)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                    activeSection === i
-                      ? "bg-violet-500/15 text-violet-300 border border-violet-500/20"
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
-                  }`}
-                  aria-current={activeSection === i ? "page" : undefined}
-                >
-                  {section.label}
-                </motion.button>
-              ))}
-            </nav>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Main Navigation Sections */}
+              <div className="p-4">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">
+                  {t('sections.title') || 'Sections'}
+                </h3>
+                <nav className="space-y-1" aria-label="Mobile navigation">
+                  {sections.map((section, i) => (
+                    <motion.button
+                      key={section.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      onClick={() => handleNavClick(section)}
+                      className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                        activeSection === i
+                          ? "bg-violet-500/15 text-violet-300 border border-violet-500/20"
+                          : "text-slate-300 hover:text-white hover:bg-white/5"
+                      }`}
+                      aria-current={activeSection === i ? "page" : undefined}
+                    >
+                      {section.label}
+                    </motion.button>
+                  ))}
+                </nav>
+              </div>
 
-            <div className="p-4 border-t border-white/5 space-y-2">
-              <SocialShare />
-              <Link
-                href="/demos/live-memory"
-                onClick={onClose}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-              >
-                <Play className="w-4 h-4 text-violet-400" />
-                <span className="text-sm text-white">{t('mobile.liveMemoryDemo')}</span>
-              </Link>
-              <Link
-                href="/demos/context-engine"
-                onClick={onClose}
-                className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-violet-600/20 to-cyan-600/20 border border-white/10 text-white text-sm hover:bg-white/5 transition-colors"
-              >
-                <BookOpen className="w-4 h-4" />
-                {t('mobile.contextEngineDemo')}
-              </Link>
+              {/* Demos Section */}
+              <div className="p-4 pt-0">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">
+                  {t('sections.demos') || 'Demos'}
+                </h3>
+                <div className="space-y-1">
+                  {demos.map((demo, i) => {
+                    const Icon = demo.icon;
+                    return (
+                      <motion.div
+                        key={demo.href}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + i * 0.05 }}
+                      >
+                        <Link
+                          href={demo.href}
+                          onClick={onClose}
+                          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors"
+                        >
+                          <Icon className={`w-5 h-5 ${demo.iconColor}`} />
+                          <div className="flex-1">
+                            <p className="text-sm text-white">{t(`demoDropdown.${demo.key}.label`)}</p>
+                            <p className="text-xs text-slate-500">{t(`demoDropdown.${demo.key}.desc`)}</p>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* GitHub Section */}
+              <div className="p-4 pt-0">
+                <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">
+                  GitHub
+                </h3>
+                <div className="space-y-1">
+                  {githubLinks.map((link, i) => (
+                    <motion.a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 + i * 0.05 }}
+                      className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors"
+                    >
+                      <Github className="w-5 h-5 text-slate-400" />
+                      <span className="text-sm text-slate-300">{link.label}</span>
+                    </motion.a>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Footer with Language Switcher */}
+            <div className="p-4 border-t border-white/5 space-y-3">
+              <div className="flex items-center justify-center">
+                <LanguageSwitcher />
+              </div>
+              <div className="flex items-center justify-center">
+                <SocialShare />
+              </div>
             </div>
           </motion.div>
         </>
