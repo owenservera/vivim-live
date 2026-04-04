@@ -62,7 +62,7 @@ export function NeuralBackground() {
 
     const w   = canvas.width;
     const h   = canvas.height;
-    const dpr = window.devicePixelRatio > 1 ? 0.5 : 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     ctx.clearRect(0, 0, w, h);
 
@@ -171,7 +171,7 @@ export function NeuralBackground() {
     if (!canvas) return;
 
     const resize = () => {
-      const dpr = window.devicePixelRatio > 1 ? 0.5 : 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       canvas.width  = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width  = "100%";
@@ -180,7 +180,7 @@ export function NeuralBackground() {
     };
 
     const handleMouse = (e: MouseEvent) => {
-      const dpr = window.devicePixelRatio > 1 ? 0.5 : 1;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
       mouseRef.current = { x: e.clientX * dpr, y: e.clientY * dpr };
     };
 

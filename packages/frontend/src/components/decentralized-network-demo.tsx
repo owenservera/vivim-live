@@ -111,7 +111,7 @@ export function DecentralizedNetworkDemo() {
             <div className="space-y-2">
               <h4 className="text-xs font-medium text-slate-400">Peer Mesh Visualization</h4>
               <div className="relative h-32 flex items-center justify-center">
-                <svg className="w-full h-full" viewBox="0 0 200 100">
+                <svg className="w-full h-full" viewBox="0 0 200 100" role="img" aria-label="Decentralized peer-to-peer network topology">
                   <defs>
                     <marker id="netArrow" markerWidth="4" markerHeight="4" refX="3" refY="2" orient="auto">
                       <path d="M0,0 L4,2 L0,4" fill="#64748B" />

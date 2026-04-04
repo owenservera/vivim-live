@@ -561,6 +561,7 @@ function AcuMemoryTab() {
         ))}
         <input
           value={search}
+          aria-label="Search ACUs"
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search ACUs..."
           className="ml-auto bg-slate-800/40 border border-white/5 rounded-lg px-3 py-1 text-xs text-slate-300

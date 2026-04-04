@@ -111,6 +111,7 @@ export function DynamicIntelligenceDemo() {
                 type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
+                aria-label="Describe what you're working on"
                 onKeyDown={e => e.key === 'Enter' && handleExtract()}
                 placeholder="Describe what you're working on..."
                 className="w-full bg-slate-800/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-violet-500/50"
@@ -246,7 +247,7 @@ export function DynamicIntelligenceDemo() {
               </div>
               
               <div className="relative h-40 flex items-center justify-center">
-                <svg className="w-full h-full" viewBox="0 0 200 120">
+                <svg className="w-full h-full" viewBox="0 0 200 120" role="img" aria-label="Knowledge graph showing connected memories and entities">
                   <defs>
                     <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                       <path d="M0,0 L6,3 L0,6" fill="#64748B" />

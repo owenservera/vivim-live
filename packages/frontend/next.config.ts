@@ -60,12 +60,18 @@ const nextConfig: NextConfig = {
     ];
   },
   
-  // Allow external images from AI providers
+  // Allow external images from known providers only
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
+        hostname: 'unpkg.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+        pathname: '/**',
       },
     ],
   },

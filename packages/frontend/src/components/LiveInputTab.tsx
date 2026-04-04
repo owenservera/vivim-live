@@ -51,6 +51,7 @@ export function LiveInputTab({ onContextUpdate }: LiveInputTabProps) {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
+          aria-label="Type a message to assemble context"
           onKeyDown={(e) => e.key === 'Enter' && handleExtract()}
           placeholder="Type any message to see context assemble in real-time..."
           disabled={isExtracting}

@@ -187,6 +187,9 @@ export function InteractiveKnowledgeGraph() {
         ref={canvasRef}
         width={width}
         height={height}
+        role="img"
+        aria-label="Interactive knowledge graph. Click nodes to explore connections."
+        tabIndex={0}
         onClick={handleCanvasClick}
         onMouseDown={handleCanvasDrag}
         className="w-full cursor-grab active:cursor-grabbing"

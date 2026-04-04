@@ -198,6 +198,9 @@ export function CookieConsentBanner() {
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-pressed={consent.analytics}
+                        aria-label="Analytics cookies"
                         onClick={() => handleToggle("analytics")}
                         className={cn(
                           "w-12 h-6 rounded-full transition-all relative",
@@ -225,6 +228,9 @@ export function CookieConsentBanner() {
                       </div>
                       <button
                         type="button"
+                        role="switch"
+                        aria-pressed={consent.personalization}
+                        aria-label="Personalization cookies"
                         onClick={() => handleToggle("personalization")}
                         className={cn(
                           "w-12 h-6 rounded-full transition-all relative",

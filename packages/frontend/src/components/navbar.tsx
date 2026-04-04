@@ -131,7 +131,7 @@ function DemosDropdown() {
         <ChevronDown className="w-3 h-3 opacity-50" />
       </button>
 
-      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover/demos:opacity-100 group-hover/demos:visible transition-all duration-200">
+      <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover/demos:opacity-100 group-hover/demos:visible group-focus-within/demos:opacity-100 group-focus-within/demos:visible transition-all duration-200">
         <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[260px] shadow-xl backdrop-blur-xl">
           {DEMOS.map((demo) => {
             const Icon = demo.icon;
@@ -169,7 +169,7 @@ function GithubDropdown() {
         <ChevronDown className="w-3 h-3 opacity-50" />
       </button>
 
-      <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover/github:opacity-100 group-hover/github:visible transition-all duration-200">
+      <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover/github:opacity-100 group-hover/github:visible group-focus-within/github:opacity-100 group-focus-within/github:visible transition-all duration-200">
         <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[200px] shadow-xl backdrop-blur-xl">
           {GITHUB_LINKS.map((link) => (
             <a

@@ -134,6 +134,7 @@ export function SovereignHistoryDemo() {
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
+                aria-label="Search across all AI conversations"
                 onKeyDown={e => e.key === 'Enter' && handleSearch()}
                 placeholder="Search across all AI conversations..."
                 className="w-full bg-slate-800/50 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-violet-500/50"

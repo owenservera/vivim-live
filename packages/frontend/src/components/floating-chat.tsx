@@ -190,7 +190,7 @@ export function FloatingChat() {
             transition={{ duration: 0.2 }}
             className={cn(
               "fixed bottom-24 right-6 z-50",
-              "w-[380px] h-[520px] max-w-[calc(100vw-3rem)]",
+              "w-full max-w-[380px] h-[520px] mx-auto",
               "bg-slate-900/95 backdrop-blur-xl",
               "border border-white/10 rounded-2xl",
               "shadow-2xl shadow-violet-500/10",
@@ -274,6 +274,7 @@ export function FloatingChat() {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  aria-label="Ask VIVIM"
                   onKeyDown={(e) => e.key === "Enter" && handleSend()}
                   placeholder="Ask anything..."
                   disabled={isLoading}

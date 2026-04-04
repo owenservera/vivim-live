@@ -1,16 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 export function HeroVisual({ className = "" }: { className?: string }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null;
-
   return (
     <div className={`relative w-full aspect-square max-w-xl mx-auto ${className}`}>
       <svg

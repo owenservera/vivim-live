@@ -35,15 +35,13 @@
  */
 
 // Re-export routing utilities
-export { 
-  routing, 
-  RTL_LOCALES, 
-  isRTL, 
+export {
+  routing,
+  RTL_LOCALES,
+  isRTL,
   getDirection,
-  LOCALE_METADATA 
+  LOCALE_METADATA
 } from './routing';
-
-// Re-export type-safe translations
 export { 
   useTypedTranslations, 
   createServerTranslations,
@@ -104,7 +102,6 @@ export function getHtmlLang(locale: string): string {
  * Use this to set dir attribute on HTML element
  */
 export function getDirAttribute(locale: string): 'ltr' | 'rtl' {
-  const { getDirection } = require('./routing');
   return getDirection(locale);
 }
 

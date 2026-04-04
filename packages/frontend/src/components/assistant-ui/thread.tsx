@@ -104,6 +104,7 @@ function Composer() {
       )}
     >
       <ComposerPrimitive.Input
+        aria-label="Ask VIVIM anything"
         placeholder="Ask VIVIM anything..."
         className={cn(
           "flex-1 bg-transparent text-white placeholder:text-slate-500",

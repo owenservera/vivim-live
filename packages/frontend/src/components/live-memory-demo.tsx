@@ -138,6 +138,7 @@ export function LiveMemoryDemo() {
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
+              aria-label="Send message to see memory extraction"
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               placeholder={flowIndex < DEMO_FLOWS.length ? DEMO_FLOWS[flowIndex].userInput : "Memory full — reload to restart"}
               className="flex-1 bg-slate-800/50 border border-white/5 rounded-lg px-3 py-2 text-sm text-slate-300 placeholder:text-slate-600 outline-none focus:border-violet-500/50"
