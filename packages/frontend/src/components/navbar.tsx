@@ -1,15 +1,31 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  Play, Github, Menu,
+  Cpu, Brain, Lock, History, Network, Users, Zap,
+  ChevronDown, ExternalLink, Layers, Shield,
+} from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
   let lastCall = 0;
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  
+
   return ((...args: unknown[]) => {
     const now = Date.now();
     const remaining = delay - (now - lastCall);
-    
+
     if (remaining <= 0) {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -26,13 +42,27 @@ function throttle<T extends (...args: unknown[]) => void>(fn: T, delay: number):
     }
   }) as T;
 }
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { Play, Github, Menu, X, BookOpen, Cpu, Brain, Lock, History, Network, Users, Zap } from "lucide-react";
-import LanguageSwitcher from "./LanguageSwitcher";
 
-const sectionToId = (section: string): string =>
-  section.toLowerCase().split(" ").join("-");
+/* ─── Data ─── */
+
+const DEMOS = [
+  { href: "/demos/live-memory", label: "Live Memory", desc: "See extraction in action", icon: Brain, iconColor: "text-cyan-400" },
+  { href: "/demos/context-engine", label: "Context Engine", desc: "Watch memory assembly live", icon: Cpu, iconColor: "text-violet-400" },
+  { href: "/demos/zero-knowledge-privacy", label: "Zero-Knowledge", desc: "Your keys never leave your device", icon: Shield, iconColor: "text-emerald-400" },
+  { href: "/demos/sovereign-history", label: "Sovereign History", desc: "Complete ownership of your data", icon: History, iconColor: "text-amber-400" },
+  { href: "/demos/decentralized-network", label: "Decentralized", desc: "Peer-to-peer sync without servers", icon: Network, iconColor: "text-blue-400" },
+  { href: "/demos/secure-collaboration", label: "Secure Collaboration", desc: "Team sharing with sovereignty", icon: Users, iconColor: "text-rose-400" },
+  { href: "/demos/dynamic-intelligence", label: "Dynamic Intelligence", desc: "Adaptive context evolution", icon: Zap, iconColor: "text-lime-400" },
+];
+
+const GITHUB_LINKS = [
+  { href: "https://github.com/owenservera/vivim-server", label: "Backend", desc: "Server infrastructure" },
+  { href: "https://github.com/owenservera/vivim-pwa", label: "App", desc: "Mobile application" },
+  { href: "https://github.com/owenservera/vivim-network", label: "Network", desc: "P2P protocol" },
+  { href: "https://github.com/owenservera/vivim-sdk", label: "SDK", desc: "Developer kit" },
+];
+
+/* ─── Progress Indicator (desktop only) ─── */
 
 function ProgressIndicator({
   sections,
@@ -57,25 +87,25 @@ function ProgressIndicator({
         >
           <span
             className={`
-            absolute right-10 text-[10px] font-bold tracking-[0.2em] uppercase whitespace-nowrap
-            transition-all duration-500 select-none pointer-events-none
-            opacity-0 -translate-x-4
-            group-hover:opacity-100 group-hover:translate-x-0
-            ${activeSection === i ? "text-violet-400" : "text-slate-500"}
-          `}
+              absolute right-10 text-[10px] font-bold tracking-[0.2em] uppercase whitespace-nowrap
+              transition-all duration-500 select-none pointer-events-none
+              opacity-0 -translate-x-4
+              group-hover:opacity-100 group-hover:translate-x-0
+              ${activeSection === i ? "text-violet-400" : "text-slate-500"}
+            `}
           >
             {section.label}
           </span>
 
           <div
             className={`
-            relative z-10 w-2 h-2 rounded-full transition-all duration-500
-            ${
-              activeSection === i
-                ? "bg-violet-400 scale-150 shadow-[0_0_20px_rgba(167,139,250,0.8)]"
-                : "bg-slate-700 group-hover:bg-slate-400 shadow-none"
-            }
-          `}
+              relative z-10 w-2 h-2 rounded-full transition-all duration-500
+              ${
+                activeSection === i
+                  ? "bg-violet-400 scale-150 shadow-[0_0_20px_rgba(167,139,250,0.8)]"
+                  : "bg-slate-700 group-hover:bg-slate-400 shadow-none"
+              }
+            `}
           />
 
           {activeSection === i && (
@@ -87,258 +117,9 @@ function ProgressIndicator({
   );
 }
 
-function MobileMenu({
-  isOpen,
-  onClose,
-  sections,
-  activeSection,
-  scrollToSection,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  sections: { label: string; id: string }[];
-  activeSection: number;
-  scrollToSection: (id: string) => void;
-}) {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-        return;
-      }
-
-      if (e.key !== "Tab") return;
-
-      const focusableElements = menuRef.current?.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      if (!focusableElements?.length) return;
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-
-      if (e.shiftKey && document.activeElement === firstElement) {
-        e.preventDefault();
-        lastElement.focus();
-      } else if (!e.shiftKey && document.activeElement === lastElement) {
-        e.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    closeButtonRef.current?.focus();
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen, onClose]);
-
-  const handleNavClick = (section: { label: string; id: string }) => {
-    scrollToSection(section.id);
-    onClose();
-  };
-
-  const demos = [
-    { href: "/demos/live-memory", label: "Live Memory", desc: "Extraction in action", icon: Brain, iconColor: "text-cyan-400" },
-    { href: "/demos/context-engine", label: "Context Engine", desc: "Memory assembly", icon: Cpu, iconColor: "text-violet-400" },
-    { href: "/demos/zero-knowledge-privacy", label: "Zero-Knowledge", desc: "Keys never leave device", icon: Lock, iconColor: "text-emerald-400" },
-    { href: "/demos/sovereign-history", label: "Sovereign History", desc: "Complete ownership", icon: History, iconColor: "text-amber-400" },
-    { href: "/demos/decentralized-network", label: "Decentralized", desc: "P2P sync", icon: Network, iconColor: "text-blue-400" },
-    { href: "/demos/secure-collaboration", label: "Secure Collaboration", desc: "Team sharing", icon: Users, iconColor: "text-rose-400" },
-    { href: "/demos/dynamic-intelligence", label: "Dynamic Intelligence", desc: "Adaptive context", icon: Zap, iconColor: "text-lime-400" },
-  ];
-
-  const githubLinks = [
-    { href: "https://github.com/owenservera/vivim-server", label: "Backend", desc: "Server infrastructure" },
-    { href: "https://github.com/owenservera/vivim-pwa", label: "App", desc: "Mobile application" },
-    { href: "https://github.com/owenservera/vivim-network", label: "Network", desc: "P2P protocol" },
-    { href: "https://github.com/owenservera/vivim-sdk", label: "SDK", desc: "Developer kit" },
-  ];
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-40 bg-slate-950/95 backdrop-blur-xl md:hidden"
-            onClick={onClose}
-            aria-hidden="true"
-          />
-
-          <motion.div
-            ref={menuRef}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.96 }}
-            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed inset-0 z-50 flex flex-col md:hidden bg-transparent"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Navigation menu"
-          >
-            <div className="flex items-center justify-between p-5 mx-4 mt-4 rounded-2xl bg-slate-900/60 border border-white/[0.08] backdrop-blur-md">
-              <Link href="/" onClick={onClose} className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/20 to-cyan-500/20 border border-white/10 flex items-center justify-center">
-                  <svg width="20" height="20" viewBox="0 0 40 40" fill="none" className="text-violet-400">
-                    <path d="M20 4L4 12L20 20L36 12L20 4Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                    <path d="M4 20L20 28L36 20" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                    <path d="M4 28L20 36L36 28" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <span className="text-white font-semibold tracking-tight">VIVIM</span>
-              </Link>
-              <button
-                type="button"
-                ref={closeButtonRef}
-                onClick={onClose}
-                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"
-                aria-label="Close menu"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <nav className="flex-1 overflow-y-auto px-4 pb-8" aria-label="Mobile navigation">
-              <div className="mt-6">
-                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-4 pl-1">
-                  Main
-                </div>
-                <div className="space-y-2">
-                  <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.08, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  >
-                    <Link
-                      href="/chat"
-                      onClick={onClose}
-                      className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-gradient-to-r from-violet-600 via-violet-500 to-cyan-500 text-white font-semibold shadow-[0_4px_24px_rgba(139,92,246,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      <Zap className="w-5 h-5" />
-                      <span>Launch App</span>
-                      <Zap className="w-4 h-4 ml-auto opacity-60" />
-                    </Link>
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.12, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  >
-                    <Link
-                      href="/"
-                      onClick={onClose}
-                      className="flex items-center gap-4 px-5 py-4 rounded-2xl text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all border border-transparent"
-                    >
-                      <span className="text-lg">🏠</span>
-                      <span className="font-medium">Home</span>
-                    </Link>
-                  </motion.div>
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-4 pl-1">
-                  Interactive Demos
-                </div>
-                <div className="grid grid-cols-1 gap-2">
-                  {demos.map((demo, i) => {
-                    const Icon = demo.icon;
-                    return (
-                      <motion.div
-                        key={demo.href}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.16 + i * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      >
-                        <Link
-                          href={demo.href}
-                          onClick={onClose}
-                          className="flex items-center gap-4 px-4 py-3.5 rounded-2xl hover:bg-white/[0.04] transition-all group border border-transparent hover:border-white/[0.06]"
-                        >
-                          <div className={`w-10 h-10 rounded-xl bg-slate-900/60 flex items-center justify-center ${demo.iconColor}`}>
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm text-white font-medium">{demo.label}</p>
-                            <p className="text-xs text-slate-500">{demo.desc}</p>
-                          </div>
-                          <Zap className="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </Link>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-4 pl-1">
-                  GitHub
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {githubLinks.map((link, i) => (
-                    <motion.a
-                      key={link.href}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.45 + i * 0.04, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      className="flex items-center gap-3 px-4 py-3.5 rounded-2xl hover:bg-white/[0.04] transition-all border border-transparent hover:border-white/[0.06]"
-                    >
-                      <Github className="w-5 h-5 text-slate-500" />
-                      <div className="flex flex-col">
-                        <span className="text-sm text-white font-medium">{link.label}</span>
-                        <span className="text-xs text-slate-600">{link.desc}</span>
-                      </div>
-                    </motion.a>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-4 pl-1">
-                  Language
-                </div>
-                <motion.div
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                >
-                  <LanguageSwitcher />
-                </motion.div>
-              </div>
-            </nav>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
+/* ─── Desktop Dropdown: Demos ─── */
 
 function DemosDropdown() {
-  const demos = [
-    { href: "/demos/live-memory", label: "Live Memory", desc: "See extraction in action", icon: Brain, iconColor: "text-cyan-400" },
-    { href: "/demos/context-engine", label: "Context Engine", desc: "Watch memory assembly live", icon: Cpu, iconColor: "text-violet-400" },
-    { href: "/demos/zero-knowledge-privacy", label: "Zero-Knowledge Privacy", desc: "Your keys never leave your device", icon: Lock, iconColor: "text-emerald-400" },
-    { href: "/demos/sovereign-history", label: "Sovereign History", desc: "Complete ownership of your data", icon: History, iconColor: "text-amber-400" },
-    { href: "/demos/decentralized-network", label: "Decentralized Network", desc: "Peer-to-peer sync without servers", icon: Network, iconColor: "text-blue-400" },
-    { href: "/demos/secure-collaboration", label: "Secure Collaboration", desc: "Team sharing with sovereignty", icon: Users, iconColor: "text-rose-400" },
-    { href: "/demos/dynamic-intelligence", label: "Dynamic Intelligence", desc: "Adaptive context evolution", icon: Zap, iconColor: "text-lime-400" },
-  ];
-
   return (
     <div className="relative group/demos">
       <button
@@ -347,22 +128,23 @@ function DemosDropdown() {
       >
         <Play className="w-3.5 h-3.5" />
         Demos
+        <ChevronDown className="w-3 h-3 opacity-50" />
       </button>
 
       <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover/demos:opacity-100 group-hover/demos:visible transition-all duration-200">
-        <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[240px] shadow-xl">
-          {demos.map((demo) => {
+        <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[260px] shadow-xl backdrop-blur-xl">
+          {DEMOS.map((demo) => {
             const Icon = demo.icon;
             return (
               <Link
                 key={demo.href}
                 href={demo.href}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
               >
                 <Icon className={`w-4 h-4 ${demo.iconColor}`} />
-                <div>
-                  <p className="text-sm text-white">{demo.label}</p>
-                  <p className="text-xs text-slate-500">{demo.desc}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white font-medium">{demo.label}</p>
+                  <p className="text-xs text-slate-500 truncate">{demo.desc}</p>
                 </div>
               </Link>
             );
@@ -373,8 +155,46 @@ function DemosDropdown() {
   );
 }
 
+/* ─── Desktop Dropdown: GitHub ─── */
+
+function GithubDropdown() {
+  return (
+    <div className="relative group/github">
+      <button
+        type="button"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5 whitespace-nowrap"
+      >
+        <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        <span className="hidden sm:inline">GitHub</span>
+        <ChevronDown className="w-3 h-3 opacity-50" />
+      </button>
+
+      <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover/github:opacity-100 group-hover/github:visible transition-all duration-200">
+        <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[200px] shadow-xl backdrop-blur-xl">
+          {GITHUB_LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+            >
+              <div>
+                <span className="text-sm text-white font-medium">{link.label}</span>
+                <span className="block text-xs text-slate-500">{link.desc}</span>
+              </div>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Navbar ─── */
+
 export function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const [scrolled, setScrolled] = useState(false);
 
@@ -446,10 +266,12 @@ export function Navbar() {
               : "glass"
           }`}
         >
+          {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <img src="/nav-logo.png" alt="VIVIM" className="w-9 h-9 rounded-xl object-contain" />
           </Link>
 
+          {/* Desktop: Section nav */}
           <div className="hidden md:flex items-center gap-0.5 flex-shrink-0">
             {sections.map((section, i) => (
               <button
@@ -473,77 +295,112 @@ export function Navbar() {
             ))}
           </div>
 
+          {/* Desktop: Right side actions */}
           <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
             <DemosDropdown />
             <LanguageSwitcher />
-
-            <div className="relative group/github">
-              <button
-                type="button"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5 whitespace-nowrap"
-              >
-                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden sm:inline">GitHub</span>
-              </button>
-
-              <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover/github:opacity-100 group-hover/github:visible transition-all duration-200">
-                <div className="bg-slate-900 border border-white/10 rounded-xl p-2 min-w-[200px] shadow-xl">
-                  <a
-                    href="https://github.com/owenservera/vivim-server"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                  >
-                    <span className="text-sm text-white">Backend</span>
-                  </a>
-                  <a
-                    href="https://github.com/owenservera/vivim-pwa"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                  >
-                    <span className="text-sm text-white">App</span>
-                  </a>
-                  <a
-                    href="https://github.com/owenservera/vivim-network"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                  >
-                    <span className="text-sm text-white">Network</span>
-                  </a>
-                  <a
-                    href="https://github.com/owenservera/vivim-sdk"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
-                  >
-                    <span className="text-sm text-white">SDK</span>
-                  </a>
-                </div>
-              </div>
-            </div>
+            <GithubDropdown />
           </div>
 
-          <button
-            type="button"
-            className="md:hidden text-slate-300 hover:text-white p-1"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="mobile-menu"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
+          {/* Mobile: Hamburger */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className="md:hidden text-slate-300 hover:text-white p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                aria-label="Open menu"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[85vw] max-w-sm bg-slate-950 border-l border-white/10 p-0 gap-0">
+              <SheetHeader className="px-5 py-4 border-b border-white/10">
+                <div className="flex items-center justify-between">
+                  <Link href="/" className="flex items-center gap-2.5">
+                    <img src="/nav-logo.png" alt="VIVIM" className="w-8 h-8 rounded-lg object-contain" />
+                    <SheetTitle className="text-white font-semibold tracking-tight">VIVIM</SheetTitle>
+                  </Link>
+                </div>
+              </SheetHeader>
 
-        <MobileMenu
-          isOpen={mobileMenuOpen}
-          onClose={() => setMobileMenuOpen(false)}
-          sections={sections}
-          activeSection={activeSection}
-          scrollToSection={scrollToSection}
-        />
+              {/* Navigation */}
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
+                {/* Home */}
+                <div>
+                  <SheetClose asChild>
+                    <Link
+                      href="/"
+                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium text-sm text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all"
+                    >
+                      <Layers className="w-4 h-4" />
+                      Home
+                    </Link>
+                  </SheetClose>
+                </div>
+
+                {/* Interactive Demos */}
+                <div>
+                  <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-3 px-1">
+                    Interactive Demos
+                  </div>
+                  <div className="space-y-1">
+                    {DEMOS.map((demo) => {
+                      const Icon = demo.icon;
+                      return (
+                        <SheetClose key={demo.href} asChild>
+                          <Link
+                            href={demo.href}
+                            className="flex items-center gap-3 px-3 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all group"
+                          >
+                            <div className={`w-9 h-9 rounded-lg bg-slate-900/60 border border-white/5 flex items-center justify-center flex-shrink-0 ${demo.iconColor}`}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{demo.label}</p>
+                              <p className="text-xs text-slate-500 truncate">{demo.desc}</p>
+                            </div>
+                          </Link>
+                        </SheetClose>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* GitHub */}
+                <div>
+                  <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-3 px-1">
+                    GitHub
+                  </div>
+                  <div className="space-y-1">
+                    {GITHUB_LINKS.map((link) => (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between gap-3 px-3 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Github className="w-4 h-4 text-slate-500" />
+                          <span className="text-sm font-medium">{link.label}</span>
+                        </div>
+                        <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Language */}
+                <div>
+                  <div className="text-[10px] font-bold tracking-[0.2em] uppercase text-slate-500 mb-3 px-1">
+                    Language
+                  </div>
+                  <LanguageSwitcher />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </nav>
     </>
   );
