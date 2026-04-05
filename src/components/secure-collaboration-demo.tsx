@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Shield, Users, Link2, Lock, Clock, Eye, Edit3, Share2, Copy, X, Check } from 'lucide-react';
 
 type Permission = 'view' | 'annotate' | 'remix' | 'reshare';
@@ -38,6 +39,8 @@ const PERMISSION_LABELS: Record<Permission, { label: string; icon: typeof Eye }>
 };
 
 export function SecureCollaborationDemo() {
+  const t = useTranslations('demos.secureCollaboration');
+  const tc = useTranslations('demos.secureCollaboration.component');
   const [activeTab, setActiveTab] = useState<'circles' | 'shares' | 'link'>('circles');
   const [selectedCircle, setSelectedCircle] = useState<string | null>(null);
   const [shares, setShares] = useState<ShareItem[]>([
@@ -50,9 +53,9 @@ export function SecureCollaborationDemo() {
     <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900/50">
       <div className="flex border-b border-white/5">
         {[
-          { id: 'circles', label: 'Circles', icon: Users },
-          { id: 'shares', label: 'Active Shares', icon: Link2 },
-          { id: 'link', label: 'Create Link', icon: Lock },
+          { id: 'circles', label: tc('tabs.circles'), icon: Users },
+          { id: 'shares', label: tc('tabs.shares'), icon: Link2 },
+          { id: 'link', label: tc('tabs.link'), icon: Lock },
         ].map(tab => (
           <button
             key={tab.id}
@@ -74,8 +77,8 @@ export function SecureCollaborationDemo() {
         {activeTab === 'circles' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-white">Your Circles</span>
-              <span className="text-xs text-slate-500">{CIRCLES.reduce((a, c) => a + c.members, 0)} total members</span>
+              <span className="text-sm font-medium text-white">{tc('yourCircles')}</span>
+              <span className="text-xs text-slate-500">{CIRCLES.reduce((a, c) => a + c.members, 0)} {tc('totalMembers')}</span>
             </div>
             
             {CIRCLES.map(circle => (
@@ -97,8 +100,8 @@ export function SecureCollaborationDemo() {
                   <span className="text-sm font-medium text-white">{circle.name}</span>
                 </div>
                 <div className="flex items-center gap-4 text-xs text-slate-500">
-                  <span>{circle.members} members</span>
-                  <span>{circle.activeShares} active shares</span>
+                  <span>{circle.members} {tc('members')}</span>
+                  <span>{circle.activeShares} {tc('activeShares')}</span>
                 </div>
 
                 <AnimatePresence>
@@ -131,7 +134,7 @@ export function SecureCollaborationDemo() {
           <div className="space-y-3">
             <div className="flex items-center gap-2 mb-4">
               <Shield className="w-4 h-4 text-emerald-400" />
-              <span className="text-sm font-medium text-white">Active Shares</span>
+              <span className="text-sm font-medium text-white">{tc('activeSharesTab')}</span>
             </div>
 
             {shares.map(share => (
@@ -143,7 +146,7 @@ export function SecureCollaborationDemo() {
                   <div>
                     <div className="text-sm font-medium text-white">{share.title}</div>
                     <div className="text-xs text-slate-500 mt-1">
-                      Shared with: <span className="text-cyan-400">{share.sharedWith}</span>
+                      {tc('sharedWith')} <span className="text-cyan-400">{share.sharedWith}</span>
                     </div>
                   </div>
                   <button
@@ -158,7 +161,7 @@ export function SecureCollaborationDemo() {
                 <div className="flex items-center gap-4 mt-3 text-xs">
                   <div className="flex items-center gap-1 text-slate-500">
                     <Eye className="w-3 h-3" />
-                    {share.views} views
+                    {share.views} {tc('views')}
                   </div>
                   <div className="flex items-center gap-1 text-slate-500">
                     <Clock className="w-3 h-3" />
@@ -185,15 +188,15 @@ export function SecureCollaborationDemo() {
             <div className="p-4 rounded-xl bg-gradient-to-r from-violet-600/10 to-cyan-600/10 border border-white/10">
               <div className="flex items-center gap-2 mb-3">
                 <Lock className="w-4 h-4 text-violet-400" />
-                <span className="text-sm font-medium text-white">Create Secure Link</span>
+                <span className="text-sm font-medium text-white">{tc('createSecureLink')}</span>
               </div>
               <p className="text-xs text-slate-500 mb-4">
-                Generate an encrypted link that only recipients can decrypt
+                {tc('generateLink')}
               </p>
 
               <div className="space-y-3">
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Permissions</label>
+                  <label htmlFor="permissions" className="text-xs text-slate-400 block mb-1">{tc('permissions')}</label>
                   <div className="flex gap-2">
                     {(['view', 'annotate'] as Permission[]).map(perm => (
                       <label key={perm} className="flex items-center gap-1.5 text-xs text-slate-300">
@@ -205,18 +208,19 @@ export function SecureCollaborationDemo() {
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Expires</label>
-                  <select className="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none">
-                    <option>1 hour</option>
-                    <option>1 day</option>
-                    <option>1 week</option>
-                    <option>Never</option>
+                  <label htmlFor="expires" className="text-xs text-slate-400 block mb-1">{tc('expires')}</label>
+                  <select id="expires" className="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none">
+                    <option>{tc('oneHour')}</option>
+                    <option>{tc('oneDay')}</option>
+                    <option>{tc('oneWeek')}</option>
+                    <option>{tc('never')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-xs text-slate-400 block mb-1">Max Views</label>
+                  <label htmlFor="maxViews" className="text-xs text-slate-400 block mb-1">{tc('maxViews')}</label>
                   <input 
+                    id="maxViews"
                     type="number" 
                     defaultValue={100}
                     className="w-full bg-slate-800 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none"

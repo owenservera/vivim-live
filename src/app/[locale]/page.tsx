@@ -442,9 +442,7 @@ export default function Home() {
                 transition={{ duration: 0.6, delay: 0.45 }}
                 className="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-3xl mx-auto mb-8 hero-stagger-4"
               >
-                A <span className="text-violet-400 font-semibold">sovereign, portable, personal memory</span> and{" "}
-                <span className="text-cyan-400 font-semibold">dynamic context engine</span> that works with{" "}
-                <span className="text-emerald-400 font-semibold">all AI providers</span> — your single, AI-native database.
+                {t('descriptionExtended')}
               </motion.p>
 
               <motion.div

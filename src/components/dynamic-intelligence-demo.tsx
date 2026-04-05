@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Brain, Sparkles, GitBranch, Zap, Target, Layers, ArrowRight, RefreshCw } from 'lucide-react';
 
 type MemoryType = 'EPISODIC' | 'SEMANTIC' | 'PROCEDURAL' | 'FACTUAL' | 'PREFERENCE' | 'IDENTITY';
@@ -52,6 +53,8 @@ const EXTRACTION_FLOWS = [
 ];
 
 export function DynamicIntelligenceDemo() {
+  const t = useTranslations('demos.dynamicIntelligence');
+  const tc = useTranslations('demos.dynamicIntelligence.component');
   const [activeTab, setActiveTab] = useState<'extraction' | 'context' | 'graph'>('extraction');
   const [input, setInput] = useState('');
   const [memories, setMemories] = useState<ExtractedMemory[]>([]);
@@ -83,9 +86,9 @@ export function DynamicIntelligenceDemo() {
     <div className="rounded-2xl overflow-hidden border border-white/10 bg-slate-900/50">
       <div className="flex border-b border-white/5">
         {[
-          { id: 'extraction', label: 'Memory Extraction', icon: Brain },
-          { id: 'context', label: 'Context Assembly', icon: Layers },
-          { id: 'graph', label: 'Knowledge Graph', icon: GitBranch },
+          { id: 'extraction', label: tc('tabs.extraction'), icon: Brain },
+          { id: 'context', label: tc('tabs.context'), icon: Layers },
+          { id: 'graph', label: tc('tabs.graph'), icon: GitBranch },
         ].map(tab => (
           <button
             key={tab.id}
@@ -112,7 +115,7 @@ export function DynamicIntelligenceDemo() {
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleExtract()}
-                placeholder="Describe what you're working on..."
+                placeholder={tc('placeholder')}
                 className="w-full bg-slate-800/50 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-violet-500/50"
               />
               <button
@@ -128,7 +131,7 @@ export function DynamicIntelligenceDemo() {
             {isExtracting && (
               <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-800/30">
                 <RefreshCw className="w-4 h-4 text-cyan-400 animate-spin" />
-                <span className="text-sm text-slate-400">Extracting memories from conversation...</span>
+                <span className="text-sm text-slate-400">{tc('extracting')}</span>
               </div>
             )}
 
@@ -174,7 +177,7 @@ export function DynamicIntelligenceDemo() {
             {memories.length === 0 && !isExtracting && (
               <div className="text-center py-8 text-slate-500 text-sm">
                 <Brain className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                <p>Type to see automatic memory extraction</p>
+                <p>{tc('typeToSee')}</p>
               </div>
             )}
           </div>
@@ -185,32 +188,32 @@ export function DynamicIntelligenceDemo() {
             <div className="p-4 rounded-xl bg-gradient-to-r from-violet-600/20 to-cyan-600/20 border border-white/10">
               <div className="flex items-center gap-2 mb-3">
                 <Zap className="w-4 h-4 text-amber-400" />
-                <span className="text-sm font-medium text-white">Context Assembly Engine</span>
+                <span className="text-sm font-medium text-white">{tc('contextAssembly')}</span>
               </div>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-cyan-400">{memories.length || '-'}</div>
-                  <div className="text-xs text-slate-500">Memories</div>
+                  <div className="text-xs text-slate-500">{tc('memories')}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-violet-400">{contextStats.contextTokens || '-'}</div>
-                  <div className="text-xs text-slate-500">Tokens</div>
+                  <div className="text-xs text-slate-500">{tc('tokens')}</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-emerald-400">{contextStats.relevantMemories || '-'}</div>
-                  <div className="text-xs text-slate-500">Relevant</div>
+                  <div className="text-xs text-slate-500">{tc('relevant')}</div>
                 </div>
               </div>
             </div>
 
             <div className="space-y-2">
-              <h4 className="text-xs font-medium text-slate-400">Context Layers</h4>
+              <h4 className="text-xs font-medium text-slate-400">{tc('contextLayers')}</h4>
               {[
-                { layer: 'L0', name: 'Identity Core', tokens: 300, max: 600 },
-                { layer: 'L1', name: 'Global Preferences', tokens: 500, max: 1000 },
-                { layer: 'L2', name: 'Topic Context', tokens: 800, max: 3000 },
-                { layer: 'L3', name: 'Entity Context', tokens: 400, max: 2000 },
-                { layer: 'L4', name: 'Conversation Arc', tokens: 600, max: 4000 },
+                { layer: 'L0', name: tc('l0'), tokens: 300, max: 600 },
+                { layer: 'L1', name: tc('l1'), tokens: 500, max: 1000 },
+                { layer: 'L2', name: tc('l2'), tokens: 800, max: 3000 },
+                { layer: 'L3', name: tc('l3'), tokens: 400, max: 2000 },
+                { layer: 'L4', name: tc('l4'), tokens: 600, max: 4000 },
               ].map(l => (
                 <div key={l.layer} className="flex items-center gap-3 text-xs">
                   <span className="w-8 font-mono text-violet-400">{l.layer}</span>
@@ -230,7 +233,7 @@ export function DynamicIntelligenceDemo() {
               <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
                 <div className="flex items-center gap-2">
                   <Target className="w-4 h-4 text-emerald-400" />
-                  <span className="text-xs text-emerald-400">Prediction: {contextStats.prediction}</span>
+                  <span className="text-xs text-emerald-400">{tc('prediction')} {contextStats.prediction}</span>
                 </div>
               </div>
             )}
@@ -242,7 +245,7 @@ export function DynamicIntelligenceDemo() {
             <div className="p-4 rounded-xl bg-slate-800/30 border border-white/5">
               <div className="flex items-center gap-2 mb-4">
                 <GitBranch className="w-4 h-4 text-cyan-400" />
-                <span className="text-sm font-medium text-white">Knowledge Graph</span>
+                <span className="text-sm font-medium text-white">{tc('knowledgeGraph')}</span>
               </div>
               
               <div className="relative h-40 flex items-center justify-center">
@@ -279,7 +282,7 @@ export function DynamicIntelligenceDemo() {
               </div>
 
               <div className="text-xs text-slate-500 text-center">
-                {memories.length} memories connected in graph
+                {memories.length} {tc('connectedInGraph')}
               </div>
             </div>
           </div>

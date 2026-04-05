@@ -48,15 +48,19 @@ const DEMO_FLOWS = [
 export default function LiveMemoryDemoPage() {
   const t = useTranslations('demos.liveMemory');
   const tCommon = useTranslations('demos.common');
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hi! Tell me about what you're building. I'll remember everything." },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [memories, setMemories] = useState<MemoryItem[]>([]);
   const [flowIndex, setFlowIndex] = useState(0);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [newMemoryIds, setNewMemoryIds] = useState<Set<string>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMessages([
+      { role: "assistant", content: t('initialGreeting') },
+    ]);
+  }, [t]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -206,9 +210,9 @@ export default function LiveMemoryDemoPage() {
           <div className="flex flex-col h-96 border-l border-white/5">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-slate-800/40">
               <Brain className="w-3.5 h-3.5 text-violet-400" />
-              <span className="text-xs text-slate-500">Live Memory Extraction</span>
+              <span className="text-xs text-slate-500">{t('liveMemoryExtraction')}</span>
               <span className="ml-auto text-xs text-violet-400 font-mono">
-                {memories.length} ACUs
+                {memories.length} {t('acUs')}
               </span>
             </div>
 
@@ -235,7 +239,7 @@ export default function LiveMemoryDemoPage() {
               {memories.length === 0 && (
                 <div className="h-full flex flex-col items-center justify-center text-slate-600 text-xs text-center">
                   <Sparkles className="w-6 h-6 mb-2 opacity-30" />
-                  <p>Memories will appear as you chat</p>
+                  <p>{t('memoriesWillAppear')}</p>
                 </div>
               )}
             </div>
@@ -244,9 +248,9 @@ export default function LiveMemoryDemoPage() {
 
         <div className="mt-12 text-center">
           <p className="text-sm text-slate-500 mb-6">
-            Want to see how the context engine works? Try the{" "}
+            {t('wantToSeeContextEngine')}{" "}
             <Link href="/demos/context-engine" className="text-violet-400 hover:text-violet-300">
-              Context Engine Demo
+              {t('contextEngineDemo')}
             </Link>
           </p>
         </div>

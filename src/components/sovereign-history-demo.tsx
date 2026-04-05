@@ -50,6 +50,7 @@ const SEARCH_DEMOS = [
 
 export function SovereignHistoryDemo() {
   const t = useTranslations('demos.sovereignHistory');
+  const tc = useTranslations('demos.sovereignHistory.component');
   const [activeTab, setActiveTab] = useState<'providers' | 'search' | 'export'>('providers');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);

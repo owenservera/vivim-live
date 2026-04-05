@@ -192,7 +192,7 @@ function MobileMenu({
               {/* Main Navigation Sections */}
               <div className="p-4">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">
-                  {t('sections.title') || 'Sections'}
+                  {t('sections.title')}
                 </h3>
                 <nav className="space-y-1" aria-label="Mobile navigation">
                   {sections.map((section, i) => (
@@ -218,7 +218,7 @@ function MobileMenu({
               {/* Demos Section */}
               <div className="p-4 pt-0">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 px-2">
-                  {t('sections.demos') || 'Demos'}
+                  {t('sections.demos')}
                 </h3>
                 <div className="space-y-1">
                   {demos.map((demo, i) => {
@@ -308,7 +308,7 @@ function DemosDropdown() {
         className="px-4 py-1.5 rounded-full text-sm font-medium text-slate-400 hover:text-white transition-colors hover:bg-white/5 flex items-center gap-1"
       >
         <Play className="w-3.5 h-3.5" />
-        {tNav('sections.demos') || 'Demos'}
+        {tNav('sections.demos')}
       </button>
 
       <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2 opacity-0 invisible group-hover/demos:opacity-100 group-hover/demos:visible transition-all duration-200">

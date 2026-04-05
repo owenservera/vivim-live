@@ -30,6 +30,7 @@ const ACCESS_LOGS: AccessLog[] = [
 
 export function ZeroKnowledgePrivacyDemo() {
   const t = useTranslations('demos.zeroKnowledgePrivacy');
+  const tc = useTranslations('demos.zeroKnowledgePrivacy.component');
   const [activeTab, setActiveTab] = useState<'shield' | 'keys' | 'logs'>('shield');
   const [isEncrypting, setIsEncrypting] = useState(false);
   const [showKeys, setShowKeys] = useState(false);
@@ -167,13 +168,13 @@ export function ZeroKnowledgePrivacyDemo() {
                 type="button"
                 className="flex-1 py-2.5 rounded-lg bg-violet-600/20 text-violet-400 text-sm font-medium border border-violet-500/30"
               >
-                Export Keys (Backup)
+                {tc('exportKeysBackup')}
               </button>
               <button
                 type="button"
                 className="flex-1 py-2.5 rounded-lg bg-red-500/20 text-red-400 text-sm font-medium border border-red-500/30"
               >
-                Wipe All Data
+                {tc('wipeAllData')}
               </button>
             </div>
           </div>
@@ -182,10 +183,10 @@ export function ZeroKnowledgePrivacyDemo() {
         {activeTab === 'logs' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-white">Access Log</span>
+              <span className="text-sm font-medium text-white">{tc('accessLog')}</span>
               <div className="flex items-center gap-2 text-xs text-slate-500">
-                <span>Today: {ACCESS_LOGS.length} accesses</span>
-                <span className="text-emerald-400">• All trusted</span>
+                <span>{tc('todayAccesses', { count: ACCESS_LOGS.length })}</span>
+                <span className="text-emerald-400">• {tc('allTrusted')}</span>
               </div>
             </div>
 
@@ -214,7 +215,7 @@ export function ZeroKnowledgePrivacyDemo() {
             <div className="p-3 rounded-lg bg-violet-500/10 border border-violet-500/30">
               <div className="flex items-center gap-2 text-violet-400 text-xs">
                 <Eye className="w-4 h-4" />
-                You see everything - VIVIM sees nothing
+                {tc('seeEverything')}
               </div>
             </div>
           </div>
