@@ -15,9 +15,21 @@ import { PrismaClient } from '@prisma/client';
 import { logger } from '../lib/logger';
 import { createLLMService } from '../../context/utils/zai-service.js';
 import { unifiedContextService } from '../../services/unified-context-service.js';
+import { VirtualMemoryExtractionEngine } from '../../context/memory/virtual-memory-extraction-engine.js';
+import { virtualMemoryAdapterService } from '../../services/virtual-memory-adapter.js';
 
 const router = Router();
 const prisma = new PrismaClient();
+
+// Initialize virtual memory extraction engine
+const virtualMemoryExtractionEngine = new VirtualMemoryExtractionEngine({
+  prisma,
+  virtualMemoryAdapter: virtualMemoryAdapterService,
+  extractionModel: 'glm-4.7',
+  maxMemoriesPerConversation: 5,
+  minConfidenceThreshold: 0.6,
+  enableAutoExtraction: true,
+});
 
 // Middleware: Virtual user auto-auth
 const virtualUserAutoAuth = async (req: Request, res: Response, next: Function) => {
@@ -350,6 +362,23 @@ router.post('/:tenantSlug/chat', virtualUserAutoAuth, async (req: Request, res: 
         },
       },
     });
+
+    // --- Step 6: Extract memories from conversation (async, don't await) ---
+    if (virtualMemoryExtractionEngine.isAutoExtractionEnabled()) {
+      setImmediate(async () => {
+        try {
+          await virtualMemoryExtractionEngine.extractFromVirtualConversation({
+            virtualUserId,
+            conversationId: conv.id,
+            forceReextract: false,
+            priority: 1,
+          });
+          logger.info({ conversationId: conv.id, virtualUserId }, 'Memory extraction completed');
+        } catch (extractionError) {
+          logger.warn({ error: extractionError, conversationId: conv.id }, 'Memory extraction failed');
+        }
+      });
+    }
 
     res.json({
       response,

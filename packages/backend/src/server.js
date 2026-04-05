@@ -57,6 +57,9 @@ import { collectionsRouter } from './routes/collections.js';
 import contextEngineRouter from './routes/context-engine.ts';
 import docSearchRouter from './routes/doc-search.ts';
 import demoRouter from './routes/demo.js';
+import { analyticsRoutes } from './routes/analytics.js';
+import { userManagementRoutes } from './routes/user-management.js';
+import { featureSwitch, createFeatureSwitchRoutes } from './lib/feature-switch.js';
 import { bootContextSystem } from './services/context-startup.ts';
 import { initializeGlobalRateLimiter } from './lib/rate-limiter-init.js';
 
@@ -64,9 +67,13 @@ import { initializeGlobalRateLimiter } from './lib/rate-limiter-init.js';
 try {
   validateConfig();
   logger.info('Configuration validated successfully');
-  
+
   // Initialize global rate limiter for AI API requests
   initializeGlobalRateLimiter();
+  
+  // Initialize feature switch system
+  await featureSwitch.initialize();
+  logger.info('Feature switch system initialized');
 } catch (error) {
   logger.error('Configuration validation failed:', error);
   process.exit(1);
@@ -354,6 +361,13 @@ app.use('/api/v1/debug', debugRouter);
 app.use('/api/v1/collections', collectionsRouter);
 app.use('/api/v2/context-engine', contextEngineRouter);
 app.use('/api/v2/context-recipes', contextRecipesRouter);
+
+// Analytics & User Management
+app.use('/api/v1/analytics', analyticsRoutes);
+app.use('/api/v1/users', userManagementRoutes);
+
+// Feature Switch Management
+app.use('/api/v1/features', createFeatureSwitchRoutes());
 
 // // Documentation Search (PageIndex-style)
 app.use('/api/docs', docSearchRouter);

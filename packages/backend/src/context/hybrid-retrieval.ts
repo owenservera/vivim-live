@@ -254,26 +254,52 @@ export class HybridRetrievalService {
     embedding: number[]
   ): Promise<SearchResult[]> {
     try {
-      const results = await this.prisma.$queryRaw<any[]>`
-        SELECT
-          id,
-          content,
-          category,
-          importance,
-          "createdAt",
-          1 - (embedding <=> ${embedding}::vector) as similarity
-        FROM memories
-        WHERE "virtualUserId" = ${virtualUserId}
-          AND "isActive" = true
-          AND embedding IS NOT NULL
-          AND array_length(embedding, 1) > 0
-          AND importance < 0.8
-        ORDER BY embedding <=> ${embedding}::vector
-        LIMIT 10
-      `;
+      // Query both regular memories and virtual memories
+      const [regularResults, virtualResults] = await Promise.all([
+        this.prisma.$queryRaw<any[]>`
+          SELECT
+            id,
+            content,
+            category,
+            importance,
+            "createdAt",
+            1 - (embedding <=> ${embedding}::vector) as similarity,
+            'regular' as memory_type
+          FROM memories
+          WHERE "virtualUserId" = ${virtualUserId}
+            AND "isActive" = true
+            AND embedding IS NOT NULL
+            AND array_length(embedding, 1) > 0
+            AND importance < 0.8
+          ORDER BY embedding <=> ${embedding}::vector
+          LIMIT 5
+        `,
+        this.prisma.$queryRaw<any[]>`
+          SELECT
+            id,
+            content,
+            category,
+            importance,
+            "createdAt",
+            1 - (embedding <=> ${embedding}::vector) as similarity,
+            'virtual' as memory_type
+          FROM virtual_memories
+          WHERE "virtualUserId" = ${virtualUserId}
+            AND "isActive" = true
+            AND embedding IS NOT NULL
+            AND array_length(embedding, 1) > 0
+            AND importance < 0.8
+          ORDER BY embedding <=> ${embedding}::vector
+          LIMIT 5
+        `
+      ]);
 
-      return results
+      const allResults = [...regularResults, ...virtualResults];
+
+      return allResults
         .filter((r) => r.similarity >= this.config.similarityThreshold)
+        .sort((a, b) => a.similarity - b.similarity) // Sort by similarity (lower is better)
+        .slice(0, 10)
         .map((r) => ({
           id: r.id,
           content: r.content,
@@ -337,26 +363,46 @@ export class HybridRetrievalService {
 
     const conditions = keywords.map((k) => Prisma.sql`LOWER(content) LIKE LOWER(${'%' + k + '%'})`);
 
-    const results = await this.prisma.$queryRaw<any[]>`
-      SELECT id, content, category, importance, "createdAt",
-        ${this.calculateKeywordScore(keywords)} as similarity
-      FROM memories
-      WHERE "virtualUserId" = ${virtualUserId}
-        AND "isActive" = true
-        AND importance < 0.8
-        AND (${Prisma.join(conditions, ' OR ')})
-      LIMIT 10
-    `;
+    // Query both regular memories and virtual memories
+    const [regularResults, virtualResults] = await Promise.all([
+      this.prisma.$queryRaw<any[]>`
+        SELECT id, content, category, importance, "createdAt",
+          ${this.calculateKeywordScore(keywords)} as similarity,
+          'regular' as memory_type
+        FROM memories
+        WHERE "virtualUserId" = ${virtualUserId}
+          AND "isActive" = true
+          AND importance < 0.8
+          AND (${Prisma.join(conditions, ' OR ')})
+        LIMIT 5
+      `,
+      this.prisma.$queryRaw<any[]>`
+        SELECT id, content, category, importance, "createdAt",
+          ${this.calculateKeywordScore(keywords)} as similarity,
+          'virtual' as memory_type
+        FROM virtual_memories
+        WHERE "virtualUserId" = ${virtualUserId}
+          AND "isActive" = true
+          AND importance < 0.8
+          AND (${Prisma.join(conditions, ' OR ')})
+        LIMIT 5
+      `
+    ]);
 
-    return results.map((r) => ({
-      id: r.id,
-      content: r.content,
-      type: 'memory',
-      category: r.category,
-      createdAt: r.createdAt,
-      similarity: Math.min(r.similarity, 1.0),
-      source: 'keyword' as const,
-    }));
+    const allResults = [...regularResults, ...virtualResults];
+
+    return allResults
+      .sort((a, b) => b.similarity - a.similarity) // Sort by similarity descending
+      .slice(0, 10)
+      .map((r) => ({
+        id: r.id,
+        content: r.content,
+        type: 'memory',
+        category: r.category,
+        createdAt: r.createdAt,
+        similarity: Math.min(r.similarity, 1.0),
+        source: 'keyword' as const,
+      }));
   }
 
   private fuseResults(semantic: SearchResult[], keyword: SearchResult[]): SearchResult[] {

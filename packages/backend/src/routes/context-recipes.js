@@ -48,18 +48,18 @@ async function seedDefaultRecipes() {
 
 seedDefaultRecipes();
 
-// Middleware to extract user ID (assuming standard auth or passing in headers for now)
+// Middleware to extract virtual user ID (fingerprint-based identification)
 const authenticate = (req, res, next) => {
-  const userId = req.headers['x-user-id'] || req.query.userId || req.body.userId;
-  if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized: Missing user ID' });
+  const virtualUserId = req.headers['x-virtual-user-id'] || req.query.virtualUserId || req.body.virtualUserId;
+  if (!virtualUserId) {
+    return res.status(401).json({ error: 'Unauthorized: Missing virtual user ID' });
   }
-  req.userId = userId;
+  req.virtualUserId = virtualUserId;
   next();
 };
 
 /**
- * Get all recipes for a user (and system defaults)
+ * Get all recipes for a virtual user (and system defaults)
  */
 router.get('/', authenticate, async (req, res) => {
   try {
@@ -67,8 +67,8 @@ router.get('/', authenticate, async (req, res) => {
     const recipes = await prisma.contextRecipe.findMany({
       where: {
         OR: [
-          { userId: req.userId },
-          { userId: null, isDefault: true }
+          { virtualUserId: req.virtualUserId },
+          { virtualUserId: null, isDefault: true }
         ]
       },
       orderBy: { createdAt: 'desc' }
@@ -90,8 +90,8 @@ router.get('/:id', authenticate, async (req, res) => {
       where: {
         id: req.params.id,
         OR: [
-          { userId: req.userId },
-          { userId: null, isDefault: true }
+          { virtualUserId: req.virtualUserId },
+          { virtualUserId: null, isDefault: true }
         ]
       }
     });
@@ -126,7 +126,7 @@ router.post('/', authenticate, async (req, res) => {
         layerWeights: layerWeights || {},
         excludedLayers: excludedLayers || [],
         customBudget: customBudget || null,
-        userId: req.userId,
+        virtualUserId: req.virtualUserId,
         isDefault: false
       }
     });
@@ -148,7 +148,7 @@ router.put('/:id', authenticate, async (req, res) => {
 
     // Check ownership
     const existing = await prisma.contextRecipe.findUnique({ where: { id: req.params.id } });
-    if (!existing || existing.userId !== req.userId) {
+    if (!existing || existing.virtualUserId !== req.virtualUserId) {
       return res.status(404).json({ error: 'Recipe not found or access denied' });
     }
 
@@ -176,10 +176,10 @@ router.put('/:id', authenticate, async (req, res) => {
 router.delete('/:id', authenticate, async (req, res) => {
   try {
     const prisma = getPrismaClient();
-    
+
     // Check ownership
     const existing = await prisma.contextRecipe.findUnique({ where: { id: req.params.id } });
-    if (!existing || existing.userId !== req.userId) {
+    if (!existing || existing.virtualUserId !== req.virtualUserId) {
       return res.status(404).json({ error: 'Recipe not found or access denied' });
     }
 

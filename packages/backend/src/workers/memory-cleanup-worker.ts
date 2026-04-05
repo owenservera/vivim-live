@@ -109,7 +109,7 @@ export class MemoryCleanupWorker {
         },
         select: {
           id: true,
-          userId: true,
+          virtualUserId: true,
           importance: true,
           expiresAt: true,
         },
@@ -146,19 +146,19 @@ export class MemoryCleanupWorker {
       try {
         const { getContextEventBus } = await import('../context/index.js');
         const eventBus = getContextEventBus();
-        
-        // Group by user for batch events
-        const byUser = new Map<string, string[]>();
+
+        // Group by virtual user for batch events
+        const byVirtualUser = new Map<string, string[]>();
         expiredMemories.forEach(m => {
-          if (!byUser.has(m.userId)) {
-            byUser.set(m.userId, []);
+          if (!byVirtualUser.has(m.virtualUserId)) {
+            byVirtualUser.set(m.virtualUserId, []);
           }
-          byUser.get(m.userId)!.push(m.id);
+          byVirtualUser.get(m.virtualUserId)!.push(m.id);
         });
 
-        for (const [userId, memoryIds] of byUser.entries()) {
+        for (const [virtualUserId, memoryIds] of byVirtualUser.entries()) {
           await eventBus.emit('memory:batch_archived', {
-            userId,
+            virtualUserId,
             memoryIds,
             reason: 'ttl_expired',
             count: memoryIds.length,

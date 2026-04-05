@@ -1,11 +1,11 @@
 // apps/server/src/routes/ai-chat.js
 // ═══════════════════════════════════════════════════════════════════════════
-// FRESH AI CHAT - Standalone conversations with optional context system
+// FRESH AI CHAT - Database-backed conversations with optional context system
 // ═══════════════════════════════════════════════════════════════════════════
 //
-// This route handles FRESH conversations — lightweight with optional context.
-// In-memory conversation state for the duration of the session.
+// This route handles FRESH conversations with full database persistence.
 // Supports personas, provider switching, streaming, and context integration.
+// Uses Prisma ORM for Supabase database integration.
 
 import { Router } from 'express';
 import { unifiedProvider } from '../ai/unified-provider.js';
@@ -16,102 +16,80 @@ import { ProviderConfig, getDefaultProvider } from '../types/ai.js';
 import { freshChatSchema } from '../validators/ai.js';
 import { executeZAIAction, isMCPConfigured } from '../services/zai-mcp-service.js';
 import { executeRtrvrAction } from '../services/rtrvr-service.js';
+import { getPrismaClient } from '../lib/database.js';
+import * as crypto from 'crypto';
 
 const router = Router();
-
-// In-memory conversation store (per-session, no persistence)
-const conversations = new Map();
-
-// Cleanup stale conversations every 30 minutes
-setInterval(
-  () => {
-    const staleThreshold = Date.now() - 60 * 60 * 1000; // 1 hour
-    for (const [id, conv] of conversations) {
-      if (conv.lastActivity < staleThreshold) {
-        conversations.delete(id);
-      }
-    }
-  },
-  30 * 60 * 1000
-);
+const prisma = getPrismaClient();
 
 // ============================================================================
-// CONVERSATION LIFECYCLE
+// HELPER FUNCTIONS
 // ============================================================================
 
 /**
  * Get userId from request
  */
 function getUserId(req) {
-  if (req.isAuthenticated() && req.user?.userId) {
+  if (req.isAuthenticated && req.isAuthenticated() && req.user?.userId) {
     return req.user.userId;
   }
   return req.headers['x-user-id'] || null;
 }
 
 /**
- * POST /start - Create a new fresh conversation
+ * Get or create virtual user for the request
  */
-router.post('/start', async (req, res) => {
-  try {
-    const userId = getUserId(req);
-    const {
-      provider,
-      model,
-      title = 'New Conversation',
-      personaId = 'default',
-      messages: initialMessages = [],
-    } = req.body;
-
-    const conversationId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const resolvedProvider = provider || getDefaultProvider();
-
-    conversations.set(conversationId, {
-      id: conversationId,
-      userId,
-      title,
-      provider: resolvedProvider,
-      model: model || ProviderConfig[resolvedProvider]?.defaultModel,
-      personaId,
-      messages: initialMessages.map((m) => ({
-        role: m.role,
-        content: m.content,
-        timestamp: new Date().toISOString(),
-      })),
-      createdAt: new Date().toISOString(),
-      lastActivity: Date.now(),
-    });
-
-    logger.info(
-      { conversationId, userId, provider: resolvedProvider, personaId },
-      'Fresh conversation started'
-    );
-
-    res.json({
-      success: true,
+async function getOrCreateVirtualUser(req) {
+  const userId = getUserId(req);
+  const fingerprint = req.headers['x-fingerprint'] || `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Try to find existing virtual user by fingerprint
+  let virtualUser = await prisma.virtualUser.findUnique({
+    where: { fingerprint },
+  });
+  
+  if (!virtualUser) {
+    // Create new virtual user
+    virtualUser = await prisma.virtualUser.create({
       data: {
-        conversationId,
-        provider: resolvedProvider,
-        model: model || ProviderConfig[resolvedProvider]?.defaultModel,
-        personaId,
-        title,
+        fingerprint,
+        displayName: generateDisplayName(),
+        fingerprintSignals: {
+          userAgent: req.headers['user-agent'],
+          ip: req.ip || req.headers['x-forwarded-for'],
+        },
+        consentGiven: false,
       },
     });
-  } catch (error) {
-    logger.error({ error: error.message }, 'Failed to start conversation');
-    res.status(500).json({ success: false, error: error.message });
+    
+    logger.info({ virtualUserId: virtualUser.id, fingerprint }, 'New virtual user created');
   }
-});
+  
+  // Update last seen
+  await prisma.virtualUser.update({
+    where: { id: virtualUser.id },
+    data: { lastSeenAt: new Date() },
+  });
+  
+  return virtualUser;
+}
+
+/**
+ * Generate display name for new virtual users
+ */
+function generateDisplayName() {
+  const adjectives = ['Curious', 'Friendly', 'Smart', 'Creative', 'Thoughtful', 'Enthusiastic'];
+  const nouns = ['Explorer', 'Learner', 'Thinker', 'Creator', 'Seeker', 'Dreamer'];
+  const num = Math.floor(Math.random() * 10000);
+  return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]} #${num}`;
+}
 
 /**
  * Parse Z.AI MCP action from message
  */
 function parseZAIAction(message) {
   const trimmed = message.trim();
-
-  if (!trimmed.startsWith('!')) {
-    return null;
-  }
+  if (!trimmed.startsWith('!')) return null;
 
   const parts = trimmed.slice(1).split(/\s+/);
   const action = parts[0]?.toLowerCase();
@@ -132,180 +110,285 @@ function parseZAIAction(message) {
 
 function parseGithubArgs(args) {
   const match = args.match(/^([^/]+\/[^\s]+)?\s*(.*)$/);
-  if (!match) {
-    return { repo: args, query: '' };
-  }
+  if (!match) return { repo: args, query: '' };
   return { repo: match[1] || '', query: match[2] || '' };
 }
 
 function parseGithubFileArgs(args) {
   const match = args.match(/^([^/]+\/[^\s]+)\s+(.+)$/);
-  if (!match) {
-    return { repo: args, file: '' };
-  }
+  if (!match) return { repo: args, file: '' };
   return { repo: match[1], file: match[2] };
 }
 
+// ============================================================================
+// CONVERSATION LIFECYCLE
+// ============================================================================
+
 /**
- * POST /send - Send a message in an existing fresh conversation
+ * POST /start - Create a new database-backed conversation
+ */
+router.post('/start', async (req, res) => {
+  try {
+    const virtualUser = await getOrCreateVirtualUser(req);
+    const {
+      provider,
+      model,
+      title = 'New Conversation',
+      personaId = 'default',
+      messages: initialMessages = [],
+    } = req.body;
+
+    const conversationId = crypto.randomUUID();
+    const resolvedProvider = provider || getDefaultProvider();
+    const resolvedModel = model || ProviderConfig[resolvedProvider]?.defaultModel;
+
+    // Create conversation in database
+    const conversation = await prisma.virtualConversation.create({
+      data: {
+        id: conversationId,
+        virtualUserId: virtualUser.id,
+        title,
+        provider: resolvedProvider,
+        model: resolvedModel,
+        metadata: { personaId, source: 'fresh-chat' },
+        tags: personaId !== 'default' ? [personaId] : [],
+      },
+    });
+
+    // Add initial messages if provided
+    if (initialMessages.length > 0) {
+      const messagesToCreate = initialMessages.map((m, index) => ({
+        id: crypto.randomUUID(),
+        conversationId,
+        role: m.role,
+        content: m.content,
+        messageIndex: index,
+        metadata: { imported: true, timestamp: new Date().toISOString() },
+      }));
+      
+      await prisma.virtualMessage.createMany({ data: messagesToCreate });
+      await prisma.virtualConversation.update({
+        where: { id: conversationId },
+        data: {
+          messageCount: initialMessages.length,
+          userMessageCount: initialMessages.filter(m => m.role === 'user').length,
+          aiMessageCount: initialMessages.filter(m => m.role === 'assistant').length,
+        },
+      });
+    }
+
+    logger.info(
+      { conversationId, virtualUserId: virtualUser.id, provider: resolvedProvider, personaId },
+      'Fresh conversation started with DB persistence'
+    );
+
+    res.json({
+      success: true,
+      data: {
+        conversationId,
+        virtualUserId: virtualUser.id,
+        provider: resolvedProvider,
+        model: resolvedModel,
+        personaId,
+        title,
+      },
+    });
+  } catch (error) {
+    logger.error({ error: error.message }, 'Failed to start conversation');
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * POST /send - Send a message in a database-backed conversation
  */
 router.post('/send', async (req, res) => {
   try {
     const { conversationId, message, provider: overrideProvider, model: overrideModel } = req.body;
-    const userId = getUserId(req);
-
+    
     if (!conversationId || !message) {
-      return res
-        .status(400)
-        .json({ success: false, error: 'conversationId and message are required' });
+      return res.status(400).json({ success: false, error: 'conversationId and message are required' });
     }
 
-    const conv = conversations.get(conversationId);
+    // Get virtual user
+    const virtualUser = await getOrCreateVirtualUser(req);
+
+    // Get conversation from database
+    const conv = await prisma.virtualConversation.findUnique({
+      where: { id: conversationId },
+      include: { messages: { orderBy: { messageIndex: 'asc' }, take: 50 } },
+    });
+
     if (!conv) {
-      return res.status(404).json({ success: false, error: 'Conversation not found or expired' });
+      return res.status(404).json({ success: false, error: 'Conversation not found' });
     }
 
+    // Verify ownership
+    if (conv.virtualUserId !== virtualUser.id) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
+
+    // Handle Z.AI MCP actions
     const zaiAction = parseZAIAction(message);
     if (zaiAction && (isMCPConfigured() || zaiAction.action === 'rtrvr')) {
       try {
-          let result = {};
-          if (zaiAction.action !== 'rtrvr') {
-            result = await executeZAIAction(zaiAction.action, zaiAction.params);
-          }
+        let result = {};
+        if (zaiAction.action !== 'rtrvr') {
+          result = await executeZAIAction(zaiAction.action, zaiAction.params);
+        }
 
-          let responseText = `🔍 **${zaiAction.action.toUpperCase()} Result**\n\n`;
+        let responseText = `🔍 **${zaiAction.action.toUpperCase()} Result**\n\n`;
 
-          if (zaiAction.action === 'rtrvr') {
-            // FIRE AND FORGET - Let it run in the background
-            executeRtrvrAction(zaiAction.params.prompt, userId).catch(err => {
-              logger.error({ error: err.message }, 'Background Rtrvr action failed');
+        if (zaiAction.action === 'rtrvr') {
+          executeRtrvrAction(zaiAction.params.prompt, virtualUser.id).catch(err => {
+            logger.error({ error: err.message }, 'Background Rtrvr action failed');
+          });
+          responseText += `🚀 **Rtrvr Background Process Started!**\n\nThe AI agent is extracting the conversation securely in the background.`;
+          Object.assign(result || {}, { count: 1, query: zaiAction.params.prompt });
+        } else if (zaiAction.action === 'websearch') {
+          responseText += `Found ${result.count} results for "${result.query}":\n\n`;
+          result.results?.slice(0, 5).forEach((r, i) => {
+            responseText += `${i + 1}. **${r.title || r.name || 'Result'}**\n   ${r.url || r.link || ''}\n   ${(r.content || r.description || '').slice(0, 200)}...\n\n`;
+          });
+        } else if (zaiAction.action === 'readurl') {
+          responseText += `📄 **${result.title}**\n\n${result.content?.slice(0, 3000) || result.summary || 'No content'}`;
+        } else if (zaiAction.action === 'github') {
+          if (result.structure) {
+            responseText += `📁 **${result.repo}**\n\n`;
+            result.structure?.slice(0, 20).forEach((item) => {
+              responseText += `${item.type === 'tree' ? '📁' : '📄'} ${item.path}\n`;
             });
-            
-            responseText += `🚀 **Rtrvr Background Process Started!**\n\nThe AI agent is extracting the conversation securely in the background. I will notify you as soon as it succeeds or fails. You can continue our chat without waiting!`;
-            
-            // Format result to mimic ZAI
-            Object.assign(result || {}, { count: 1, query: zaiAction.params.prompt });
-          } else if (zaiAction.action === 'websearch') {
-            responseText += `Found ${result.count} results for "${result.query}":\n\n`;
+          } else if (result.content) {
+            responseText += `📄 **${result.file}** from ${result.repo}\n\n\`\`\`\n${result.content?.slice(0, 5000)}\n\`\`\``;
+          } else {
+            responseText += `Found ${result.count} results in **${result.repo}** for "${result.query}":\n\n`;
             result.results?.slice(0, 5).forEach((r, i) => {
-              responseText += `${i + 1}. **${r.title || r.name || 'Result'}**\n`;
-              responseText += `   ${r.url || r.link || ''}\n`;
-              responseText += `   ${(r.content || r.description || '').slice(0, 200)}...\n\n`;
+              responseText += `${i + 1}. ${r.title || r.name || 'Result'}\n   ${r.content || r.description || ''}\n\n`;
             });
-          } else if (zaiAction.action === 'readurl') {
-            responseText += `📄 **${result.title}**\n\n`;
-            responseText += result.content?.slice(0, 3000) || result.summary || 'No content';
-          } else if (zaiAction.action === 'github') {
-            if (result.structure) {
-              responseText += `📁 **${result.repo}**\n\n`;
-              result.structure?.slice(0, 20).forEach((item) => {
-                responseText += `${item.type === 'tree' ? '📁' : '📄'} ${item.path}\n`;
-              });
-            } else if (result.content) {
-              responseText += `📄 **${result.file}** from ${result.repo}\n\n`;
-              responseText += `\`\`\`\n${result.content?.slice(0, 5000)}\n\`\`\``;
-            } else {
-              responseText += `Found ${result.count} results in **${result.repo}** for "${result.query}":\n\n`;
-              result.results?.slice(0, 5).forEach((r, i) => {
-                responseText += `${i + 1}. ${r.title || r.name || 'Result'}\n`;
-                responseText += `   ${r.content || r.description || ''}\n\n`;
-              });
-            }
           }
+        }
 
-          conv.messages.push({
+        // Save ZAI action response to database
+        await prisma.virtualMessage.create({
+          data: {
+            id: crypto.randomUUID(),
+            conversationId,
             role: 'assistant',
             content: responseText,
-            timestamp: new Date().toISOString(),
+            messageIndex: conv.messageCount,
             metadata: { isZAIAction: true, tool: zaiAction.action },
-          });
-
-          return res.json({
-            success: true,
-            data: {
-              content: responseText,
-              model: 'zai-mcp',
-              provider: 'zai',
-              isZAIAction: true,
-              conversationId,
-            },
-          });
-        } catch (actionError) {
-          logger.error({ error: actionError.message, action: zaiAction }, 'Z.AI MCP action failed');
-          return res.json({
-            success: true,
-            data: {
-              content: `❌ Error: ${actionError.message}`,
-              model: 'zai-mcp',
-              provider: 'zai',
-              conversationId,
-            },
-          });
-        }
-      }
-
-    // Add user message
-    conv.messages.push({ role: 'user', content: message, timestamp: new Date().toISOString() });
-    conv.lastActivity = Date.now();
-
-    const provider = overrideProvider || conv.provider;
-    const model = overrideModel || conv.model;
-
-    let contextResult = null;
-    if (userId) {
-      try {
-        contextResult = await unifiedContextService.generateContextForChat(conversationId, {
-          userId,
-          userMessage: message,
-          personaId: conv.personaId,
+          },
         });
-      } catch (ctxError) {
-        logger.warn({ error: ctxError.message }, 'Context assembly failed for fresh chat');
+
+        await prisma.virtualConversation.update({
+          where: { id: conversationId },
+          data: { messageCount: { increment: 1 }, aiMessageCount: { increment: 1 }, updatedAt: new Date() },
+        });
+
+        return res.json({
+          success: true,
+          data: { content: responseText, model: 'zai-mcp', provider: 'zai', isZAIAction: true, conversationId },
+        });
+      } catch (actionError) {
+        logger.error({ error: actionError.message, action: zaiAction }, 'Z.AI MCP action failed');
+        return res.json({
+          success: true,
+          data: { content: `❌ Error: ${actionError.message}`, model: 'zai-mcp', provider: 'zai', conversationId },
+        });
       }
     }
 
-    const systemPrompt =
-      contextResult?.systemPrompt ||
-      systemPromptManager.buildPrompt({
-        mode: 'fresh',
-        personaId: conv.personaId,
-        userId,
+    // Add user message to database
+    await prisma.virtualMessage.create({
+      data: {
+        id: crypto.randomUUID(),
+        conversationId,
+        role: 'user',
+        content: message,
+        messageIndex: conv.messageCount,
+      },
+    });
+
+    const provider = overrideProvider || conv.provider || getDefaultProvider();
+    const model = overrideModel || conv.model || ProviderConfig[provider]?.defaultModel;
+
+    // Get context from unified context service
+    let contextResult = null;
+    try {
+      contextResult = await unifiedContextService.generateContextForChat(conversationId, {
+        virtualUserId: virtualUser.id,
+        userMessage: message,
+        personaId: conv.metadata?.personaId || 'default',
       });
+    } catch (ctxError) {
+      logger.warn({ error: ctxError.message }, 'Context assembly failed for fresh chat');
+    }
 
-    // Format messages for API
-    const apiMessages = conv.messages.map((m) => ({ role: m.role, content: m.content }));
+    const systemPrompt = contextResult?.systemPrompt || systemPromptManager.buildPrompt({
+      mode: 'fresh',
+      personaId: conv.metadata?.personaId || 'default',
+      userId: virtualUser.id,
+    });
 
+    // Build message history for API
+    const apiMessages = conv.messages.map((m) => ({ 
+      role: m.role, 
+      content: typeof m.parts === 'string' ? m.parts : m.content || JSON.stringify(m.parts) 
+    }));
+    apiMessages.push({ role: 'user', content: message });
+
+    // Generate AI response
     const result = await unifiedProvider.generateCompletion({
       provider,
       model,
       messages: apiMessages,
       system: systemPrompt,
-      userId,
+      userId: virtualUser.id,
     });
 
-    // Add assistant response
-    conv.messages.push({
-      role: 'assistant',
-      content: result.text,
-      timestamp: new Date().toISOString(),
-      metadata: { model, provider, tokens: result.usage?.totalTokens },
+    // Save assistant response to database
+    await prisma.virtualMessage.create({
+      data: {
+        id: crypto.randomUUID(),
+        conversationId,
+        role: 'assistant',
+        content: result.text,
+        messageIndex: conv.messageCount + 1,
+        metadata: { model, provider, tokens: result.usage?.totalTokens, contextEngine: contextResult?.engineUsed },
+      },
+    });
+
+    // Update conversation stats
+    await prisma.virtualConversation.update({
+      where: { id: conversationId },
+      data: {
+        messageCount: { increment: 2 },
+        userMessageCount: { increment: 1 },
+        aiMessageCount: { increment: 1 },
+        totalTokens: { increment: result.usage?.totalTokens || 0 },
+        updatedAt: new Date(),
+        metadata: { ...conv.metadata, lastMessageAt: new Date().toISOString(), lastModel: model },
+      },
     });
 
     // Auto-generate title from first exchange
-    if (conv.messages.length === 2 && conv.title === 'New Conversation') {
-      conv.title = message.substring(0, 60) + (message.length > 60 ? '...' : '');
+    if (conv.messageCount === 0 && conv.title === 'New Conversation') {
+      await prisma.virtualConversation.update({
+        where: { id: conversationId },
+        data: { title: message.substring(0, 60) + (message.length > 60 ? '...' : '') },
+      });
     }
 
     res.json({
       success: true,
       data: {
         content: result.text,
-        model: model || ProviderConfig[provider]?.defaultModel,
+        model,
         usage: result.usage,
         finishReason: result.finishReason,
         provider,
         conversationId,
-        messageCount: conv.messages.length,
+        messageCount: conv.messageCount + 2,
         contextAllocation: contextResult?.layers || null,
         contextStats: contextResult?.stats || null,
       },
@@ -327,48 +410,59 @@ router.post('/stream', async (req, res) => {
   try {
     const parsed = freshChatSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res
-        .status(400)
-        .json({ success: false, error: 'Validation failed', details: parsed.error.errors });
+      return res.status(400).json({ success: false, error: 'Validation failed', details: parsed.error.errors });
     }
 
-    const {
-      message,
-      provider: requestedProvider,
-      model: requestedModel,
-      personaId,
-      options,
-    } = parsed.data;
-    const userId = getUserId(req);
+    const { message, provider: requestedProvider, model: requestedModel, personaId, options } = parsed.data;
+    const virtualUser = await getOrCreateVirtualUser(req);
 
     const provider = requestedProvider || getDefaultProvider();
     const model = requestedModel || ProviderConfig[provider]?.defaultModel;
 
+    // Create conversation for streaming
+    const conversationId = crypto.randomUUID();
+    await prisma.virtualConversation.create({
+      data: {
+        id: conversationId,
+        virtualUserId: virtualUser.id,
+        title: message.substring(0, 60) + (message.length > 60 ? '...' : ''),
+        provider,
+        model,
+        metadata: { personaId: personaId || 'default' },
+      },
+    });
+
     let contextResult = null;
-    const convId = `fresh_${Date.now()}`;
-    if (userId) {
-      try {
-        contextResult = await unifiedContextService.generateContextForChat(convId, {
-          userId,
-          userMessage: message,
-          personaId: personaId || 'default',
-        });
-      } catch (ctxError) {
-        logger.warn({ error: ctxError.message }, 'Context assembly failed for fresh stream');
-      }
+    try {
+      contextResult = await unifiedContextService.generateContextForChat(conversationId, {
+        virtualUserId: virtualUser.id,
+        userMessage: message,
+        personaId: personaId || 'default',
+      });
+    } catch (ctxError) {
+      logger.warn({ error: ctxError.message }, 'Context assembly failed for fresh stream');
     }
 
-    const systemPrompt =
-      contextResult?.systemPrompt ||
-      systemPromptManager.buildPrompt({
-        mode: 'fresh',
-        personaId: personaId || 'default',
-        userId,
-      });
+    const systemPrompt = contextResult?.systemPrompt || systemPromptManager.buildPrompt({
+      mode: 'fresh',
+      personaId: personaId || 'default',
+      userId: virtualUser.id,
+    });
 
     const messages = [{ role: 'user', content: message }];
 
-    // Use Vercel AI SDK's streaming with pipeDataStreamToResponse
+    // Save user message
+    await prisma.virtualMessage.create({
+      data: {
+        id: crypto.randomUUID(),
+        conversationId,
+        role: 'user',
+        content: message,
+        messageIndex: 0,
+      },
+    });
+
+    // Use Vercel AI SDK's streaming
     await unifiedProvider.streamCompletion({
       provider,
       model,
@@ -376,8 +470,25 @@ router.post('/stream', async (req, res) => {
       system: systemPrompt,
       temperature: options?.temperature,
       maxTokens: options?.maxTokens,
-      userId,
+      userId: virtualUser.id,
       res,
+      onComplete: async (content) => {
+        // Save assistant response after streaming completes
+        await prisma.virtualMessage.create({
+          data: {
+            id: crypto.randomUUID(),
+            conversationId,
+            role: 'assistant',
+            content,
+            messageIndex: 1,
+            metadata: { model, provider },
+          },
+        });
+        await prisma.virtualConversation.update({
+          where: { id: conversationId },
+          data: { messageCount: 2, userMessageCount: 1, aiMessageCount: 1 },
+        });
+      },
     });
   } catch (error) {
     logger.error({ error: error.message }, 'Fresh chat stream failed');
@@ -392,40 +503,67 @@ router.post('/stream', async (req, res) => {
 // ============================================================================
 
 /**
- * GET /list - List active fresh conversations
+ * GET /list - List database-backed conversations
  */
 router.get('/list', async (req, res) => {
   try {
-    const userId = getUserId(req);
+    const virtualUser = await getOrCreateVirtualUser(req);
 
-    const userConversations = Array.from(conversations.values())
-      .filter((c) => c.userId === userId)
-      .map((c) => ({
-        id: c.id,
-        title: c.title,
-        provider: c.provider,
-        model: c.model,
-        personaId: c.personaId,
-        messageCount: c.messages.length,
-        createdAt: c.createdAt,
-        lastActivity: new Date(c.lastActivity).toISOString(),
-      }))
-      .sort((a, b) => new Date(b.lastActivity) - new Date(a.lastActivity));
+    const conversations = await prisma.virtualConversation.findMany({
+      where: { virtualUserId: virtualUser.id },
+      orderBy: { updatedAt: 'desc' },
+      take: 50,
+      select: {
+        id: true,
+        title: true,
+        provider: true,
+        model: true,
+        metadata: true,
+        messageCount: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
 
-    res.json({ success: true, data: { conversations: userConversations } });
+    res.json({
+      success: true,
+      data: {
+        conversations: conversations.map((c) => ({
+          id: c.id,
+          title: c.title,
+          provider: c.provider,
+          model: c.model,
+          personaId: c.metadata?.personaId,
+          messageCount: c.messageCount,
+          createdAt: c.createdAt,
+          lastActivity: c.updatedAt,
+        })),
+      },
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
 /**
- * GET /:id - Get full conversation
+ * GET /:id - Get full conversation with messages
  */
 router.get('/:id', async (req, res) => {
   try {
-    const conv = conversations.get(req.params.id);
+    const virtualUser = await getOrCreateVirtualUser(req);
+    const { id } = req.params;
+
+    const conv = await prisma.virtualConversation.findUnique({
+      where: { id },
+      include: { messages: { orderBy: { messageIndex: 'asc' } } },
+    });
+
     if (!conv) {
       return res.status(404).json({ success: false, error: 'Conversation not found' });
+    }
+
+    if (conv.virtualUserId !== virtualUser.id) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
     }
 
     res.json({ success: true, data: conv });
@@ -435,12 +573,24 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * DELETE /:id - Delete a fresh conversation
+ * DELETE /:id - Delete a conversation
  */
 router.delete('/:id', async (req, res) => {
   try {
-    const deleted = conversations.delete(req.params.id);
-    res.json({ success: true, data: { deleted } });
+    const virtualUser = await getOrCreateVirtualUser(req);
+    const { id } = req.params;
+
+    const conv = await prisma.virtualConversation.findUnique({ where: { id } });
+    if (!conv) {
+      return res.status(404).json({ success: false, error: 'Conversation not found' });
+    }
+
+    if (conv.virtualUserId !== virtualUser.id) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
+
+    await prisma.virtualConversation.delete({ where: { id } });
+    res.json({ success: true, data: { deleted: true } });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -452,71 +602,101 @@ router.delete('/:id', async (req, res) => {
 router.post('/fork', async (req, res) => {
   try {
     const { sourceId, prompt, provider, model } = req.body;
-    const userId = getUserId(req);
+    const virtualUser = await getOrCreateVirtualUser(req);
 
     if (!sourceId) {
       return res.status(400).json({ success: false, error: 'sourceId is required' });
     }
 
-    const source = conversations.get(sourceId);
+    const source = await prisma.virtualConversation.findUnique({
+      where: { id: sourceId },
+      include: { messages: { orderBy: { messageIndex: 'asc' } } },
+    });
+
     if (!source) {
       return res.status(404).json({ success: false, error: 'Source conversation not found' });
     }
 
-    const forkedId = `conv_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const resolvedProvider = provider || source.provider;
+    if (source.virtualUserId !== virtualUser.id) {
+      return res.status(403).json({ success: false, error: 'Access denied' });
+    }
 
-    conversations.set(forkedId, {
-      id: forkedId,
-      userId,
-      title: `Fork of: ${source.title}`,
-      provider: resolvedProvider,
-      model: model || source.model,
-      personaId: source.personaId,
-      messages: [...source.messages],
-      createdAt: new Date().toISOString(),
-      lastActivity: Date.now(),
-      forkedFrom: sourceId,
+    const forkedId = crypto.randomUUID();
+    const resolvedProvider = provider || source.provider || getDefaultProvider();
+    const resolvedModel = model || source.model || ProviderConfig[resolvedProvider]?.defaultModel;
+
+    // Create forked conversation
+    await prisma.virtualConversation.create({
+      data: {
+        id: forkedId,
+        virtualUserId: virtualUser.id,
+        title: `Fork of: ${source.title}`,
+        provider: resolvedProvider,
+        model: resolvedModel,
+        metadata: { ...source.metadata, forkedFrom: sourceId },
+        tags: source.tags,
+      },
     });
+
+    // Copy messages
+    if (source.messages.length > 0) {
+      await prisma.virtualMessage.createMany({
+        data: source.messages.map((m) => ({
+          id: crypto.randomUUID(),
+          conversationId: forkedId,
+          role: m.role,
+          content: m.content,
+          messageIndex: m.messageIndex,
+          metadata: { ...m.metadata, forked: true },
+        })),
+      });
+    }
 
     // If a prompt was provided, send it in the forked conversation
     if (prompt) {
-      const conv = conversations.get(forkedId);
-      conv.messages.push({ role: 'user', content: prompt, timestamp: new Date().toISOString() });
-
-      let contextResult = null;
-      if (userId) {
-        try {
-          contextResult = await unifiedContextService.generateContextForChat(forkedId, {
-            userId,
-            userMessage: prompt,
-            personaId: conv.personaId,
-          });
-        } catch (ctxError) {
-          logger.warn({ error: ctxError.message }, 'Context assembly failed for fork');
-        }
-      }
-
-      const systemPrompt =
-        contextResult?.systemPrompt ||
-        systemPromptManager.buildPrompt({
-          mode: 'fresh',
-          personaId: conv.personaId,
-          userId,
-        });
-
       const result = await unifiedProvider.generateCompletion({
         provider: resolvedProvider,
-        model: model || source.model,
-        messages: conv.messages.map((m) => ({ role: m.role, content: m.content })),
-        system: systemPrompt,
-        userId,
+        model: resolvedModel,
+        messages: [
+          ...source.messages.map((m) => ({ role: m.role, content: m.content })),
+          { role: 'user', content: prompt },
+        ],
+        system: systemPromptManager.buildPrompt({
+          mode: 'fresh',
+          personaId: source.metadata?.personaId || 'default',
+          userId: virtualUser.id,
+        }),
+        userId: virtualUser.id,
       });
 
-      conv.messages.push({
-        role: 'assistant',
-        content: result.text,
-        timestamp: new Date().toISOString(),
+      await prisma.virtualMessage.create({
+        data: {
+          id: crypto.randomUUID(),
+          conversationId: forkedId,
+          role: 'user',
+          content: prompt,
+          messageIndex: source.messages.length,
+        },
+      });
+
+      await prisma.virtualMessage.create({
+        data: {
+          id: crypto.randomUUID(),
+          conversationId: forkedId,
+          role: 'assistant',
+          content: result.text,
+          messageIndex: source.messages.length + 1,
+          metadata: { model: resolvedModel, provider: resolvedProvider },
+        },
+      });
+
+      await prisma.virtualConversation.update({
+        where: { id: forkedId },
+        data: {
+          messageCount: source.messages.length + 2,
+          userMessageCount: { increment: 1 },
+          aiMessageCount: { increment: 1 },
+        },
       });
     }
 
@@ -524,12 +704,7 @@ router.post('/fork', async (req, res) => {
 
     res.json({
       success: true,
-      data: {
-        conversationId: forkedId,
-        forkedFrom: sourceId,
-        provider: resolvedProvider,
-        messageCount: conversations.get(forkedId).messages.length,
-      },
+      data: { conversationId: forkedId, forkedFrom: sourceId, provider: resolvedProvider },
     });
   } catch (error) {
     logger.error({ error: error.message }, 'Fork failed');

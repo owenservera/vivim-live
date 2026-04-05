@@ -763,8 +763,7 @@ enum MemoryConsolidationStatus {
 model Memory {
   // Core identification
   id             String   @id @default(uuid())
-  userId         String?
-  virtualUserId  String?
+  virtualUserId  String   // Required - links to VirtualUser
 
   // Content
   content        String   // The actual memory content
@@ -860,41 +859,24 @@ model Memory {
   children       Memory[] @relation("MemoryHierarchy")
 
   // Indexes for efficient querying
-  @@index([userId, memoryType])
   @@index([virtualUserId, memoryType])
-  @@index([userId, category])
   @@index([virtualUserId, category])
-  @@index([userId, importance(sort: Desc)])
   @@index([virtualUserId, importance(sort: Desc)])
-  @@index([userId, relevance(sort: Desc)])
   @@index([virtualUserId, relevance(sort: Desc)])
-  @@index([userId, isPinned])
   @@index([virtualUserId, isPinned])
-  @@index([userId, consolidationStatus])
   @@index([virtualUserId, consolidationStatus])
-  @@index([userId, createdAt(sort: Desc)])
   @@index([virtualUserId, createdAt(sort: Desc)])
-  @@index([userId, lastAccessedAt])
   @@index([virtualUserId, lastAccessedAt])
-  @@index([userId, tags])
   @@index([virtualUserId, tags])
-  @@index([userId, occurredAt])
   @@index([virtualUserId, occurredAt])
   // Composite indexes for common query patterns
-  @@index([userId, memoryType, importance(sort: Desc)])
   @@index([virtualUserId, memoryType, importance(sort: Desc)])
-  @@index([userId, consolidationStatus, createdAt(sort: Desc)])
   @@index([virtualUserId, consolidationStatus, createdAt(sort: Desc)])
-  @@index([userId, isPinned, importance(sort: Desc)])
   @@index([virtualUserId, isPinned, importance(sort: Desc)])
-  @@index([userId, expiresAt])
   @@index([virtualUserId, expiresAt])
   // Provenance indexes
-  @@index([userId, provider])
   @@index([virtualUserId, provider])
-  @@index([userId, sourceType])
   @@index([virtualUserId, sourceType])
-  @@index([userId, sourcePlatform])
   @@index([virtualUserId, sourcePlatform])
   @@index([captureSessionId])
   @@index([contentHash])
@@ -1668,11 +1650,11 @@ model ContextRecipe {
   excludedLayers String[] @default([])   // Layers to skip
   customBudget   Int?     // Optional budget override
   isDefault      Boolean  @default(false)
-  userId         String?  // null = global system recipe
+  virtualUserId  String?  // null = global system recipes
   createdAt      DateTime @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime @updatedAt @db.Timestamptz(6)
 
-  @@index([userId])
+  @@index([virtualUserId])
   @@index([isDefault])
   @@map("context_recipes")
 }

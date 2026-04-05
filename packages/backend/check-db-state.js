@@ -1,88 +1,87 @@
-#!/usr/bin/env node
-
-/**
- * VIVIM Supabase Database State Check
- *
- * Quick script to verify database connectivity and current state
- */
-
-import { getPrismaClient } from "./src/lib/database.js";
+import { getPrismaClient } from './src/lib/database.js';
 
 async function checkDatabaseState() {
-  console.log("🔍 Checking VIVIM Supabase Database State");
-  console.log("");
-
+  const prisma = getPrismaClient();
+  
   try {
-    const prisma = getPrismaClient();
-
-    // Test connection
-    console.log("📡 Testing database connection...");
-    await prisma.$queryRaw`SELECT 1 as test`;
-    console.log("✅ Database connection successful");
-    console.log("");
-
-    // Check core tables
-    console.log("📊 Checking core tables:");
-
-    const tables = [
-      { name: 'profiles', model: 'user' },
-      { name: 'conversations', model: 'conversation' },
-      { name: 'messages', model: 'message' },
-      { name: 'memories', model: 'memory' },
-      { name: 'virtual_users', model: 'virtualUser' },
-      { name: 'user_context_settings', model: 'userContextSettings' },
-      { name: 'context_recipes', model: 'contextRecipe' }
+    // Get all tables
+    const tables = await prisma.$queryRawUnsafe(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name
+    `);
+    
+    console.log('=== DATABASE TABLES ===');
+    console.log(`Total tables: ${tables.length}\n`);
+    
+    // Check key tables for virtual user system
+    const keyTables = [
+      'virtual_users',
+      'virtual_sessions', 
+      'virtual_conversations',
+      'virtual_messages',
+      'virtual_memories',
+      'virtual_acus',
+      'memories',
+      'context_recipes',
+      'conversations',
+      'messages',
+      'tenants',
+      'feature_flags'
     ];
-
-    for (const table of tables) {
+    
+    for (const tableName of keyTables) {
       try {
-        const count = await prisma[table.model].count();
-        console.log(`  ✅ ${table.name}: ${count} records`);
-      } catch (error) {
-        console.log(`  ❌ ${table.name}: Error - ${error.message}`);
+        const columns = await prisma.$queryRawUnsafe(`
+          SELECT column_name, data_type, is_nullable
+          FROM information_schema.columns 
+          WHERE table_name = '${tableName}' 
+          ORDER BY ordinal_position
+        `);
+        
+        console.log(`\n📋 ${tableName} (${columns.length} columns):`);
+        columns.forEach(col => {
+          const nullable = col.is_nullable === 'YES' ? '?' : '!';
+          console.log(`   ${nullable} ${col.column_name}: ${col.data_type}`);
+        });
+      } catch (e) {
+        console.log(`\n❌ ${tableName}: NOT FOUND`);
       }
     }
-
-    // Check for any virtual users
-    const virtualUsers = await prisma.virtualUser.findMany({
-      select: { id: true, fingerprint: true, createdAt: true },
-      orderBy: { createdAt: 'desc' },
-      take: 5
+    
+    // Check if feature_flags table exists
+    const featureFlagsExists = await prisma.$queryRawUnsafe(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'feature_flags'
+      ) as exists
+    `);
+    
+    console.log('\n\n=== FEATURE FLAGS TABLE ===');
+    console.log(featureFlagsExists[0].exists ? '✅ Exists' : '❌ Missing');
+    
+    // Check indexes on key tables
+    console.log('\n\n=== KEY INDEXES ===');
+    const indexes = await prisma.$queryRawUnsafe(`
+      SELECT tablename, indexname, indexdef
+      FROM pg_indexes
+      WHERE schemaname = 'public'
+      AND tablename IN ('virtual_users', 'virtual_conversations', 'virtual_messages', 'virtual_memories', 'memories', 'context_recipes')
+      ORDER BY tablename, indexname
+      LIMIT 50
+    `);
+    
+    indexes.forEach(idx => {
+      console.log(`   ${idx.tablename}.${idx.indexname}`);
     });
-
-    if (virtualUsers.length > 0) {
-      console.log("");
-      console.log("👥 Recent Virtual Users:");
-      virtualUsers.forEach(vu => {
-        console.log(`  ${vu.id} - ${vu.fingerprint.substring(0, 20)}... - ${vu.createdAt}`);
-      });
-    }
-
-    // Check recent conversations
-    const conversations = await prisma.conversation.findMany({
-      select: { id: true, title: true, virtualUserId: true, createdAt: true },
-      orderBy: { createdAt: 'desc' },
-      take: 3
-    });
-
-    if (conversations.length > 0) {
-      console.log("");
-      console.log("💬 Recent Conversations:");
-      conversations.forEach(conv => {
-        console.log(`  ${conv.id} - "${conv.title}" - User: ${conv.virtualUserId || 'anonymous'}`);
-      });
-    }
-
-    await prisma.$disconnect();
-
-    console.log("");
-    console.log("🎉 Database state check completed successfully!");
-
+    
   } catch (error) {
-    console.error("❌ Database check failed:", error.message);
-    console.error("Full error:", error);
+    console.error('Error:', error.message);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-// Run the check
 checkDatabaseState();
