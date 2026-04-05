@@ -47,6 +47,26 @@ jobs:
       - name: Type check
         run: bun run typecheck
 
+  i18n-validation:
+    name: Validate Translations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate translation coverage
+        run: node scripts/i18n-check.js
+        continue-on-error: true
+
+      - name: Check for unused keys
+        run: node scripts/find-unused-translations.js
+        continue-on-error: true
+
   build:
     name: Build
     runs-on: ubuntu-latest

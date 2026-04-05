@@ -92,6 +92,7 @@ export function getHtmlLang(locale: string): string {
   const langMap: Record<string, string> = {
     en: 'en-US',
     es: 'es-ES',
+    ca: 'ca-ES',
     ar: 'ar-SA',
   };
   return langMap[locale] || locale;
@@ -111,12 +112,13 @@ export function getDirAttribute(locale: string): 'ltr' | 'rtl' {
 export const SUPPORTED_LOCALES = [
   { code: 'en', name: 'English', flag: '🇺🇸', direction: 'ltr' as const },
   { code: 'es', name: 'Español', flag: '🇪🇸', direction: 'ltr' as const },
+  { code: 'ca', name: 'Català', flag: '🏳️', direction: 'ltr' as const },
   { code: 'ar', name: 'العربية', flag: '🇸🇦', direction: 'rtl' as const },
 ] as const;
 
 /**
  * Check if a locale is supported
  */
-export function isSupportedLocale(locale: string): locale is 'en' | 'es' | 'ar' {
+export function isSupportedLocale(locale: string): locale is 'en' | 'es' | 'ca' | 'ar' {
   return SUPPORTED_LOCALES.some(l => l.code === locale);
 }

@@ -118,6 +118,12 @@ export const LOCALES: Record<string, LocaleConfig> = {
     direction: 'ltr',
     flag: '🇪🇸',
   },
+  ca: {
+    code: 'ca',
+    name: 'Català',
+    direction: 'ltr',
+    flag: '🏳️',
+  },
   ar: {
     code: 'ar',
     name: 'العربية',

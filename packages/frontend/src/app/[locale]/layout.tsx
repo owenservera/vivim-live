@@ -1,11 +1,19 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { ReducedMotionWrapper } from "@/components/ReducedMotionWrapper";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { getDirection, getHtmlLang } from '@/i18n';
 import "./globals.css";
+
+// OpenGraph locale mapping
+const OG_LOCALE_MAP: Record<string, string> = {
+  en: 'en_US',
+  es: 'es_ES',
+  ca: 'ca_ES',
+  ar: 'ar_SA',
+};
 
 const inter = Inter({
   variable: "--font-inter",
@@ -47,7 +55,6 @@ export const metadata: Metadata = {
     description: "Sovereign, portable, personal AI memory that works with all providers",
     url: "https://vivim.live",
     siteName: "VIVIM",
-    locale: "en_US",
     type: "website",
     images: [
       {
@@ -85,6 +92,20 @@ export const metadata: Metadata = {
     "mask-icon": "/mask-icon.svg",
   },
 };
+
+export async function generateMetadata(
+  { params }: { params: Promise<{ locale: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { locale } = await params;
+  const ogLocale = OG_LOCALE_MAP[locale] || 'en_US';
+
+  return {
+    openGraph: {
+      locale: ogLocale,
+    },
+  };
+}
 
 export default async function LocaleLayout({
   children,

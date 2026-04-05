@@ -1,0 +1,1190 @@
+{
+  "common": {
+    "nav": {
+      "github": "GitHub",
+      "discord": "Discord",
+      "docs": "Documentació"
+    },
+    "demos": "Demostracions",
+    "navbar": {
+      "sections": {
+        "overview": "Visió General",
+        "problem": "Problema",
+        "solution": "Solució",
+        "acus": "ACU",
+        "principles": "Principis",
+        "developers": "Desenvolupadors"
+      },
+      "github": {
+        "backend": "Backend",
+        "app": "App",
+        "network": "Xarxa",
+        "sdk": "SDK"
+      },
+      "mobile": {
+        "liveMemoryDemo": "Demo de Memòria en Viu",
+        "contextEngineDemo": "Demo del Motor de Context"
+      },
+      "demoDropdown": {
+        "liveMemory": {
+          "label": "Memòria en Viu",
+          "desc": "Veure l'extracció en acció"
+        },
+        "contextEngine": {
+          "label": "Motor de Context",
+          "desc": "Veure l'assemblatge de memòria en viu"
+        },
+        "zeroKnowledgePrivacy": {
+          "label": "Privadesa de Coneixement Zero",
+          "desc": "Les teves claus mai surten del teu dispositiu"
+        },
+        "sovereignHistory": {
+          "label": "Història Sobirana",
+          "desc": "Propietat completa de les teves dades"
+        },
+        "decentralizedNetwork": {
+          "label": "Xarxa Descentralitzada",
+          "desc": "Sincronització peer-to-peer sense servidors"
+        },
+        "secureCollaboration": {
+          "label": "Col·laboració Segura",
+          "desc": "Compartir amb equip mantenint sobirania"
+        },
+        "dynamicIntelligence": {
+          "label": "Intel·ligència Dinàmica",
+          "desc": "Context adaptatiu que evoluciona"
+        }
+      }
+    },
+    "cta": {
+      "tryLiveDemo": "Prova la Demostració en Viu",
+      "viewOnGithub": "Veure a GitHub"
+    },
+    "footer": {
+      "tagline": "La teva memòria. Les teves regles. Arreu.",
+      "philosophy": "La filosofia que guia tot el que construïm.",
+      "copyright": "© 2026 VIVIM • AGPL v3 • Codi Obert"
+    },
+    "errors": {
+      "somethingWrong": "Alguna cosa ha anat malament",
+      "tryAgain": "Tornar a intentar"
+    },
+    "misc": {
+      "comingSoon": "Pròximament",
+      "learnMore": "Saber més",
+      "viewAll": "Veure tot",
+      "rank": "Posició #"
+    }
+  },
+  "hero": {
+    "tagline": "Sobirà • Portable • Personal",
+    "title": "La Memòria Viva",
+    "titleHighlight": "per a la teva IA",
+    "description": "Una capa de memòria que és teva, que funciona amb qualsevol proveïdor d'IA, i va a on vulguis.",
+    "quote": "No és només tecnologia — és una filosofia sobre qui posseeix la teva memòria d'IA.",
+    "descriptionExtended": "Una memòria sobirana, portàtil i personal i un motor de context dinàmic que funciona amb tots els proveïdors d'IA — la teva única base de dades nativa per a IA."
+  },
+  "providers": {
+    "title": "Funciona amb {highlight}",
+    "highlight": "Qualsevol Proveïdor d'IA",
+    "description": "VIVIM és agnòstic al proveïdor. Connecta els teus models preferits a l'instant.",
+    "logos": {
+      "openai": "OpenAI",
+      "googleGemini": "Google Gemini",
+      "claude": "Claude",
+      "grok": "Grok",
+      "zai": "Z.ai",
+      "qwen": "Qwen",
+      "kimi": "Kimi"
+    }
+  },
+  "problem": {
+    "title": "El Problema",
+    "sectionBadge": "El Problema",
+    "sectionHeading": "Cada Conversa amb IA",
+    "sectionHighlight": "Neix Trencada",
+    "sectionDescription": "La finestra de context no només és limitada — juga activament en contra teva. I la majoria de les 'solucions' ho empitjoren.",
+    "heading": "Cada Conversa amb IA",
+    "highlight": "Neix Trencada",
+    "description": "La finestra de context no només és limitada — juga activament en contra teva. I la majoria de les 'solucions' ho empitjoren.",
+    "viewScores": "Veure puntuacions →",
+    "openFullScorecard": "Obrir puntuació completa",
+    "exploreAll": "Explorar els 12 problemes",
+    "howVivimSolves": "Com VIVIM resol això",
+    "rankPrefix": "Posició #",
+    "stats": {
+      "accuracyDrop": "Caiguda de precisió a mesura que creix el context",
+      "frontierModels": "Models frontier es degraden amb el context",
+      "vectorMarket": "El mercat de BD vectorials valida el problema"
+    },
+    "sources": {
+      "accuracyDrop": "Stanford, Google, Anthropic, Meta",
+      "frontierModels": "Chroma, Març 2026",
+      "vectorMarket": "Kings Research 2026"
+    },
+    "categories": {
+      "all": "Tots els problemes",
+      "memory": "🧠 Memòria",
+      "portability": "🔄 Portabilitat",
+      "trust": "🛡️ Confiança i Sobirania",
+      "developer": "⚙️ Desenvolupador"
+    },
+    "filterLabels": {
+      "all": "Tots els problemes",
+      "memory": "🧠 Memòria",
+      "portability": "🔄 Portabilitat",
+      "trust": "🛡️ Confiança i Sobirania",
+      "developer": "⚙️ Desenvolupador"
+    },
+    "cards": {
+      "contextWipe": {
+        "title": "L'Esborrat de Context",
+        "hook": "La IA oblida tot, cada sessió",
+        "stat": "Les converses es degraden després de 15–20 missatges, fins i tot amb finestres de context d'1M de tokens.",
+        "desc": "Els usuaris reconstrueixen el context des de zero a cada conversa. 3 anys de coneixement del domini, preferències i decisions desapareixen en el moment que es tanca una pestanya.",
+        "vivimAnswer": "El motor d'assemblatge de context de 8 capes + emmagatzematge de memòria ACU persistent. Cada conversa es segmenta en unitats de memòria adreçables, classificades en 9 tipus, i recuperades per JIT per a cada interacció futura.",
+        "vivimScore": 9.5,
+        "vivimGap": "Requereix fricció d'incorporació: els usuaris han d'importar historial o començar a construir memòria."
+      },
+      "providerLockIn": {
+        "title": "La Trampa del Lock-in del Proveïdor",
+        "hook": "La teva memòria pertany a ChatGPT, no a tu",
+        "stat": "Canviar de proveïdor d'IA significa perdre tot el context acumulat.",
+        "desc": "Canviar de proveïdor d'IA significa perdre tot el context acumulat. Els usuaris són ostatges de les barreres de memòria que els proveïdors van construir intencionadament.",
+        "vivimAnswer": "Emmagatzematge ACU agnòstic al proveïdor + analitzadors d'importació per a cada plataforma principal. Historial de ChatGPT → VIVIM en un comandament. La mateixa memòria funciona a GPT-4, Claude, Gemini, Ollama.",
+        "vivimScore": 9,
+        "vivimGap": "La completesa de l'analitzador segueix creixent. La cobertura completa requereix contribucions de la comunitat."
+      },
+      "copyPasteTax": {
+        "title": "L'Impost del Copiar i Enganxar",
+        "hook": "Hores perdudes reconstruint context cada setmana",
+        "stat": "Hores cada setmana reconstruint context des de zero.",
+        "desc": "Els treballadors del coneixement passen 5–10 hores/setmana re-explicant el seu stack, preferències, estructura d'equip i història del projecte a eines d'IA que obliden tot durant la nit.",
+        "vivimAnswer": "Les capes L0–L3 (Nucli d'Identitat, Preferències, Tema, Entitat) precarreguen context permanent abans de cada interacció.",
+        "vivimScore": 8.5,
+        "vivimGap": "El guany d'eficiència només es realitza després de l'acumulació de memòria. Triga 2–4 setmanes d'ús."
+      },
+      "middleBlackHole": {
+        "title": "El Forat Negre del Mig",
+        "hook": "La IA ignora el context que vas proporcionar explícitament",
+        "stat": "20+ punts percentuals pitjor precisió per a informació al mig del context.",
+        "desc": "Recerca de Stanford/Google/Anthropic confirma una caiguda de 20+ punts percentuals en precisió per a informació al mig de finestres de context llargues. Els usuaris proporcionen context sense saber que la IA mai el llegeix.",
+        "vivimAnswer": "La recuperació JIT (L5) selecciona quirúrgicament només les ACU més rellevants per a cada missatge, no un bolcat monolític.",
+        "vivimScore": 9,
+        "vivimGap": "Requereix qualitat d'incrustació sòlida. Precisió de recuperació dependent del model a les vores."
+      },
+      "dataHostage": {
+        "title": "L'ostatge de les Dades",
+        "hook": "No pots exportar el que has construït",
+        "stat": "Les plataformes bloquegen les teves dades en formats propietaris.",
+        "desc": "Exportació completa d'ACU a JSON, SQLite, o IPFS en formats oberts documentats — llegible sense VIVIM.",
+        "vivimAnswer": "Exportació completa d'ACU a JSON, SQLite o IPFS en formats oberts documentats, llegibles sense VIVIM.",
+        "vivimScore": 9.5,
+        "vivimGap": "Bretxa de consciència: els usuaris no senten aquest dolor fins que intenten deixar una plataforma."
+      },
+      "enterpriseCompliance": {
+        "title": "El Mur de Compliment Empresarial",
+        "hook": "Memòria d'IA sense registre d'auditoria",
+        "stat": "Les empreses necessiten registres d'auditoria que la majoria de plataformes no proporcionen.",
+        "desc": "Servei de registre d'auditoria + RBAC en col·leccions de memòria + gestor d'accés. El nivell empresarial afegeix lliurament de registres d'auditoria de grau de compliment.",
+        "vivimAnswer": "Servei de registre d'auditoria + RBAC en col·leccions de memòria + gestor d'accés. El nivell empresarial afegeix lliurament de registres d'auditoria de grau de compliment.",
+        "vivimScore": 8,
+        "vivimGap": "Auditoria SOC 2 Tipus II en procés. HIPAA BAA i FedRAMP estan a 12–18 mesos."
+      },
+      "aiMemorySurveillance": {
+        "title": "El Problema de Vigilància de Memòria d'IA",
+        "hook": "Memòria organitzacional vs privadesa individual",
+        "stat": "Les empreses volen posseir el context d'IA dels seus empleats.",
+        "desc": "VIVIM Teams preserva la sobirania individual per disseny — memòria per seient, només ús compartit optatiu selectiu.",
+        "vivimAnswer": "VIVIM Teams preserva la sobirania individual per disseny: memòria per seient, només ús compartit optatiu selectiu.",
+        "vivimScore": 9,
+        "vivimGap": "Difícil vendre un argument de sobirania al comprador quan la sobirania protegeix els empleats del venedor."
+      },
+      "localModelGap": {
+        "title": "La Bretxa del Model Local",
+        "hook": "La IA autoallotjada no té capa de memòria persistent",
+        "stat": "Els models locals perden tot el context entre sessions.",
+        "desc": "SDK agnòstic al proveïdor amb adaptadors locals SQLite + IPFS. Pila completa autoallotjable a docker-compose.",
+        "vivimAnswer": "SDK agnòstic al proveïdor amb adaptadors locals SQLite + IPFS. Pila completa autoallotjable a docker-compose.",
+        "vivimScore": 9,
+        "vivimGap": "Audiència de nínxol avui. Però aquesta és la comunitat de major convicció per a una eina sobirana."
+      },
+      "identityCollapse": {
+        "title": "El Col·lapse de la Identitat",
+        "hook": "La IA no té un model persistent de qui ets",
+        "stat": "Cada conversa comença amb una pissarra en blanc.",
+        "desc": "Nucli d'Identitat L0 + perfil d'usuari ancorat a DID. Qui ets sempre es carrega primer.",
+        "vivimAnswer": "Nucli d'Identitat L0 + perfil d'usuari ancorat a DID. Qui ets sempre es carrega primer.",
+        "vivimScore": 8.5,
+        "vivimGap": "La riquesa d'identitat és proporcional a la profunditat d'ús. Els nous usuaris experimenten això mínimament fins que s'acumulen prou ACU."
+      },
+      "developerInfrastructureGap": {
+        "title": "La Bretxa d'Infraestructura per a Desenvolupadors",
+        "hook": "No hi ha estàndard obert per a memòria d'IA",
+        "stat": "Tothom construeix la seva pròpia capa de memòria des de zero.",
+        "desc": "L'especificació ACU és un estàndard obert que qualsevol pot implementar. @vivim/sdk s'integra a LangChain/LlamaIndex com a backend de memòria.",
+        "vivimAnswer": "L'especificació ACU és un estàndard obert que qualsevol pot implementar. @vivim/sdk s'integra a LangChain/LlamaIndex com a backend de memòria.",
+        "vivimScore": 8,
+        "vivimGap": "Problema de l'ou i la gallina: els desenvolupadors necessiten usuaris per justificar la construcció, els usuaris necessiten integracions per adoptar."
+      },
+      "multiAiFragmentation": {
+        "title": "El Problema de Fragmentació Multi-IA",
+        "hook": "Memòria aïllada per eina",
+        "stat": "Cada eina d'IA té la seva pròpia memòria aïllada.",
+        "desc": "Una base de dades ACU portàtil única abasta tots els proveïdors. Importa des de cada plataforma major.",
+        "vivimAnswer": "Una base de dades ACU portàtil única abasta tots els proveïdors. Importa des de cada plataforma major.",
+        "vivimScore": 9,
+        "vivimGap": "Requereix que els usuaris siguin multi-IA en primer lloc. La majoria encara són d'un sol proveïdor."
+      },
+      "contextDecay": {
+        "title": "La Decadència del Context de Conversa",
+        "hook": "La precisió disminueix a mesura que creixen els fils",
+        "stat": "Les converses llargues perden coherència.",
+        "desc": "Termodinàmica del context + compressió de memòria al sistema Cortex. El model de decadència ACU promou memòries reforçades.",
+        "vivimAnswer": "Termodinàmica del context + compressió de memòria al sistema Cortex. El model de decadència ACU promou memòries reforçades.",
+        "vivimScore": 8.5,
+        "vivimGap": "El model termodinàmic encara s'està validant. Es necessiten dades de rendiment del món real."
+      }
+    }
+  },
+  "solution": {
+    "title": "La Solució",
+    "sectionBadge": "La Solució",
+    "heading": "I Si la IA Pogués",
+    "highlight": "Realment Recordar?",
+    "description": "No només emmagatzemar — sinó entendre, connectar i recuperar el que importa — a cada conversa, amb cada IA.",
+    "cta": "Veure el Motor de Context",
+    "features": {
+      "remembersEverything": {
+        "title": "Ho Recorda Tot",
+        "desc": "Cada conversa, preferència i detall s'emmagatzema i organitza intel·ligentment."
+      },
+      "intelligentRetrieval": {
+        "title": "Recuperació Intel·ligent",
+        "desc": "Troba exactament el rellevant utilitzant cerca semàntica — no més repetir-te."
+      },
+      "worksWithAnyAi": {
+        "title": "Funciona amb Qualsevol IA",
+        "desc": "El disseny agnòstic al model significa que pots canviar de proveïdor sense perdre la teva memòria."
+      }
+    }
+  },
+  "acus": {
+    "sectionBadge": "Innovació Central",
+    "title": "Unitats Atòmiques de Xat",
+    "description": "El bloc fonamental de construcció que fa possible la memòria persistent multi-escenari",
+    "descriptionExtended": "Cada conversa es divideix en unitats buscables i compartibles individualment — donant-te control granular sobre el que la teva IA recorda i com connecta el coneixement.",
+    "problemTitle": "El Problema del Monòlit de Missatges",
+    "problemItems": [
+      "Missatges emmagatzemats com blocs gegants — com un capítol sencer en una peça",
+      "Cercar codi, obtenir tota la resposta de 500 línies",
+      "No es pot compartir només la solució sense perdre context",
+      "Idees enterrades en milers de missatges"
+    ],
+    "solutionTitle": "Unitats Atòmiques de Xat VIVIM",
+    "solutionItems": [
+      "Cada pensament és individualment buscable i compartible",
+      "Troba exactament el fragment de codi que necessites",
+      "Compartir idees granulars amb context complet preservat",
+      "Coneixement connectat, organitzat i sempre accessible"
+    ],
+    "totalContext": "Finestra de Context Total"
+  },
+  "rightsLayer": {
+    "title": "La Capa de Drets",
+    "sectionBadge": "La Capa de Drets",
+    "heading": "Les Teves Dades,",
+    "highlight": "Les Teves Regles",
+    "description": "Nivells de propietat granular que s'adapten al context — personal, compartit o co-governat. La teva memòria d'IA, classificada per tu.",
+    "tiers": {
+      "t0": {
+        "label": "Només Personal",
+        "desc": "Ho posseeixes completament. Sense compartir, sense governança."
+      },
+      "t1": {
+        "label": "Probablement Personal",
+        "desc": "Probablement personal, però obert a revisió de classificació."
+      },
+      "t2": {
+        "label": "Possiblement Compartit",
+        "desc": "Podria ser compartit — llest per configuració de co-governança."
+      },
+      "t3": {
+        "label": "Co-Governat",
+        "desc": "L'empresa obté governança. Clau dual requerida per exportacions."
+      },
+      "t4": {
+        "label": "Restringit",
+        "desc": "Protecció millorada. Accés limitat fins i tot per a tu."
+      },
+      "t5": {
+        "label": "Regulat",
+        "desc": "Mai exporta. Caixa forta mèdica, legal, financera."
+      }
+    },
+    "features": {
+      "tdass": {
+        "title": "Co-governança TDASS",
+        "desc": "Les empreses obtenen governança sense custòdia. Les teves dades romanen a la teva volta — només obtenen una clau compartida per abastos designats.",
+        "activePeriod": "Període Actiu: Ambdues claus requerides",
+        "sunset": "Clausura: La participació de l'empresa s'esvaeix amb el temps",
+        "postSunset": "Post-Clausura: Mantens control complet"
+      },
+      "tpdi": {
+        "title": "Classificador TPDI",
+        "desc": "Classificació de contingut amb ML que aprèn de les teves correccions. Es torna més intel·ligent com més l'uses.",
+        "flow": "Entrada → Extracció de Característiques → ML → Nivell + Confiança"
+      }
+    },
+    "cta": "Prova la Capa de Drets"
+  },
+  "sentinel": {
+    "title": "El Centinella",
+    "sectionBadge": "El Centinella",
+    "heading": "Saber Si Les Teves Dades Van Ser Utilitzades",
+    "highlight": "Sense El Teu Permís",
+    "description": "13 algoritmes de verificació comproven la teva sobirania de dades — amb prova criptogràfica que pots portar a tribunal.",
+    "algorithms": [
+      "Inferència de Pertenença Espectral",
+      "Estimació d'Informació Mútua",
+      "Unicitat de Kolmogorov",
+      "Compte de Fotons",
+      "Patró d'Interferència",
+      "Funció de Canary",
+      "Calibratge de Boltzmann",
+      "Filigrana Hologràfica",
+      "Flux Termodinàmic",
+      "Empremtes Digitals de Fisher",
+      "Prova d'Entreteiximent",
+      "Xarxa de Difracció",
+      "Llei de Conservació"
+    ],
+    "features": {
+      "canary": {
+        "title": "Sistema Canary",
+        "desc": "Planta tokens únics a les teves converses. Quan els models d'IA els referencien sense autorització — detecció confirmada.",
+        "ready": "Llest"
+      },
+      "evidence": {
+        "title": "Paquet de Prova",
+        "desc": "Paquet de prova criptogràfic llest per acció legal. Timestamps, proves de Merkle, evidència de resposta del model.",
+        "exportFormat": "Format d'Exportació"
+      }
+    },
+    "cta": "Prova la Detecció Centinella"
+  },
+  "marketplace": {
+    "title": "El Mercat",
+    "sectionBadge": "El Mercat",
+    "heading": "Monetitza La Teva",
+    "highlight": "Intel·ligència",
+    "description": "Ven les teves dades en els teus termes — o mantén-les privades. Les proves de coneixement zero permeten als compradors verificar sense veure.",
+    "steps": {
+      "step1": {
+        "label": "Publicar",
+        "desc": "Selecciona ACU, estableix preu, genera prova ZK"
+      },
+      "step2": {
+        "label": "Descobrir",
+        "desc": "Els compradors exploren llistats verificats"
+      },
+      "step3": {
+        "label": "Comprar",
+        "desc": "El pagament en custòdia assegura la transacció"
+      },
+      "step4": {
+        "label": "Intercanviar",
+        "desc": "Lliurament encriptat via ECDH"
+      },
+      "step5": {
+        "label": "Verificar",
+        "desc": "Validació de prova ZK"
+      }
+    },
+    "features": {
+      "revenue": {
+        "title": "Divisió d'Ingressos",
+        "desc": "Distribució justa per vendes de dades co-governades:",
+        "breaks": "Desglossament de la Distribució",
+        "platform": "Plataforma (15%)",
+        "human": "Humà (60% × 40%)",
+        "company": "Empresa (60% × 40%)",
+        "totalSale": "Venta Total"
+      },
+      "zkp": {
+        "title": "Proves de Coneixement Zero"
+      },
+      "zkProofs": {
+        "title": "Proves de Coneixement Zero",
+        "desc": "Propietats de dades de prova sense revelar contingut:",
+        "items": [
+          "Prova de propietat",
+          "Validesa de consentiment",
+          "Atestació de propietats de dades",
+          "Estadístiques agregades"
+        ]
+      }
+    },
+    "cta": "Uneix-te a la Llista d'Espera del Mercat",
+    "comingSoon": "Arribant a v3.0 (Mes 15)"
+  },
+  "principles": {
+    "title": "La Nostra Filosofia",
+    "sectionLabel": "La Nostra Filosofia",
+    "heading": "Memòria d'IA Sobirana",
+    "highlight": "Et Pertany",
+    "description": "VIVIM no és només tecnologia — és una filosofia sobre qui posseeix la teva memòria d'IA.",
+    "descriptionExtended": "Creiem que les teves memòries, preferències i context mai haurien d'estar bloquejades a un sol proveïdor. Sempre hauries de tenir control complet, visibilitat i portabilitat.",
+    "items": {
+      "sovereign": {
+        "title": "Sobirà",
+        "desc": "Posseeixes completament les teves dades de memòria. VIVIM mai reclama propietat — la teva memòria d'IA et pertany a tu, no a la plataforma."
+      },
+      "personal": {
+        "title": "Personal",
+        "desc": "La teva memòria és només teva. A diferència de bases de dades compartides, VIVIM crea una capa de memòria individual única per a cada usuari."
+      },
+      "providerAgnostic": {
+        "title": "Agnòstic al Proveïdor",
+        "desc": "Canvia entre GPT-4, Claude, Gemini o qualsevol model d'IA — la teva memòria roman intacta. Mai més lock-in de proveïdor."
+      },
+      "portable": {
+        "title": "Portable",
+        "desc": "Exporta la teva memòria completa en qualsevol moment en formats estàndard. Emporta't la teva memòria d'IA a on vulguis."
+      },
+      "useCaseAgnostic": {
+        "title": "Agnòstic al Cas d'Ús",
+        "desc": "Funciona per a assistents de codi, suport al client, educació, salut — qualsevol aplicació que es beneficiï de la memòria."
+      },
+      "dynamicallyGenerated": {
+        "title": "Generat Dinàmicament",
+        "desc": "El context no és estàtic — es construeix fresc per a cada interacció basat en el que estàs fent ara."
+      }
+    }
+  },
+  "contextLayers": {
+    "title": "El Sistema de 8 Capes",
+    "sectionBadge": "El Sistema de 8 Capes",
+    "heading": "Assemblatge Intel·ligent de Context",
+    "description": "Com nivells de caché de CPU — cada capa té diferente latència, especificitat i taxes d'actualització.",
+    "layers": {
+      "l0": {
+        "label": "Nucli d'Identitat",
+        "desc": "Qui ets — context permanent",
+        "tokens": "~300"
+      },
+      "l1": {
+        "label": "Preferències Globals",
+        "desc": "Com la IA hauria de respondre't",
+        "tokens": "~500"
+      },
+      "l2": {
+        "label": "Context de Temes",
+        "desc": "Coneixement profund sobre temes actuals",
+        "tokens": "~1,500"
+      },
+      "l3": {
+        "label": "Context d'Entitats",
+        "desc": "Persones, projectes i eines que discuteixes",
+        "tokens": "~1,000"
+      },
+      "l4": {
+        "label": "Arc de Conversa",
+        "desc": "Fil de la discussió actual",
+        "tokens": "~2,000"
+      },
+      "l5": {
+        "label": "Recuperació JIT",
+        "desc": "Coneixement rellevant en temps real",
+        "tokens": "~2,500"
+      },
+      "l6": {
+        "label": "Historial de Missatges",
+        "desc": "Missatges recents de conversa",
+        "tokens": "~3,500"
+      },
+      "l7": {
+        "label": "Missatge de l'Usuari",
+        "desc": "La teva entrada actual",
+        "tokens": "Variable"
+      }
+    },
+    "totalLabel": "Finestra de Context Total:",
+    "totalTokens": "~12,300 tokens",
+    "total": "Finestra de Context Total: ~12,300 tokens"
+  },
+  "memoryTypes": {
+    "title": "9 Tipus de",
+    "highlight": "Memòria Humana",
+    "description": "Passa el cursor per veure exemples de cada tipus de memòria",
+    "types": {
+      "episodic": {
+        "name": "Episòdica",
+        "example": "\"La setmana passada vam discutir...\"",
+        "label": "Episòdica"
+      },
+      "semantic": {
+        "name": "Semàntica",
+        "example": "\"Python és el teu llenguatge principal\"",
+        "label": "Semàntica"
+      },
+      "procedural": {
+        "name": "Procedural",
+        "example": "\"Prefereixes metodologia TDD\"",
+        "label": "Procedural"
+      },
+      "factual": {
+        "name": "Fàctica",
+        "example": "\"Treballes com a enginyer senior\"",
+        "label": "Fàctica"
+      },
+      "preference": {
+        "name": "Preferència",
+        "example": "\"Prefereix interfície de mode fosc\"",
+        "label": "Preferència"
+      },
+      "identity": {
+        "name": "Identitat",
+        "example": "\"Desenvolupador full-stack\"",
+        "label": "Identitat"
+      },
+      "relationship": {
+        "name": "Relació",
+        "example": "\"John és el teu lead tècnic\"",
+        "label": "Relació"
+      },
+      "goal": {
+        "name": "Meta",
+        "example": "\"Llançar MVP per Q2\"",
+        "label": "Meta"
+      },
+      "project": {
+        "name": "Projecte",
+        "example": "\"E-commerce usa Next.js\"",
+        "label": "Projecte"
+      }
+    }
+  },
+  "developers": {
+    "title": "Per a Desenvolupadors",
+    "sectionBadge": "Per a Desenvolupadors",
+    "heading": "Construeix amb",
+    "highlight": "@vivim/sdk",
+    "description": "Tot el que necessites per crear experiències d'IA sobiranes i privadesa-primer",
+    "descriptionExtended": "Perquè els teus usuaris mereixen memòria que és seva, no memòria bloquejada a la teva plataforma.",
+    "features": {
+      "identity": {
+        "title": "Identitat i DIDs",
+        "desc": "Identificadors descentralitzats amb gestió de claus criptogràfiques"
+      },
+      "contextEngine": {
+        "title": "Motor de Context",
+        "desc": "Assemblatge de context dinàmic de 8 capes impulsat per ACU"
+      },
+      "storage": {
+        "title": "Opcions d'Emmagatzematge",
+        "desc": "Local, SQLite, o IPFS amb xifratge d'extrem a extrem"
+      },
+      "zeroKnowledge": {
+        "title": "Coneixement Zero",
+        "desc": "Les claus de xifratge mai surten del dispositiu de l'usuari"
+      }
+    },
+    "codeExample": "npm install @vivim/sdk"
+  },
+  "demos": {
+    "title": "Demostracions Interactives",
+    "sectionBadge": "Prova-ho Ara",
+    "sectionTitle": "Demostracions Interactives",
+    "sectionDescription": "Explora les capacitats de VIVIM a través d'aquestes demostracions interactives en viu",
+    "description": "Explora les capacitats de VIVIM a través d'aquestes demostracions interactives en viu",
+    "items": {
+      "liveMemory": {
+        "title": "Memòria en Viu",
+        "desc": "Observa com s'extreu la teva memòria de converses reals en temps real"
+      },
+      "contextEngine": {
+        "title": "Motor de Context",
+        "desc": "Veure el sistema d'assemblatge de context de 8 capes construir context des de zero"
+      },
+      "zeroKnowledgePrivacy": {
+        "title": "Privadesa de Coneixement Zero",
+        "desc": "Les teves claus de xifratge mai surten del teu dispositiu — fins i tot nosaltres podem veure les teves dades"
+      },
+      "sovereignHistory": {
+        "title": "Història Sobirana",
+        "desc": "Propietat completa de la teva història de converses amb exportacions portàtils"
+      },
+      "decentralizedNetwork": {
+        "title": "Xarxa Descentralitzada",
+        "desc": "Sincronització de memòria peer-to-peer sense servidors centrals ni lock-in"
+      },
+      "secureCollaboration": {
+        "title": "Col·laboració Segura",
+        "desc": "Comparteix context de memòria amb el teu equip preservant la sobirania individual"
+      },
+      "dynamicIntelligence": {
+        "title": "Intel·ligència Dinàmica",
+        "desc": "Context adaptatiu que evoluciona basat en els teus patrons d'ús"
+      },
+      "rightsLayer": {
+        "title": "Capa de Drets",
+        "desc": "Nivells de propietat granulars amb co-governança per a les teves dades"
+      },
+      "sentinelDetection": {
+        "title": "Detecció Centinella",
+        "desc": "13 algoritmes que detecten si les teves dades van ser utilitzades sense permís"
+      },
+      "marketplace": {
+        "title": "Mercat",
+        "desc": "Monetitza la teva intel·ligència en els teus termes"
+      }
+    },
+    "common": {
+      "backToHome": "Tornar a l'Inici",
+      "backToBrowse": "Tornar a Navegar",
+      "interactiveDemo": "Demostració Interactiva",
+      "wantToSee": "Vols veure"
+    },
+    "contextEngine": {
+      "title": "Context Engine Demo",
+      "watchContext": "Watch Context Being Built",
+      "tryLiveMemory": "Want to see live memory extraction? Try the Live Memory Demo",
+      "buildingContext": "Building context...",
+      "scanComplete": "Scan Complete",
+      "ready": "Ready",
+      "loadingLayers": "Loading layers...",
+      "description": "Every message triggers a bespoke 8-layer context injection, assembled from your ACU memory store in real-time. Switch scenarios below to see it rebuild from scratch.",
+      "noBlackBox": "No black box. VIVIM gives you full visibility into what gets injected, why, and lets you edit any piece of it.",
+      "tabs": {
+        "shift": {
+          "label": "① Context Shift",
+          "sub": "Watch the pipeline rebuild live"
+        },
+        "memory": {
+          "label": "② ACU Memory Store",
+          "sub": "Your knowledge, atomized"
+        },
+        "controls": {
+          "label": "③ Your Controls",
+          "sub": "You own this system"
+        }
+      },
+      "layerLabels": {
+        "l0": "Identity Core",
+        "l1": "Response Style",
+        "l2": "Topic Context",
+        "l3": "Entity Context",
+        "l4": "Conversation Arc",
+        "l5": "JIT Retrieval",
+        "l6": "Message History",
+        "l7": "Your Message"
+      },
+      "controls": {
+        "contextBudget": "Context Budget",
+        "knowledgeDepth": "Knowledge Depth",
+        "privacyControls": "Privacy Controls",
+        "includeIdentity": "Include Identity Core",
+        "includeTopic": "Include Topic Context",
+        "includeEntity": "Include Entity Profiles",
+        "includeArc": "Include Conversation Arc",
+        "shareTeam": "Share with Team Circle",
+        "lastAssembly": "Last Assembly",
+        "assemblyTime": "Assembly time",
+        "tokensUsed": "Tokens used",
+        "bundleCacheHits": "Bundle cache hits",
+        "cacheMisses": "Cache misses",
+        "memoryStore": "Memory Store",
+        "exportMemory": "Export Memory",
+        "wipeReset": "Wipe & Reset"
+      },
+      "depth": {
+        "minimal": "minimal",
+        "standard": "standard",
+        "deep": "deep"
+      },
+      "scenario": {
+        "switchTo": "Switch to Scenario",
+        "persona": "Persona",
+        "topic": "Topic"
+      }
+    },
+    "zeroKnowledgePrivacy": {
+      "title": "Zero-Knowledge Privacy Demo",
+      "mathPrivacy": "Mathematical Privacy — Blind Infrastructure",
+      "seeExactly": "Want to see exactly what gets sent to AI?",
+      "securityScore": "Security Score",
+      "allLayersProtected": "100% - All layers protected",
+      "encryptedMemories": "Encrypted Memories",
+      "dataEncrypted": "Data Encrypted",
+      "yourEncryptionKeys": "Your Encryption Keys",
+      "masterKey": "Master Key",
+      "generatedOnDevice": "Generated on device",
+      "sessionKeys": "Session Keys",
+      "uniquePerSession": "Unique per session",
+      "contentKeys": "Content Keys",
+      "perMemoryEncryption": "Per-memory encryption",
+      "keysNeverLeaveDevice": "Keys never leave your device - not even to VIVIM servers",
+      "description": "Our architecture is designed so that even we can't read your data. All intelligence and context generation happens client-side, with full transparency.",
+      "tabs": {
+        "privacyShield": "Privacy Shield",
+        "keyManagement": "Key Management",
+        "accessLogs": "Access Logs"
+      },
+      "layers": {
+        "clientEncryption": {
+          "name": "Client-Side Encryption",
+          "desc": "All data encrypted before leaving device"
+        },
+        "transportSecurity": {
+          "name": "Transport Security",
+          "desc": "TLS 1.3 with perfect forward secrecy"
+        },
+        "storageEncryption": {
+          "name": "Storage Encryption",
+          "desc": "AES-256-GCM encryption at rest"
+        },
+        "accessControl": {
+          "name": "Access Control",
+          "desc": "Cryptographic key-based permissions"
+        },
+        "audit": {
+          "name": "Audit & Transparency",
+          "desc": "Full access logging & verification"
+        }
+      },
+      "component": {
+        "exportKeysBackup": "Export Keys (Backup)",
+        "wipeAllData": "Wipe All Data",
+        "accessLog": "Access Log",
+        "todayAccesses": "Today: {count} accesses",
+        "allTrusted": "All trusted",
+        "seeEverything": "You see everything - VIVIM sees nothing"
+      }
+    },
+    "sovereignHistory": {
+      "title": "Sovereign History Demo",
+      "localNodes": "Want to see how this integrates with local nodes?",
+      "completeOwnership": "Complete ownership of your data",
+      "portableExports": "Portable exports in open formats",
+      "ownYourArchives": "Own Your Archives",
+      "universalExport": "Universal Export",
+      "description": "Break free from siloed AI providers. VIVIM syncs and centrally organizes your history across ChatGPT, Claude, and Gemini, giving you true ownership over your digital footprint.",
+      "tabs": {
+        "providers": "Connected Providers",
+        "search": "Universal Search",
+        "export": "Export"
+      },
+      "labels": {
+        "title": "Your Sovereign History",
+        "sessions": "{count} sessions",
+        "sessionsSynced": "{count} sessions synced",
+        "searchPlaceholder": "Search across all AI conversations...",
+        "exportFormat": "Select Export Format",
+        "exportReady": "Your history is ready for export",
+        "downloadNow": "Download JSON Archive",
+        "portableNotice": "This archive is fully portable and compatible with open standards."
+      },
+      "component": {
+        "yourSovereignHistory": "Your Sovereign History",
+        "sessionsCount": "{count} sessions",
+        "sessionsSynced": "{count} sessions synced"
+      }
+    },
+    "decentralizedNetwork": {
+      "title": "Decentralized Network Demo",
+      "privacyDevices": "Want to see how we manage privacy across devices?",
+      "peerToPeerSync": "Peer-to-peer sync",
+      "noCentralServers": "No central servers",
+      "localFirstCrdt": "Local-First CRDT",
+      "peerToPeerSyncTitle": "Peer-to-Peer Sync",
+      "description": "VIVIM runs as a local-first node on your device. It synchronizes data natively across your trusted devices and peers using CRDTs, ensuring conflict-free operations even when offline.",
+      "tabs": {
+        "network": "P2P Network",
+        "sync": "Sync Status",
+        "node": "Your Node"
+      },
+      "labels": {
+        "online": "Network Online",
+        "offline": "Offline Mode",
+        "peersConnected": "{count} peers connected",
+        "workingLocally": "Working locally, will sync when online",
+        "connected": "Connected",
+        "dataSynced": "Data Synced",
+        "discovered": "Discovered",
+        "meshVisualization": "Peer Mesh Visualization",
+        "you": "You",
+        "syncStatus": "Real-time CRDT Sync",
+        "activePeers": "Active Peers",
+        "nodeHealth": "Node Health",
+        "storage": "Storage"
+      }
+    },
+    "secureCollaboration": {
+      "title": "Secure Collaboration Demo",
+      "dataProtected": "Want to see how your data is protected?",
+      "teamSharing": "Team sharing with sovereignty",
+      "selectiveOptIn": "Selective opt-in sharing",
+      "headline": "Share With Confidence",
+      "subheadline": "Zero-Knowledge Sharing",
+      "description": "VIVIM enables true end-to-end encrypted collaboration. By creating unique decryption keys per circle or share link, your data remains completely blind to our servers while allowing complex team workflows.",
+      "component": {
+        "tabs": {
+          "circles": "Circles",
+          "shares": "Active Shares",
+          "link": "Create Link"
+        },
+        "yourCircles": "Your Circles",
+        "totalMembers": "total members",
+        "members": "members",
+        "activeShares": "active shares",
+        "activeSharesTab": "Active Shares",
+        "sharedWith": "Shared with:",
+        "views": "views",
+        "createSecureLink": "Create Secure Link",
+        "generateLink": "Generate an encrypted link that only recipients can decrypt",
+        "permissions": "Permissions",
+        "expires": "Expires",
+        "maxViews": "Max Views",
+        "oneHour": "1 hour",
+        "oneDay": "1 day",
+        "oneWeek": "1 week",
+        "never": "Never"
+      }
+    },
+    "liveMemory": {
+      "title": "Live Memory Demo",
+      "watchMemory": "Watch Memory Being Born",
+      "autoExtracts": "VIVIM automatically extracts",
+      "demoChat": "VIVIM Demo Chat",
+      "send": "Send",
+      "memoryFull": "Memory full — reload to restart",
+      "description": "key information from your conversations. Click through the demo to see it in action — no setup required.",
+      "liveMemoryExtraction": "Live Memory Extraction",
+      "acUs": "ACUs",
+      "memoriesWillAppear": "Memories will appear as you chat",
+      "wantToSeeContextEngine": "Want to see how the context engine works? Try the",
+      "contextEngineDemo": "Context Engine Demo",
+      "initialGreeting": "Hi! Tell me about what you're building. I'll remember everything.",
+      "component": {
+        "demoChat": "VIVIM Demo Chat",
+        "send": "Send",
+        "memoryFull": "Memory full — reload to restart",
+        "liveMemoryExtraction": "Live Memory Extraction",
+        "acUs": "ACUs",
+        "memoriesWillAppear": "Memories will appear as you chat",
+        "confidence": "conf"
+      }
+    },
+    "dynamicIntelligence": {
+      "title": "Dynamic Intelligence Demo",
+      "memoriesTracked": "Want to see how memories are tracked in real time?",
+      "adaptiveContext": "Adaptive context evolution",
+      "realTimeUpdates": "Real-time updates",
+      "headline": "Continual Learning",
+      "subheadline": "Knowledge Graph Extraction",
+      "description": "VIVIM analyzes every interaction securely, extracting entities, preferences, and facts, wiring them into a personal knowledge graph. It learns continually with zero manual configuration.",
+      "component": {
+        "tabs": {
+          "extraction": "Memory Extraction",
+          "context": "Context Assembly",
+          "graph": "Knowledge Graph"
+        },
+        "placeholder": "Describe what you're working on...",
+        "extracting": "Extracting memories from conversation...",
+        "typeToSee": "Type to see automatic memory extraction",
+        "contextAssembly": "Context Assembly Engine",
+        "memories": "Memories",
+        "tokens": "Tokens",
+        "relevant": "Relevant",
+        "contextLayers": "Context Layers",
+        "l0": "Identity Core",
+        "l1": "Global Preferences",
+        "l2": "Topic Context",
+        "l3": "Entity Context",
+        "l4": "Conversation Arc",
+        "prediction": "Prediction:",
+        "knowledgeGraph": "Knowledge Graph",
+        "connectedInGraph": "memories connected in graph"
+      }
+    },
+    "rightsLayer": {
+      "title": "Rights Layer Demo",
+      "granularTiers": "Granular ownership tiers",
+      "coGovernance": "Co-governance for your data",
+      "description": "Explore granular ownership tiers and co-governance — see how VIVIM classifies your conversations.",
+      "tiers": {
+        "t0": {
+          "label": "Personal Only",
+          "desc": "Complete ownership, no sharing"
+        },
+        "t1": {
+          "label": "Personal-Likely",
+          "desc": "Probably personal, reviewable"
+        },
+        "t2": {
+          "label": "Shared-Possibly",
+          "desc": "Ready for co-governance"
+        },
+        "t3": {
+          "label": "Co-Governed",
+          "desc": "Dual-key required for exports"
+        },
+        "t4": {
+          "label": "Restricted",
+          "desc": "Enhanced protection"
+        },
+        "t5": {
+          "label": "Regulated",
+          "desc": "Never exports, lockbox"
+        }
+      },
+      "sampleConversations": {
+        "dinner": {
+          "text": "What should I make for dinner tonight?",
+          "expectedTier": "T0",
+          "description": "Personal, everyday question"
+        },
+        "code": {
+          "text": "Here's the code for the new login flow...",
+          "expectedTier": "T3",
+          "description": "Work-related, company asset"
+        },
+        "medical": {
+          "text": "My medical symptoms have been...",
+          "expectedTier": "T5",
+          "description": "Health information, regulated"
+        },
+        "preference": {
+          "text": "I prefer dark mode in all my IDEs",
+          "expectedTier": "T1",
+          "description": "Personal preference"
+        },
+        "financial": {
+          "text": "The Q4 financial projections are ready",
+          "expectedTier": "T3",
+          "description": "Business confidential"
+        },
+        "general": {
+          "text": "What are the best restaurants in Tokyo?",
+          "expectedTier": "T0",
+          "description": "General personal interest"
+        }
+      },
+      "actions": {
+        "classify": "Classify Content",
+        "export": "Export Memory",
+        "classifying": "Classifying...",
+        "detectedTier": "Detected Tier",
+        "confidence": "Confidence",
+        "approvalPending": "Pending Approval",
+        "approvalApproved": "Approved",
+        "approvalDenied": "Denied",
+        "tierClassifier": "Tier Classifier",
+        "selectSample": "Select a sample conversation:",
+        "sample": "Sample",
+        "expected": "Expected",
+        "simulateExport": "Simulate Export Request",
+        "exportApproved": "Export approved ({reason})",
+        "exportDenied": "Export denied — Tier 5 content cannot leave vault",
+        "dualKeyRequired": "dual-key required",
+        "noRestrictions": "no restrictions",
+        "tdassTimeline": "TDASS Timeline",
+        "phaseActive": "Active",
+        "phaseSunset": "Sunset",
+        "phasePostSunset": "Post-Sunset",
+        "humanKey": "Human Key",
+        "companyKey": "Company Key",
+        "keyRequired": "Required",
+        "keyFading": "Fading...",
+        "keyNotRequired": "Not Required",
+        "companyDecaying": "Company share decaying — transfer in progress",
+        "ownershipTiers": "Ownership Tiers"
+      }
+    },
+    "sentinelDetection": {
+      "title": "Sentinel Detection Demo",
+      "headline": "The Sentinel",
+      "algorithms": "13 detection algorithms",
+      "cryptographicProof": "Cryptographic proof",
+      "backToHome": "Back to Home",
+      "interactiveDemo": "Interactive Demo",
+      "startScan": "Start Scan",
+      "startDetectionScan": "Start Detection Scan",
+      "generatingEvidence": "Generating Evidence...",
+      "viewEvidence": "View Evidence",
+      "detected": "Detected",
+      "ready": "Ready",
+      "scanning": "Scanning",
+      "confidence": "Confidence",
+      "detectionDashboard": "Detection Dashboard",
+      "detectionsFound": "{count} Detection{count > 1 ? 's' : ''} Found",
+      "canarySystem": "Canary System",
+      "canaryDescription": "Plant unique tokens in your conversations. When AI models reference them without authorization — detection confirmed.",
+      "allAlgorithms": "All 13 Algorithms",
+      "evidencePackage": "Evidence Package",
+      "evidenceDescription": "Generate cryptographic proof ready for legal action.",
+      "generateEvidence": "Generate Evidence Package",
+      "runScanFirst": "Run detection scan first to generate evidence",
+      "evidenceGenerated": "Evidence Generated",
+      "detectionPipeline": "Detection Pipeline",
+      "userData": "User Data",
+      "algos": "13 Algos",
+      "algorithmList": {
+        "spectral-mi": {
+          "name": "Spectral Membership Inference",
+          "description": "Primary detection via spectroscopy"
+        },
+        "mutual-info": {
+          "name": "Mutual Information Estimation",
+          "description": "Quantify retained information"
+        },
+        "kolmogorov": {
+          "name": "Kolmogorov Uniqueness Scoring",
+          "description": "Identify most-detectable content"
+        },
+        "photon-counting": {
+          "name": "Photon Counting",
+          "description": "Per-token attribution"
+        },
+        "interference": {
+          "name": "Interference Pattern Detection",
+          "description": "Cross-provider contamination"
+        },
+        "canary": {
+          "name": "Canary Wave Function",
+          "description": "Proactive detection"
+        },
+        "boltzmann": {
+          "name": "Boltzmann Calibration",
+          "description": "Statistical calibration"
+        },
+        "holographic": {
+          "name": "Holographic Watermarking",
+          "description": "Identity encoding"
+        },
+        "thermodynamic": {
+          "name": "Thermodynamic Flow Tracing",
+          "description": "Temporal absorption"
+        },
+        "fisher": {
+          "name": "Fisher Information Fingerprinting",
+          "description": "Parameter influence"
+        },
+        "entanglement": {
+          "name": "Entanglement Testing",
+          "description": "Hidden sharing detection"
+        },
+        "diffraction": {
+          "name": "Diffraction Grating Analysis",
+          "description": "Multi-scale analysis"
+        },
+        "conservation": {
+          "name": "Conservation Law Verification",
+          "description": "Complete accounting"
+        }
+      },
+      "canaryTokens": {
+        "ready": "Ready",
+        "detected": "Detected"
+      },
+      "evidence": {
+        "title": "Detection Evidence",
+        "description": "Cryptographic proof of unauthorized data usage"
+      }
+    },
+    "marketplace": {
+      "title": "Marketplace Demo",
+      "monetizeIntelligence": "Monetize your intelligence",
+      "zkProofs": "Zero-knowledge proofs",
+      "backToHome": "Back to Home",
+      "headline": "The Marketplace",
+      "interactiveDemo": "Interactive Demo",
+      "description": "Monetize your intelligence — sell data on your terms with zero-knowledge proofs.",
+      "browseListings": "Browse Listings",
+      "purchaseFlow": "Purchase Flow",
+      "createListing": "Create Listing",
+      "listingPublished": "Listing Published!",
+      "listingDescription": "Your data is now available for purchase with ZK proofs.",
+      "backToBrowse": "Back to Browse",
+      "revenueCalculator": "Revenue Calculator",
+      "salePrice": "Sale Price",
+      "platform": "Platform (15%)",
+      "human": "Human (60% × 40%)",
+      "company": "Company (60% × 40%)",
+      "total": "Total",
+      "zeroKnowledgeProofs": "Zero-Knowledge Proofs",
+      "ownershipProof": "Ownership Proof",
+      "ownershipProofDesc": "Prove you own the data without revealing it",
+      "consentValidity": "Consent Validity",
+      "consentValidityDesc": "Prove valid consent exists for the data",
+      "dataProperty": "Data Property Attestation",
+      "dataPropertyDesc": "Prove data properties without exposure",
+      "marketplaceFlow": "Marketplace Flow",
+      "list": "List",
+      "discover": "Discover",
+      "purchase": "Purchase",
+      "exchange": "Exchange",
+      "verify": "Verify",
+      "createNewListing": "Create New Listing",
+      "selectListing": "Select Listing",
+      "escrowPayment": "Escrow Payment",
+      "encryptedDelivery": "Encrypted Delivery",
+      "verifyComplete": "Verify & Complete",
+      "purchaseComplete": "Purchase Complete!",
+      "encryptedAccess": "You now have encrypted access to"
+    }
+  },
+  "chat": {
+    "header": {
+      "title": "VIVIM Chat",
+      "subtitle": "Impulsat per la teva memòria personal"
+    },
+    "contextBadge": "Context Stub",
+    "footer": "L'Assistent VIVIM utilitza el teu context personal per proporcionar respostes rellevants"
+  },
+  "components": {
+    "socialShare": {
+      "buttonLabel": "Compartir",
+      "shareGeneric": "Compartir...",
+      "copied": "Copiat!",
+      "copyLink": "Copiar enllaç",
+      "whatsapp": "WhatsApp"
+    },
+    "navbar": {
+      "github": "GitHub",
+      "backend": "Backend",
+      "app": "App",
+      "network": "Xarxa",
+      "sdk": "SDK",
+      "liveMemoryDemo": "Demo de Memòria en Viu",
+      "contextEngineDemo": "Demo del Motor de Context"
+    }
+  },
+  "footer": {
+    "tagline": "La teva memòria. Les teves regles. Arreu.",
+    "philosophy": "La filosofia que guia tot el que construïm.",
+    "github": "GitHub",
+    "discord": "Discord",
+    "docs": "Documentació"
+  },
+  "scorecard": {
+    "pain": "Dolor",
+    "timeLost": "Temps Perdut",
+    "trustErosion": "Erosió de la Confiança",
+    "marketSize": "Mida del Mercat",
+    "vivimSolution": "Solució VIVIM",
+    "solutionFit": "Ajust de la Solució:",
+    "gapAnalysis": "Anàlisi de Bretxes",
+    "score": "Puntuació",
+    "modalTitle": "Targeta de Puntuació de Problemes",
+    "solutionFitPrefix": "Ajust de la Solució:",
+    "scorePrefix": "Puntuació:",
+    "dimensionLabels": {
+      "P": "Severitat del dolor",
+      "T": "Temps perdut",
+      "E": "Erosió de confiança",
+      "M": "Mida del mercat"
+    }
+  }
+}

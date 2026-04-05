@@ -2,7 +2,7 @@ import { defineRouting } from 'next-intl/routing';
 
 export const routing = defineRouting({
   // Locales supported by the application
-  locales: ['en', 'es', 'ar'],
+  locales: ['en', 'es', 'ca', 'ar'],
   defaultLocale: 'en',
   
   // When a user visits the root URL, redirect to their preferred locale
@@ -37,5 +37,6 @@ export function getDirection(locale: string): 'ltr' | 'rtl' {
 export const LOCALE_METADATA: Record<string, { name: string; flag: string }> = {
   en: { name: 'English', flag: '🇺🇸' },
   es: { name: 'Español', flag: '🇪🇸' },
+  ca: { name: 'Català', flag: '🏳️' },
   ar: { name: 'العربية', flag: '🇸🇦' },
 };
