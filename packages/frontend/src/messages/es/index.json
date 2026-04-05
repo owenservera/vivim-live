@@ -1186,5 +1186,89 @@
       "E": "Erosión de confianza",
       "M": "Tamaño de mercado"
     }
+  },
+  "pricing": {
+    "sectionBadge": "Precios",
+    "title": "Inteligencia gratuita. Comodidad pagada.",
+    "subtitle": "El nivel gratuito es genuinamente completo. Paga solo por conveniencia gestionada.",
+    "tiers": {
+      "freecore": {
+        "name": "Gratis",
+        "badge": "Código Abierto",
+        "price": "$0",
+        "period": "ilimitado",
+        "description": "Inteligencia completa. Sin límites. Autoalojado para siempre.",
+        "cta": "GitHub",
+        "features": [
+          "Motor de contexto de 8 capas completo",
+          "9 tipos de memoria",
+          "10+ analizadores de proveedor",
+          "Cifrado de conocimiento cero",
+          "Servidor MCP",
+          "Red P2P",
+          "13 algoritmos de detección",
+          "Identidad DID",
+          "Co-gobernanza TDASS",
+          "Autoalojado ilimitado"
+        ]
+      },
+      "cloudPro": {
+        "name": "Cloud Pro",
+        "badge": "Más Popular",
+        "price": "$9",
+        "period": "/mes",
+        "description": "Nube gestionada. Multi-dispositivo. Soporte prioritario.",
+        "cta": "Comenzar",
+        "features": [
+          "Todo en FreeCore",
+          "Hosting en nube gestionado",
+          "10 GB almacenamiento cifrado",
+          "Sincronización en tiempo real",
+          "Acceso multi-dispositivo",
+          "App móvil",
+          "Soporte prioritario",
+          "Copias de seguridad automáticas",
+          "Analíticas de uso"
+        ]
+      },
+      "teams": {
+        "name": "Equipos",
+        "badge": "Equipos",
+        "price": "$25",
+        "period": "/asiento/mes",
+        "description": "Memoria compartida. Co-gobernanza. Admin de equipo.",
+        "cta": "Contactar Ventas",
+        "features": [
+          "Todo en Cloud Pro",
+          "Panel de administración de equipo",
+          "Pools de memoria compartida",
+          "Co-gobernanza TDASS",
+          "Integración SSO",
+          "Registros de auditoría",
+          "Mínimo 5 asientos",
+          "Acceso basado en roles",
+          "Feed de actividad del equipo"
+        ]
+      },
+      "enterprise": {
+        "name": "Empresa",
+        "badge": "Empresa",
+        "price": "Personalizado",
+        "period": "",
+        "description": "Infraestructura dedicada. Cumplimiento garantizado.",
+        "cta": "Contactar Ventas",
+        "features": [
+          "Todo en Equipos",
+          "Infraestructura dedicada",
+          "SOC 2 / HIPAA / FedRAMP",
+          "Garantía SLA 99.9%",
+          "Opción on-premise",
+          "Retención legal y eDiscovery",
+          "Integraciones personalizadas",
+          "Ingeniero de soporte dedicado",
+          "Entrenamiento personalizado"
+        ]
+      }
+    }
   }
 }

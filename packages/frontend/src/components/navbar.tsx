@@ -204,6 +204,7 @@ export function Navbar() {
       { label: "Problem", id: "the-problem" },
       { label: "Solution", id: "the-solution" },
       { label: "ACUs", id: "acus" },
+      { label: "Pricing", id: "pricing" },
       { label: "Principles", id: "principles" },
       { label: "Developers", id: "developers" },
     ],

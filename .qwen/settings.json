@@ -1,7 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(rmdir *)"
+      "Bash(rmdir *)",
+      "Bash(bunx *)",
+      "Bash(set *)",
+      "Bash(mkdir *)",
+      "Bash(echo *)",
+      "Bash(dir *)",
+      "Bash(wc *)",
+      "Bash(powershell *)",
+      "Bash(findstr *)",
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   },
   "$version": 3

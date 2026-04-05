@@ -1186,5 +1186,89 @@
       "E": "Erosió de confiança",
       "M": "Mida del mercat"
     }
+  },
+  "pricing": {
+    "sectionBadge": "Preus",
+    "title": "Intel·ligència gratuïta. Conveniència pagada.",
+    "subtitle": "El nivell gratuït és genuïnament complet. Paga només per conveniència gestionada.",
+    "tiers": {
+      "freecore": {
+        "name": "Gratuït",
+        "badge": "Codi Obert",
+        "price": "$0",
+        "period": "il·limitat",
+        "description": "Intel·ligència completa. Sense límits. Autoallotjat per sempre.",
+        "cta": "GitHub",
+        "features": [
+          "Motor de context de 8 capes complet",
+          "9 tipus de memòria",
+          "10+ analitzadors de proveïdor",
+          "Xifratge de coneixement zero",
+          "Servidor MCP",
+          "Xarxa P2P",
+          "13 algoritmes de detecció",
+          "Identitat DID",
+          "Co-governança TDASS",
+          "Autoallotjat il·limitat"
+        ]
+      },
+      "cloudPro": {
+        "name": "Cloud Pro",
+        "badge": "Més Popular",
+        "price": "$9",
+        "period": "/mes",
+        "description": "Núvol gestionat. Multi-dispositiu. Suport prioritari.",
+        "cta": "Començar",
+        "features": [
+          "Tot a FreeCore",
+          "Hosting al núvol gestionat",
+          "10 GB emmagatzematge xifrat",
+          "Sincronització en temps real",
+          "Accés multi-dispositiu",
+          "App mòbil",
+          "Suport prioritari",
+          "Còpies de seguretat automàtiques",
+          "Anàliques d'ús"
+        ]
+      },
+      "teams": {
+        "name": "Equip",
+        "badge": "Equip",
+        "price": "$25",
+        "period": "/seient/mes",
+        "description": "Memòria compartida. Co-governança. Admin d'equip.",
+        "cta": "Contactar Vendes",
+        "features": [
+          "Tot a Cloud Pro",
+          "Panell d'administració d'equip",
+          "Pools de memòria compartida",
+          "Co-governança TDASS",
+          "Integració SSO",
+          "Registres d'auditoria",
+          "Mínim 5 seients",
+          "Accés basat en rols",
+          "Feed d'activitat de l'equip"
+        ]
+      },
+      "enterprise": {
+        "name": "Empresa",
+        "badge": "Empresa",
+        "price": "Personalitzat",
+        "period": "",
+        "description": "Infraestructura dedicada. Compliment garantit.",
+        "cta": "Contactar Vendes",
+        "features": [
+          "Tot a Equip",
+          "Infraestructura dedicada",
+          "SOC 2 / HIPAA / FedRAMP",
+          "Garantia SLA 99.9%",
+          "Opció on-premise",
+          "Retenció legal i eDiscovery",
+          "Integracions personalitzades",
+          "Enginyer de suport dedicat",
+          "Entrenament personalitzat"
+        ]
+      }
+    }
   }
 }

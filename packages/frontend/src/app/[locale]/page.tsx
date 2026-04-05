@@ -58,6 +58,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Navbar } from "@/components/navbar";
+import { PricingSection } from "@/components/pricing-section";
 import { NeuralBackground } from "@/components/neural-bg";
 import { HeroVisual } from "@/components/hero-visual";
 import { ReadingProgress } from "@/components/reading-progress";
@@ -732,6 +733,9 @@ export default function Home() {
                 </Button>
               </Link>
             </div>
+
+            {/* Pricing Section */}
+            <PricingSection />
 
             {/* Interactive Demos Section */}
             <div className="mt-16">

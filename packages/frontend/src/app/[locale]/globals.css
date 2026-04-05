@@ -642,3 +642,37 @@ textarea:focus-visible {
     -webkit-backdrop-filter: blur(8px);
   }
 }
+"" 
+"/* ============ Pricing Section (borrowed from vivim-php) ============ */" 
+".pricing{padding:var(--space-3xl) 0;position:relative}" 
+".pricing__container{max-width:1200px;margin:0 auto;padding:0 1.5rem}"
+
+.pricing__header{text-align:center;margin-bottom:var(--space-3xl);opacity:0;transform:translateY(20px);transition:all .6s var(--ease)}
+.pricing__header.animate{opacity:1;transform:translateY(0)}
+.pricing__title{font-family:var(--font-display);font-size:clamp(2rem,4.5vw,3.5rem);font-weight:600;line-height:1.1;letter-spacing:-.02em;margin-bottom:var(--space-md);background:linear-gradient(135deg,var(--foreground),var(--muted-foreground));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pricing__subtitle{font-size:clamp(1rem,2vw,1.25rem);color:var(--muted-foreground);max-width:600px;margin:0 auto}
+.pricing__grid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-md)}
+.pricing-card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:12px;padding:var(--space-lg);display:flex;flex-direction:column;transition:all .3s var(--ease);opacity:0;transform:translateY(20px)}
+.pricing-card.animate{opacity:1;transform:translateY(0)}
+.pricing-card:hover{border-color:var(--border-accent);transform:translateY(-4px)}
+.pricing-card.animate:hover{transform:translateY(-4px)}
+.pricing-card--featured{border-color:var(--teal);box-shadow:0 0 40px var(--teal-dim);position:relative}
+.pricing-card--featured::before{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+.pricing-card--enterprise{border-color:var(--purple-dim);background:linear-gradient(180deg,var(--surface),rgba(124,110,247,.02))}
+.pricing-card__head{margin-bottom:var(--space-sm)}
+.pricing-card__badge{display:inline-block;padding:.25rem .625rem;border-radius:100px;font-size:.625rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:var(--space-sm);background:rgba(255,255,255,.05);color:var(--muted-foreground)}
+.pricing-card__name{font-family:var(--font-display);font-size:1.25rem;font-weight:600;margin-bottom:var(--space-xs)}
+.pricing-card__price{font-size:.875rem;color:var(--muted-foreground);margin-bottom:var(--space-md)}
+.pricing-card__price .mono{font-size:1.5rem;font-weight:700;color:var(--foreground);font-family:var(--font-mono)}
+.pricing-card__period{color:var(--muted-foreground);font-size:.75rem}
+.pricing-card__desc{font-size:.875rem;color:var(--muted-foreground);margin-bottom:var(--space-md);line-height:1.5}
+.pricing-card__features{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:var(--space-md);flex:1}
+.pricing-card__features li{font-size:.8125rem;color:var(--muted-foreground);padding-left:1.125rem;position:relative;line-height:1.4}
+.pricing-card__features li::before{content:'';position:absolute;left:0;top:.35rem;width:6px;height:6px;border-radius:50%;background:var(--teal)}
+.pricing-card__btn{width:100%;justify-content:center;margin-top:auto;padding:.75rem 1.5rem;border-radius:8px;font-weight:500;font-size:.875rem;text-align:center;text-decoration:none;transition:all .2s ease;display:flex;align-items:center;gap:.5rem;cursor:pointer}
+.btn--primary{background:var(--foreground);color:var(--background);border:none}
+.btn--primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn--ghost{background:transparent;color:var(--foreground);border:1px solid var(--border-accent)}
+.btn--ghost:hover{background:rgba(255,255,255,.05)}
+@media(max-width:1024px){.pricing__grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.pricing__grid{grid-template-columns:1fr}.pricing__title{font-size:1.75rem}.pricing__container{padding:0 1rem}}

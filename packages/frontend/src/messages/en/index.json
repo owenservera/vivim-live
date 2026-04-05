@@ -26,13 +26,34 @@
         "contextEngineDemo": "Context Engine Demo"
       },
       "demoDropdown": {
-        "liveMemory": { "label": "Live Memory", "desc": "See extraction in action" },
-        "contextEngine": { "label": "Context Engine", "desc": "Watch memory assembly live" },
-        "zeroKnowledgePrivacy": { "label": "Zero-Knowledge Privacy", "desc": "Your keys never leave your device" },
-        "sovereignHistory": { "label": "Sovereign History", "desc": "Complete ownership of your data" },
-        "decentralizedNetwork": { "label": "Decentralized Network", "desc": "Peer-to-peer sync without servers" },
-        "secureCollaboration": { "label": "Secure Collaboration", "desc": "Team sharing with sovereignty" },
-        "dynamicIntelligence": { "label": "Dynamic Intelligence", "desc": "Adaptive context evolution" }
+        "liveMemory": {
+          "label": "Live Memory",
+          "desc": "See extraction in action"
+        },
+        "contextEngine": {
+          "label": "Context Engine",
+          "desc": "Watch memory assembly live"
+        },
+        "zeroKnowledgePrivacy": {
+          "label": "Zero-Knowledge Privacy",
+          "desc": "Your keys never leave your device"
+        },
+        "sovereignHistory": {
+          "label": "Sovereign History",
+          "desc": "Complete ownership of your data"
+        },
+        "decentralizedNetwork": {
+          "label": "Decentralized Network",
+          "desc": "Peer-to-peer sync without servers"
+        },
+        "secureCollaboration": {
+          "label": "Secure Collaboration",
+          "desc": "Team sharing with sovereignty"
+        },
+        "dynamicIntelligence": {
+          "label": "Dynamic Intelligence",
+          "desc": "Adaptive context evolution"
+        }
       }
     },
     "cta": {
@@ -276,12 +297,30 @@
     "highlight": "Your Rules",
     "description": "Granular ownership tiers that adapt to context — personal, shared, or co-governed. Your AI memory, classified by you.",
     "tiers": {
-      "t0": { "label": "Personal Only", "desc": "You own it completely. No sharing, no governance." },
-      "t1": { "label": "Personal-Likely", "desc": "Probably personal, but open to classification review." },
-      "t2": { "label": "Shared-Possibly", "desc": "Could be shared — ready for co-governance setup." },
-      "t3": { "label": "Co-Governed", "desc": "Company gets governance. Dual-key required for exports." },
-      "t4": { "label": "Restricted", "desc": "Enhanced protection. Limited access even for you." },
-      "t5": { "label": "Regulated", "desc": "Never exports. Medical, legal, financial lockbox." }
+      "t0": {
+        "label": "Personal Only",
+        "desc": "You own it completely. No sharing, no governance."
+      },
+      "t1": {
+        "label": "Personal-Likely",
+        "desc": "Probably personal, but open to classification review."
+      },
+      "t2": {
+        "label": "Shared-Possibly",
+        "desc": "Could be shared — ready for co-governance setup."
+      },
+      "t3": {
+        "label": "Co-Governed",
+        "desc": "Company gets governance. Dual-key required for exports."
+      },
+      "t4": {
+        "label": "Restricted",
+        "desc": "Enhanced protection. Limited access even for you."
+      },
+      "t5": {
+        "label": "Regulated",
+        "desc": "Never exports. Medical, legal, financial lockbox."
+      }
     },
     "features": {
       "tdass": {
@@ -341,11 +380,26 @@
     "highlight": "Intelligence",
     "description": "Sell your data on your terms — or keep it private. Zero-knowledge proofs let buyers verify without seeing.",
     "steps": {
-      "step1": { "label": "List", "desc": "Select ACUs, set price, generate ZK proof" },
-      "step2": { "label": "Discover", "desc": "Buyers browse verified listings" },
-      "step3": { "label": "Purchase", "desc": "Escrow payment secures transaction" },
-      "step4": { "label": "Exchange", "desc": "Encrypted delivery via ECDH" },
-      "step5": { "label": "Verify", "desc": "ZK proof validation" }
+      "step1": {
+        "label": "List",
+        "desc": "Select ACUs, set price, generate ZK proof"
+      },
+      "step2": {
+        "label": "Discover",
+        "desc": "Buyers browse verified listings"
+      },
+      "step3": {
+        "label": "Purchase",
+        "desc": "Escrow payment secures transaction"
+      },
+      "step4": {
+        "label": "Exchange",
+        "desc": "Encrypted delivery via ECDH"
+      },
+      "step5": {
+        "label": "Verify",
+        "desc": "ZK proof validation"
+      }
     },
     "features": {
       "revenue": {
@@ -382,12 +436,30 @@
     "description": "VIVIM isn't just technology — it's a philosophy about who owns your AI memory.",
     "descriptionExtended": "We believe your memories, preferences, and context should never be locked to a single provider. You should always have full control, visibility, and portability.",
     "items": {
-      "sovereign": { "title": "Sovereign", "desc": "You own your memory data completely. VIVIM never claims ownership — your AI memory belongs to you, not the platform." },
-      "personal": { "title": "Personal", "desc": "Your memory is yours alone. Unlike shared databases, VIVIM creates an individual memory layer unique to each user." },
-      "providerAgnostic": { "title": "Provider Agnostic", "desc": "Switch between GPT-4, Claude, Gemini, or any AI model — your memory stays intact. No vendor lock-in, ever." },
-      "portable": { "title": "Portable", "desc": "Export your entire memory at any time in standard formats. Take your AI memory wherever you go." },
-      "useCaseAgnostic": { "title": "Use-Case Agnostic", "desc": "Works for coding assistants, customer support, education, healthcare — any application that benefits from memory." },
-      "dynamicallyGenerated": { "title": "Dynamically Generated", "desc": "Context isn't static — it's built fresh for each interaction based on what you're doing right now." }
+      "sovereign": {
+        "title": "Sovereign",
+        "desc": "You own your memory data completely. VIVIM never claims ownership — your AI memory belongs to you, not the platform."
+      },
+      "personal": {
+        "title": "Personal",
+        "desc": "Your memory is yours alone. Unlike shared databases, VIVIM creates an individual memory layer unique to each user."
+      },
+      "providerAgnostic": {
+        "title": "Provider Agnostic",
+        "desc": "Switch between GPT-4, Claude, Gemini, or any AI model — your memory stays intact. No vendor lock-in, ever."
+      },
+      "portable": {
+        "title": "Portable",
+        "desc": "Export your entire memory at any time in standard formats. Take your AI memory wherever you go."
+      },
+      "useCaseAgnostic": {
+        "title": "Use-Case Agnostic",
+        "desc": "Works for coding assistants, customer support, education, healthcare — any application that benefits from memory."
+      },
+      "dynamicallyGenerated": {
+        "title": "Dynamically Generated",
+        "desc": "Context isn't static — it's built fresh for each interaction based on what you're doing right now."
+      }
     }
   },
   "contextLayers": {
@@ -396,14 +468,46 @@
     "heading": "Intelligent Context Assembly",
     "description": "Like CPU cache levels — each layer has different latency, specificity, and refresh rates.",
     "layers": {
-      "l0": { "label": "Identity Core", "desc": "Who you are — permanent context", "tokens": "~300" },
-      "l1": { "label": "Global Preferences", "desc": "How AI should respond to you", "tokens": "~500" },
-      "l2": { "label": "Topic Context", "desc": "Deep knowledge about current topics", "tokens": "~1,500" },
-      "l3": { "label": "Entity Context", "desc": "People, projects, and tools you discuss", "tokens": "~1,000" },
-      "l4": { "label": "Conversation Arc", "desc": "Thread of current discussion", "tokens": "~2,000" },
-      "l5": { "label": "JIT Retrieval", "desc": "Real-time relevant knowledge", "tokens": "~2,500" },
-      "l6": { "label": "Message History", "desc": "Recent conversation messages", "tokens": "~3,500" },
-      "l7": { "label": "User Message", "desc": "Your current input", "tokens": "Variable" }
+      "l0": {
+        "label": "Identity Core",
+        "desc": "Who you are — permanent context",
+        "tokens": "~300"
+      },
+      "l1": {
+        "label": "Global Preferences",
+        "desc": "How AI should respond to you",
+        "tokens": "~500"
+      },
+      "l2": {
+        "label": "Topic Context",
+        "desc": "Deep knowledge about current topics",
+        "tokens": "~1,500"
+      },
+      "l3": {
+        "label": "Entity Context",
+        "desc": "People, projects, and tools you discuss",
+        "tokens": "~1,000"
+      },
+      "l4": {
+        "label": "Conversation Arc",
+        "desc": "Thread of current discussion",
+        "tokens": "~2,000"
+      },
+      "l5": {
+        "label": "JIT Retrieval",
+        "desc": "Real-time relevant knowledge",
+        "tokens": "~2,500"
+      },
+      "l6": {
+        "label": "Message History",
+        "desc": "Recent conversation messages",
+        "tokens": "~3,500"
+      },
+      "l7": {
+        "label": "User Message",
+        "desc": "Your current input",
+        "tokens": "Variable"
+      }
     },
     "totalLabel": "Total Context Window:",
     "totalTokens": "~12,300 tokens",
@@ -414,15 +518,51 @@
     "highlight": "Human-Like Memory",
     "description": "Hover to see examples of each memory type",
     "types": {
-      "episodic": { "name": "Episodic", "example": "\"Last week we discussed...\"", "label": "Episodic" },
-      "semantic": { "name": "Semantic", "example": "\"Python is your primary language\"", "label": "Semantic" },
-      "procedural": { "name": "Procedural", "example": "\"You prefer TDD methodology\"", "label": "Procedural" },
-      "factual": { "name": "Factual", "example": "\"You work as a senior engineer\"", "label": "Factual" },
-      "preference": { "name": "Preference", "example": "\"Prefers dark mode interface\"", "label": "Preference" },
-      "identity": { "name": "Identity", "example": "\"Full-stack developer\"", "label": "Identity" },
-      "relationship": { "name": "Relationship", "example": "\"John is your tech lead\"", "label": "Relationship" },
-      "goal": { "name": "Goal", "example": "\"Launch MVP by Q2\"", "label": "Goal" },
-      "project": { "name": "Project", "example": "\"E-commerce uses Next.js\"", "label": "Project" }
+      "episodic": {
+        "name": "Episodic",
+        "example": "\"Last week we discussed...\"",
+        "label": "Episodic"
+      },
+      "semantic": {
+        "name": "Semantic",
+        "example": "\"Python is your primary language\"",
+        "label": "Semantic"
+      },
+      "procedural": {
+        "name": "Procedural",
+        "example": "\"You prefer TDD methodology\"",
+        "label": "Procedural"
+      },
+      "factual": {
+        "name": "Factual",
+        "example": "\"You work as a senior engineer\"",
+        "label": "Factual"
+      },
+      "preference": {
+        "name": "Preference",
+        "example": "\"Prefers dark mode interface\"",
+        "label": "Preference"
+      },
+      "identity": {
+        "name": "Identity",
+        "example": "\"Full-stack developer\"",
+        "label": "Identity"
+      },
+      "relationship": {
+        "name": "Relationship",
+        "example": "\"John is your tech lead\"",
+        "label": "Relationship"
+      },
+      "goal": {
+        "name": "Goal",
+        "example": "\"Launch MVP by Q2\"",
+        "label": "Goal"
+      },
+      "project": {
+        "name": "Project",
+        "example": "\"E-commerce uses Next.js\"",
+        "label": "Project"
+      }
     }
   },
   "developers": {
@@ -433,10 +573,22 @@
     "description": "Everything you need to create sovereign, privacy-first AI experiences",
     "descriptionExtended": "Because your users deserve memory that they own, not memory that's locked to your platform.",
     "features": {
-      "identity": { "title": "Identity & DIDs", "desc": "Decentralized identifiers with cryptographic key management" },
-      "contextEngine": { "title": "Context Engine", "desc": "8-layer dynamic context assembly powered by ACUs" },
-      "storage": { "title": "Storage Options", "desc": "Local, SQLite, or IPFS with end-to-end encryption" },
-      "zeroKnowledge": { "title": "Zero-Knowledge", "desc": "Encryption keys never leave the user's device" }
+      "identity": {
+        "title": "Identity & DIDs",
+        "desc": "Decentralized identifiers with cryptographic key management"
+      },
+      "contextEngine": {
+        "title": "Context Engine",
+        "desc": "8-layer dynamic context assembly powered by ACUs"
+      },
+      "storage": {
+        "title": "Storage Options",
+        "desc": "Local, SQLite, or IPFS with end-to-end encryption"
+      },
+      "zeroKnowledge": {
+        "title": "Zero-Knowledge",
+        "desc": "Encryption keys never leave the user's device"
+      }
     },
     "codeExample": "npm install @vivim/sdk"
   },
@@ -505,9 +657,18 @@
       "description": "Every message triggers a bespoke 8-layer context injection, assembled from your ACU memory store in real-time. Switch scenarios below to see it rebuild from scratch.",
       "noBlackBox": "No black box. VIVIM gives you full visibility into what gets injected, why, and lets you edit any piece of it.",
       "tabs": {
-        "shift": { "label": "① Context Shift", "sub": "Watch the pipeline rebuild live" },
-        "memory": { "label": "② ACU Memory Store", "sub": "Your knowledge, atomized" },
-        "controls": { "label": "③ Your Controls", "sub": "You own this system" }
+        "shift": {
+          "label": "① Context Shift",
+          "sub": "Watch the pipeline rebuild live"
+        },
+        "memory": {
+          "label": "② ACU Memory Store",
+          "sub": "Your knowledge, atomized"
+        },
+        "controls": {
+          "label": "③ Your Controls",
+          "sub": "You own this system"
+        }
       },
       "layerLabels": {
         "l0": "Identity Core",
@@ -571,11 +732,26 @@
         "accessLogs": "Access Logs"
       },
       "layers": {
-        "clientEncryption": { "name": "Client-Side Encryption", "desc": "All data encrypted before leaving device" },
-        "transportSecurity": { "name": "Transport Security", "desc": "TLS 1.3 with perfect forward secrecy" },
-        "storageEncryption": { "name": "Storage Encryption", "desc": "AES-256-GCM encryption at rest" },
-        "accessControl": { "name": "Access Control", "desc": "Cryptographic key-based permissions" },
-        "audit": { "name": "Audit & Transparency", "desc": "Full access logging & verification" }
+        "clientEncryption": {
+          "name": "Client-Side Encryption",
+          "desc": "All data encrypted before leaving device"
+        },
+        "transportSecurity": {
+          "name": "Transport Security",
+          "desc": "TLS 1.3 with perfect forward secrecy"
+        },
+        "storageEncryption": {
+          "name": "Storage Encryption",
+          "desc": "AES-256-GCM encryption at rest"
+        },
+        "accessControl": {
+          "name": "Access Control",
+          "desc": "Cryptographic key-based permissions"
+        },
+        "audit": {
+          "name": "Audit & Transparency",
+          "desc": "Full access logging & verification"
+        }
       },
       "component": {
         "exportKeysBackup": "Export Keys (Backup)",
@@ -738,20 +914,62 @@
       "coGovernance": "Co-governance for your data",
       "description": "Explore granular ownership tiers and co-governance — see how VIVIM classifies your conversations.",
       "tiers": {
-        "t0": { "label": "Personal Only", "desc": "Complete ownership, no sharing" },
-        "t1": { "label": "Personal-Likely", "desc": "Probably personal, reviewable" },
-        "t2": { "label": "Shared-Possibly", "desc": "Ready for co-governance" },
-        "t3": { "label": "Co-Governed", "desc": "Dual-key required for exports" },
-        "t4": { "label": "Restricted", "desc": "Enhanced protection" },
-        "t5": { "label": "Regulated", "desc": "Never exports, lockbox" }
+        "t0": {
+          "label": "Personal Only",
+          "desc": "Complete ownership, no sharing"
+        },
+        "t1": {
+          "label": "Personal-Likely",
+          "desc": "Probably personal, reviewable"
+        },
+        "t2": {
+          "label": "Shared-Possibly",
+          "desc": "Ready for co-governance"
+        },
+        "t3": {
+          "label": "Co-Governed",
+          "desc": "Dual-key required for exports"
+        },
+        "t4": {
+          "label": "Restricted",
+          "desc": "Enhanced protection"
+        },
+        "t5": {
+          "label": "Regulated",
+          "desc": "Never exports, lockbox"
+        }
       },
       "sampleConversations": {
-        "dinner": { "text": "What should I make for dinner tonight?", "expectedTier": "T0", "description": "Personal, everyday question" },
-        "code": { "text": "Here's the code for the new login flow...", "expectedTier": "T3", "description": "Work-related, company asset" },
-        "medical": { "text": "My medical symptoms have been...", "expectedTier": "T5", "description": "Health information, regulated" },
-        "preference": { "text": "I prefer dark mode in all my IDEs", "expectedTier": "T1", "description": "Personal preference" },
-        "financial": { "text": "The Q4 financial projections are ready", "expectedTier": "T3", "description": "Business confidential" },
-        "general": { "text": "What are the best restaurants in Tokyo?", "expectedTier": "T0", "description": "General personal interest" }
+        "dinner": {
+          "text": "What should I make for dinner tonight?",
+          "expectedTier": "T0",
+          "description": "Personal, everyday question"
+        },
+        "code": {
+          "text": "Here's the code for the new login flow...",
+          "expectedTier": "T3",
+          "description": "Work-related, company asset"
+        },
+        "medical": {
+          "text": "My medical symptoms have been...",
+          "expectedTier": "T5",
+          "description": "Health information, regulated"
+        },
+        "preference": {
+          "text": "I prefer dark mode in all my IDEs",
+          "expectedTier": "T1",
+          "description": "Personal preference"
+        },
+        "financial": {
+          "text": "The Q4 financial projections are ready",
+          "expectedTier": "T3",
+          "description": "Business confidential"
+        },
+        "general": {
+          "text": "What are the best restaurants in Tokyo?",
+          "expectedTier": "T0",
+          "description": "General personal interest"
+        }
       },
       "actions": {
         "classify": "Classify Content",
@@ -813,19 +1031,58 @@
       "userData": "User Data",
       "algos": "13 Algos",
       "algorithmList": {
-        "spectral-mi": { "name": "Spectral Membership Inference", "description": "Primary detection via spectroscopy" },
-        "mutual-info": { "name": "Mutual Information Estimation", "description": "Quantify retained information" },
-        "kolmogorov": { "name": "Kolmogorov Uniqueness Scoring", "description": "Identify most-detectable content" },
-        "photon-counting": { "name": "Photon Counting", "description": "Per-token attribution" },
-        "interference": { "name": "Interference Pattern Detection", "description": "Cross-provider contamination" },
-        "canary": { "name": "Canary Wave Function", "description": "Proactive detection" },
-        "boltzmann": { "name": "Boltzmann Calibration", "description": "Statistical calibration" },
-        "holographic": { "name": "Holographic Watermarking", "description": "Identity encoding" },
-        "thermodynamic": { "name": "Thermodynamic Flow Tracing", "description": "Temporal absorption" },
-        "fisher": { "name": "Fisher Information Fingerprinting", "description": "Parameter influence" },
-        "entanglement": { "name": "Entanglement Testing", "description": "Hidden sharing detection" },
-        "diffraction": { "name": "Diffraction Grating Analysis", "description": "Multi-scale analysis" },
-        "conservation": { "name": "Conservation Law Verification", "description": "Complete accounting" }
+        "spectral-mi": {
+          "name": "Spectral Membership Inference",
+          "description": "Primary detection via spectroscopy"
+        },
+        "mutual-info": {
+          "name": "Mutual Information Estimation",
+          "description": "Quantify retained information"
+        },
+        "kolmogorov": {
+          "name": "Kolmogorov Uniqueness Scoring",
+          "description": "Identify most-detectable content"
+        },
+        "photon-counting": {
+          "name": "Photon Counting",
+          "description": "Per-token attribution"
+        },
+        "interference": {
+          "name": "Interference Pattern Detection",
+          "description": "Cross-provider contamination"
+        },
+        "canary": {
+          "name": "Canary Wave Function",
+          "description": "Proactive detection"
+        },
+        "boltzmann": {
+          "name": "Boltzmann Calibration",
+          "description": "Statistical calibration"
+        },
+        "holographic": {
+          "name": "Holographic Watermarking",
+          "description": "Identity encoding"
+        },
+        "thermodynamic": {
+          "name": "Thermodynamic Flow Tracing",
+          "description": "Temporal absorption"
+        },
+        "fisher": {
+          "name": "Fisher Information Fingerprinting",
+          "description": "Parameter influence"
+        },
+        "entanglement": {
+          "name": "Entanglement Testing",
+          "description": "Hidden sharing detection"
+        },
+        "diffraction": {
+          "name": "Diffraction Grating Analysis",
+          "description": "Multi-scale analysis"
+        },
+        "conservation": {
+          "name": "Conservation Law Verification",
+          "description": "Complete accounting"
+        }
       },
       "canaryTokens": {
         "ready": "Ready",
@@ -928,6 +1185,90 @@
       "T": "Time lost",
       "E": "Trust erosion",
       "M": "Market size"
+    }
+  },
+  "pricing": {
+    "sectionBadge": "Pricing",
+    "title": "Free intelligence. Paid convenience.",
+    "subtitle": "The free tier is genuinely complete. Pay only for managed convenience.",
+    "tiers": {
+      "freecore": {
+        "name": "Free",
+        "badge": "Open Core",
+        "price": "$0",
+        "period": "unlimited",
+        "description": "Full intelligence. No limits. Self-host forever.",
+        "cta": "GitHub",
+        "features": [
+          "Full 8-layer context engine",
+          "9 memory types",
+          "10+ provider parsers",
+          "Zero-knowledge encryption",
+          "MCP server",
+          "P2P network",
+          "13 detection algorithms",
+          "DID identity",
+          "TDASS co-governance",
+          "Unlimited self-hosted"
+        ]
+      },
+      "cloudPro": {
+        "name": "Cloud Pro",
+        "badge": "Most Popular",
+        "price": "$9",
+        "period": "/month",
+        "description": "Managed cloud. Multi-device. Priority support.",
+        "cta": "Get Started",
+        "features": [
+          "Everything in FreeCore",
+          "Managed cloud hosting",
+          "10 GB encrypted storage",
+          "Real-time sync",
+          "Multi-device access",
+          "Mobile app",
+          "Priority support",
+          "Automatic backups",
+          "Usage analytics"
+        ]
+      },
+      "teams": {
+        "name": "Teams",
+        "badge": "Teams",
+        "price": "$25",
+        "period": "/seat/month",
+        "description": "Shared memory. Co-governance. Team admin.",
+        "cta": "Contact Sales",
+        "features": [
+          "Everything in Cloud Pro",
+          "Team admin dashboard",
+          "Shared memory pools",
+          "TDASS co-governance",
+          "SSO integration",
+          "Audit logs",
+          "5-seat minimum",
+          "Role-based access",
+          "Team activity feed"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "badge": "Enterprise",
+        "price": "Custom",
+        "period": "",
+        "description": "Dedicated infrastructure. Compliance guaranteed.",
+        "cta": "Contact Sales",
+        "features": [
+          "Everything in Teams",
+          "Dedicated infrastructure",
+          "SOC 2 / HIPAA / FedRAMP",
+          "99.9% SLA guarantee",
+          "On-premise option",
+          "Legal hold & eDiscovery",
+          "Custom integrations",
+          "Dedicated support engineer",
+          "Custom training"
+        ]
+      }
     }
   }
 }
