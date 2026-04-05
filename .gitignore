@@ -28,6 +28,29 @@ yarn-error.log*
 .vercel
 
 # Vercel setup helpers (optional to commit)
+vercel-setup.*
+
+# Test scripts (one-off validation scripts)
+test-*.js
+test-*.mjs
+test-*.ts
+verify-*.js
+check-*.js
+
+# Session logs and AI agent artifacts
+session-ses_*.md
+.kilo/
+
+# Windows PowerShell artifacts
+$null
+NUL
+
+# Temp migration scripts (one-off scripts, not production)
+apply-*.js
+fix-*.js
+full-db-*.js
+get-actual-*.js
+migrate-*.js
 setup-vercel-env.bat
 setup-vercel-env.ps1
 setup-vercel-env.js
