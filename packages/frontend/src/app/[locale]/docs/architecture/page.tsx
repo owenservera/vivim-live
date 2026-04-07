@@ -758,13 +758,13 @@ LIMIT 20;`}
                 <tr className="border-b border-white/5">
                   <td className="py-3 px-4 font-mono text-violet-300">chat:message</td>
                   <td className="py-3 px-4"><span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-xs">Server → Client</span></td>
-                  <td className="py-3 px-4 font-mono text-xs">{message, conversationId}</td>
+                  <td className="py-3 px-4 font-mono text-xs">`message, conversationId`</td>
                   <td className="py-3 px-4 text-xs">Streams AI response tokens in real-time during generation</td>
                 </tr>
                 <tr className="border-b border-white/5">
                   <td className="py-3 px-4 font-mono text-violet-300">chat:send</td>
                   <td className="py-3 px-4"><span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-xs">Client → Server</span></td>
-                  <td className="py-3 px-4 font-mono text-xs">{content, conversationId, provider}</td>
+                  <td className="py-3 px-4 font-mono text-xs">`content, conversationId, provider`</td>
                   <td className="py-3 px-4 text-xs">Sends user message to initiate AI response streaming</td>
                 </tr>
                 <tr className="border-b border-white/5">
