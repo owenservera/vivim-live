@@ -486,7 +486,13 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10 scroll-animate">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                {providers('title')}
+                {providers.rich('title', {
+                  highlight: (chunks: React.ReactNode[]) => (
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-cyan-400">
+                      {chunks}
+                    </span>
+                  ),
+                })}
               </h2>
               <p className="text-slate-400">
                 {providers('description')}
