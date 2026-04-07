@@ -25,84 +25,79 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://vivim.live"),
-  title: {
-    default: "VIVIM - Sovereign, Portable, Personal AI Memory",
-    template: "%s | VIVIM",
-  },
-  description: "Give your AI a brain that never forgets. VIVIM provides intelligent context management, persistent memory, and semantic storage that works with all AI providers.",
-  keywords: ["VIVIM", "AI Memory", "LLM", "Context Engine", "ACU", "Atomic Chat Units", "Personal AI", "Memory Layer", "AI Context Management"],
-  authors: [{ name: "VIVIM" }],
-  creator: "VIVIM",
-  publisher: "VIVIM",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  alternates: {
-    canonical: "https://vivim.live",
-  },
-  openGraph: {
-    title: "VIVIM - The Living Memory for Your AI",
-    description: "Sovereign, portable, personal AI memory that works with all providers",
-    url: "https://vivim.live",
-    siteName: "VIVIM",
-    type: "website",
-    images: [
-      {
-        url: "https://vivim.live/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "VIVIM - Sovereign, Portable, Personal AI Memory",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "VIVIM - The Living Memory for Your AI",
-    description: "Sovereign, portable, personal AI memory that works with all providers",
-    creator: "@vivim",
-    images: ["https://vivim.live/twitter-image.png"],
-  },
-  icons: {
-    icon: "/favicon.png",
-    apple: "/apple-touch-icon.png",
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "VIVIM",
-  },
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  manifest: "/manifest.json",
-  other: {
-    "theme-color": "#020617",
-    "mask-icon": "/mask-icon.svg",
-  },
-};
-
 export async function generateMetadata(
   { params }: { params: Promise<{ locale: string }> },
-  parent: ResolvingMetadata
+  _parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { locale } = await params;
   const ogLocale = OG_LOCALE_MAP[locale] || 'en_US';
 
   return {
+    metadataBase: new URL("https://vivim.live"),
+    title: {
+      default: "VIVIM - Sovereign, Portable, Personal AI Memory",
+      template: "%s | VIVIM",
+    },
+    description: "Give your AI a brain that never forgets. VIVIM provides intelligent context management, persistent memory, and semantic storage that works with all AI providers.",
+    keywords: ["VIVIM", "AI Memory", "LLM", "Context Engine", "ACU", "Atomic Chat Units", "Personal AI", "Memory Layer", "AI Context Management"],
+    authors: [{ name: "VIVIM" }],
+    creator: "VIVIM",
+    publisher: "VIVIM",
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+    alternates: {
+      canonical: "https://vivim.live",
+    },
     openGraph: {
+      title: "VIVIM - The Living Memory for Your AI",
+      description: "Sovereign, portable, personal AI memory that works with all providers",
+      url: "https://vivim.live",
+      siteName: "VIVIM",
       locale: ogLocale,
+      type: "website",
+      images: [
+        {
+          url: "https://vivim.live/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: "VIVIM - Sovereign, Portable, Personal AI Memory",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "VIVIM - The Living Memory for Your AI",
+      description: "Sovereign, portable, personal AI memory that works with all providers",
+      creator: "@vivim",
+      images: ["https://vivim.live/twitter-image.png"],
+    },
+    icons: {
+      icon: "/favicon.png",
+      apple: "/apple-touch-icon.png",
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: "VIVIM",
+    },
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    manifest: "/manifest.json",
+    other: {
+      "theme-color": "#020617",
+      "mask-icon": "/mask-icon.svg",
     },
   };
 }
