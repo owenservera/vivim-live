@@ -788,7 +788,7 @@ LIMIT 20;`}
                 <tr className="border-b border-white/5">
                   <td className="py-3 px-4 font-mono text-violet-300">connection:status</td>
                   <td className="py-3 px-4"><span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 text-xs">Bidirectional</span></td>
-                  <td className="py-3 px-4 font-mono text-xs">{status: 'connected' | 'disconnected'}</td>
+                  <td className="py-3 px-4 font-mono text-xs">`status: connected | disconnected`</td>
                   <td className="py-3 px-4 text-xs">Tracks WebSocket connection state for UI feedback</td>
                 </tr>
                 <tr className="border-b border-white/5">

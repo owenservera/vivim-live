@@ -185,8 +185,8 @@ const MEMORY_TYPES = [
       storage: "Goal objects with status, priority, and deadline attributes",
       retrieval: "Relevance-based matching to current conversation context",
       tokenBudget: "~600-1,200 tokens for active goals",
-      decayStrategy: "Completion or expiration-based archival, active goals persist",
-    ],
+      decayStrategy: "Completion or expiration-based archival",
+    },
   },
   {
     name: "Project",
@@ -204,8 +204,8 @@ const MEMORY_TYPES = [
       storage: "Project objects with nested ACU sequences and metadata",
       retrieval: "Project-context matching with temporal relevance",
       tokenBudget: "~1,500-3,000 tokens per active project",
-      decayStrategy: "Activity-based, dormant projects archive with summary preservation",
-    ],
+      decayStrategy: "Completion or expiration-based archival",
+    },
   },
 ];
 
